@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, FlatList, StyleSheet, TouchableOpacity, Image, ScrollView, Button } from 'react-native';
 import { ListItem } from 'react-native-elements';
-import { Picker } from '@react-native-picker/picker';
 import PlaceDetailsModal from './PlaceDetailsModal';
 import ConfirmedDestinationListModal from './confirmedDestinationListModal'; // Import the modal
 import Dialog from 'react-native-dialog';

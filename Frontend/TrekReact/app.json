@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "destinationSelect",
-    "slug": "destinationSelect",
+    "name": "TrekReact",
+    "slug": "TrekReact",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
