@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, TextInput, ScrollView, StyleSheet, Modal, Dimensions } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import NavBar from '../NavBar';
 
 const ImageFeed = () => {
   const [likes, setLikes] = useState(Array(5).fill(0));
@@ -118,6 +119,9 @@ const ImageFeed = () => {
           </View>
         </Modal>
       )}
+      <View style={styles.navBarContainer}>
+        <NavBar />
+    </View>
     </View>
   );
 };
@@ -221,6 +225,13 @@ const styles = StyleSheet.create({
     top: 60,
     right: 20,
     zIndex: 1,
+  },
+  navBarContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#fff',
   },
 });
 

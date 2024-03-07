@@ -23,11 +23,11 @@ const categories = [
 const NearbyDestinationsScreen = () => {
   
   const route = useRoute();
-  const { lastLongitude, lastLatitude, radius} = route.params;
+  const { longitude, latitude, radius} = route.params;
   useEffect(() => {
     // Log the lastLongitude and lastLatitude when the component mounts
-    console.log('Last Longitude:', lastLongitude);
-    console.log('Last Latitude:', lastLatitude);
+    console.log('Last Longitude:', longitude);
+    console.log('Last Latitude:', latitude);
     console.log(radius);
     //console.log(isCurrentLocation);
   }, []);
@@ -49,7 +49,7 @@ const NearbyDestinationsScreen = () => {
 
   const fetchNearbyDestinations = async () => {
     try {
-      let url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lastLatitude},${lastLongitude}&radius=${radius}&key=${GOOGLE_PLACES_API_KEY}`;
+      let url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&key=${GOOGLE_PLACES_API_KEY}`;
      
       if (selectedType) {
         if (selectedType === "restaurant_cafe") {
