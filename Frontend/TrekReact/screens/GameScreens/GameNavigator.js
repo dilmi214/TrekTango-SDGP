@@ -5,6 +5,7 @@ import NearbyDestinationsScreen from './DestinationList'; // Import your second 
 import SelectStartLocationScreen from './StartLocationSetting';
 import StartGameScreen from './StartGameUI';
 import GameMapScreen from './MainGameUI';
+import LocationSelectionScreen from './LocationSelection2';
 
 const Stack = createStackNavigator();
 
@@ -12,7 +13,15 @@ function GameNavigation() {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="Location Selection "
+        name="LocationSelectionScreen"
+        component={LocationSelectionScreen}
+        options={{ 
+          headerShown: false, 
+          gestureEnabled: false 
+        }} 
+      />
+      <Stack.Screen
+        name="Location Selection"
         component={App}
         options={{ 
           headerShown: false, 
@@ -23,8 +32,8 @@ function GameNavigation() {
         name="NearbyDestinations"
         component={NearbyDestinationsScreen}
         options={{
-          headerShown: false, // Hide the header for the "NearbyDestinations" screen
-          gestureEnabled: false //prevents going back to previous screen by swiping
+          headerShown: false, 
+          gestureEnabled: false,
         }}
       />
       <Stack.Screen
