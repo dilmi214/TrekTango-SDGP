@@ -6,6 +6,7 @@ import SelectStartLocationScreen from './StartLocationSetting';
 import StartGameScreen from './StartGameUI';
 import GameMapScreen from './MainGameUI';
 import LocationSelectionScreen from './LocationSelection2';
+import  CurrentLocationScreen from './CurrentInitialLocation';
 
 const Stack = createStackNavigator();
 
@@ -15,6 +16,14 @@ function GameNavigation() {
       <Stack.Screen
         name="LocationSelectionScreen"
         component={LocationSelectionScreen}
+        options={{ 
+          headerShown: false, 
+          gestureEnabled: false 
+        }} 
+      />
+      <Stack.Screen
+        name="CurrentLocation"
+        component={CurrentLocationScreen}
         options={{ 
           headerShown: false, 
           gestureEnabled: false 
