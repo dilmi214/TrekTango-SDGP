@@ -43,7 +43,9 @@ const SearchLocationScreen = ({ navigation }) => {
       navigation.navigate('RadiusSetScreen', { latitude, longitude });
     } else {
       setShowSnackbar(true);
-
+      setTimeout(() => {
+        setShowSnackbar(false);
+      }, 1201); 
     }
   };
 
@@ -114,7 +116,7 @@ const SearchLocationScreen = ({ navigation }) => {
       <Snackbar
         visible={showSnackbar}
         message="No place has been selected."
-        duration={3000}
+        duration={1200}
         action={{ label: 'Dismiss', onPress: () => setShowSnackbar(false) }}
       />
     )}

@@ -5,6 +5,8 @@ import PlaceDetailsModal from './PlaceDetailsModal';
 import ConfirmedDestinationListModal from './confirmedDestinationListModal'; // Import the modal
 import Dialog from 'react-native-dialog';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import NavBar from '../../NavBar';
+import CustomDialog from '../CustomDialog';
 
 const GOOGLE_PLACES_API_KEY = "AIzaSyCCHxfnoWl-DNhLhKcjhCTiHYNY917ltL8";
 
@@ -41,6 +43,7 @@ const NearbyDestinationsScreen = () => {
   const [selectedPlacesIds, setSelectedPlacesIds] = useState([]); // Array to store selected place IDs
   const [confirmedModalVisible, setConfirmedModalVisible] = useState(false); 
   const [showBackDialog, setShowBackDialog] = useState(false); // State to track whether to show the back dialog
+  const [showDialog, setShowDialog] = useState(false);
 
   const navigation = useNavigation();
   useEffect(() => {
@@ -171,11 +174,10 @@ const toggleConfirmedModal = () => {
   setConfirmedModalVisible(!confirmedModalVisible);
 };
 
-const handleBackDialogResponse = (response) => {
-  // If the user agrees to go back, proceed
-  if (response === 'back') {
+const handleBackDialogResponse = (option) => {
+  if (option === 'Back') {
     navigation.goBack(); // Navigate back to the previous screen
-    // Implement logic to handle going back
+
   }
   // Hide the dialog box
   setShowBackDialog(false);
@@ -213,12 +215,13 @@ const handleBackDialogResponse = (response) => {
           </View>
         }
       </View>
-      <Dialog.Container visible={showBackDialog}>
-        <Dialog.Title>Confirmation</Dialog.Title>
-        <Dialog.Description>Do you want to go back?</Dialog.Description>
-        <Dialog.Button label="Cancel" onPress={() => handleBackDialogResponse('cancel')} />
-        <Dialog.Button label="Back" onPress={() => handleBackDialogResponse('back')} />
-      </Dialog.Container>
+      <CustomDialog
+        visible={showBackDialog}
+        title="Confirmation"
+        message="Do you want to go back?"
+        options={['Cancel', 'Back']}
+        onSelect={handleBackDialogResponse}
+      />
       <PlaceDetailsModal
         visible={modalVisible}
         place={selectedPlace}
@@ -226,6 +229,7 @@ const handleBackDialogResponse = (response) => {
         onAddToList={addToPlacesList} // Pass the function as a prop to the modal
         selectedPlacesIds={selectedPlacesIds} // Pass selectedPlacesIds as a prop
       />
+
       <ConfirmedDestinationListModal
         visible={confirmedModalVisible}
         onClose={toggleConfirmedModal}
@@ -255,7 +259,9 @@ const handleBackDialogResponse = (response) => {
         keyExtractor={(item) => item.place_id}
       />
     </View>
-
+    <View style={styles.navBarContainer}>
+        <NavBar />
+    </View>
     </View> 
   );
 };
@@ -317,6 +323,13 @@ const styles = StyleSheet.create({
   },
   flatListContainer: {
     zIndex: 0,
+  },
+  navBarContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#fff',
   },
 });
 

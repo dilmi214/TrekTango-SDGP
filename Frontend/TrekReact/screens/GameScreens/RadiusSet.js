@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { View, StyleSheet, Dimensions, TouchableOpacity, Text, ScrollView } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker, Circle } from 'react-native-maps';
 import Constants from 'expo-constants';
+import NavBar from '../../NavBar';
 
 import CustomDialog from '../CustomDialog';
 
@@ -114,6 +115,9 @@ const RadiusSetScreen = ({ route, navigation }) => {
           )}
         </TouchableOpacity>
       </View>
+      <View style={styles.navBarContainer}>
+        <NavBar />
+    </View>
     </View>
   );
 };
@@ -135,23 +139,25 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     width: '100%',
-    zIndex: 2,
+    zIndex: 1,
   },
   button: {
     backgroundColor: 'rgba(255, 255, 255, 0.5)',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
+    zIndex: 1,
   },
   buttonText: {
     fontSize: 16,
     fontWeight: 'bold',
+
   },
   radiusContainer: {
     position: 'absolute',
     top: Constants.statusBarHeight + 20,
     zIndex: 1,
-    width: '100%',
+    width: '50%',
     alignItems: 'center',
   },
   selectedRadiusContainer: {
@@ -166,19 +172,26 @@ const styles = StyleSheet.create({
   },
   dropdownContainer: {
     position: 'absolute',
-    top: Constants.statusBarHeight + 5, // Adjust the top position as needed
+    top: Constants.statusBarHeight - 11, // Adjust the top position as needed
     backgroundColor: '#fff',
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 5,
     maxHeight: 150,
-    zIndex: 2,
+    zIndex: 1,
   },
   dropdownItem: {
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
+  },
+  navBarContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#fff',
   },
 });
 
