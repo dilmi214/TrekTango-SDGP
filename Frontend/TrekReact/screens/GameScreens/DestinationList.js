@@ -171,11 +171,6 @@ const toggleConfirmedModal = () => {
   setConfirmedModalVisible(!confirmedModalVisible);
 };
 
-const onBackButtonPress = () => {
-  // Show the back dialog
-  setShowBackDialog(true);
-};
-
 const handleBackDialogResponse = (response) => {
   // If the user agrees to go back, proceed
   if (response === 'back') {
@@ -297,7 +292,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
-    zIndex: 2,
+    zIndex: 5,
   },
   destinationListContainer: {
     flex: 1,
@@ -319,10 +314,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
     fontWeight: 'bold',
-  },
-  destinationListContainer: {
-    flex: 1,
-    zIndex: 0,
   },
   flatListContainer: {
     zIndex: 0,

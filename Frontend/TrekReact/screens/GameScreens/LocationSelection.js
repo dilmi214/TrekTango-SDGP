@@ -25,7 +25,7 @@ const INITIAL_POSITION = {
 export default function App() {
   const [lastSelectedLocation, setLastSelectedLocation] = useState(null); // Keep track of the last selected location
   const [circlePosition, setCirclePosition] = useState(null);
-  const [isConfirmationMode, setIsConfirmationMode] = useState(false);
+  const [isLocationConfirmed, setIsLocationConfirmed] = useState(false);
   const [error, setError] = useState(null); // State to track errors
   const [dialogVisible, setDialogVisible] = useState(false); // State to track dialog visibility
   const [errorDialogVisible, setErrorDialogVisible] = useState(false); // State to track error dialog visibility
@@ -90,6 +90,7 @@ export default function App() {
     }
   };
 
+
   const showConfirmationDialog = () => {
     if (!lastSelectedLocation) {
       setError('No location has been selected, please select a location.');
@@ -100,7 +101,7 @@ export default function App() {
   };
 
   const continueConfirmation = () => {
-    setIsConfirmationMode(true);
+    setIsLocationConfirmed(true);
     drawCircle();
     hideConfirmationDialog();   
   };
@@ -144,12 +145,6 @@ export default function App() {
     });
   };
 
-  const handleRadiusChange = (text) => {
-    // Validate if text is a number and update the radius state
-    if (!isNaN(text)) {
-      setRadius(parseInt(text));
-    }   
-  };
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -163,7 +158,7 @@ export default function App() {
   const handleBackDialogResponse = (response) => {
     // If the user agrees to go back, proceed
     if (response === 'back') {
-      setIsConfirmationMode(false);
+      setIsLocationConfirmed(false);
       setCirclePosition(null);
     }
     // Hide the dialog box
@@ -195,7 +190,7 @@ export default function App() {
             onPress={() => console.log("Marker pressed!")}
           />
         )}
-        {isConfirmationMode && circlePosition && (
+        {isLocationConfirmed && circlePosition && (
           <Circle
             center={circlePosition}
             radius={radius} // Use the radius state value
@@ -206,7 +201,7 @@ export default function App() {
         )}
       </MapView>
     </View>
-      {!isConfirmationMode && (
+      {!isLocationConfirmed && (
         <View style={styles.searchContainer}>
           <GooglePlacesAutocomplete
             styles={{    
@@ -228,7 +223,8 @@ export default function App() {
               overflow: 'scroll', 
             },
           }}
-            placeholder="Search Location"
+          placeholder={"Search Location"}
+            
             fetchDetails
             onPress={(data, details = null) => {
               onPlaceSelected(details);
@@ -265,7 +261,7 @@ export default function App() {
         <Dialog.Button label="Cancel" onPress={() => handleBackDialogResponse('cancel')} />
         <Dialog.Button label="Back" onPress={() => handleBackDialogResponse('back')} />
       </Dialog.Container>
-      {isConfirmationMode && (
+      {isLocationConfirmed && (
         <View style={styles.buttonContainer}>
           <TouchableOpacity onPress={onBackButtonPress} style={styles.backButton}>
             <Text>Back</Text>
