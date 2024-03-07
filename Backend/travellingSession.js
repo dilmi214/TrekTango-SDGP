@@ -46,7 +46,7 @@ const Location = mongoose.model('Location', locationSchema);
 
 
     /**
-     * Allows to change the starting place ID
+     * Allows to change the starting place ID 
     */
   app.put('/locations/:sessionId', async (req, res) => {
     try {
@@ -104,10 +104,8 @@ app.put('/locations/:sessionId/add-place', async (req, res) => {
         // Add the new placeId to the listOfPlaceIds array
         location.listOfPlaceIds.push({ placeId });
 
-        // Save the updated location
         await location.save();
 
-        // Send back the updated location as a response
         res.json({ location });
     } catch (error) {
         console.error('Error adding place ID:', error);
@@ -128,7 +126,6 @@ app.get('/locations/:username', async (req, res) => {
         // Find all locations for the given username
         const locations = await Location.find({ username });
 
-        // Send back the locations as a response
         res.json({ locations });
     } catch (error) {
         console.error('Error retrieving locations:', error);
@@ -150,7 +147,6 @@ app.get('/places/:sessionId', async (req, res) => {
       // Extract place IDs from each location
       const placeIds = locations.map(location => location.listOfPlaceIds).flat();
 
-      // Send back the array of place IDs as a response
       res.json({ placeIds });
   } catch (error) {
       console.error('Error fetching place IDs:', error);
@@ -158,7 +154,7 @@ app.get('/places/:sessionId', async (req, res) => {
   }
 });
 
-//add a placeID
+
 
 
 
@@ -190,10 +186,10 @@ app.put('/locations/:sessionId', async (req, res) => {
         // Replace the old placeId with the new one
         location.listOfPlaceIds[index].placeId = newPlaceId;
 
-        // Save the updated location
+     
         const updatedLocation = await location.save();
 
-        // Send back the updated location as a response
+        
         res.json({ updatedLocation });
     } catch (error) {
         console.error('Error updating place ID:', error);
@@ -249,10 +245,9 @@ app.delete('/locations/:sessionId/:placeId', async (req, res) => {
         // Remove the placeId, complete, and listOfImageReferenceIds at the found index
         location.listOfPlaceIds.splice(index, 1);
 
-        // Save the updated location
         const updatedLocation = await location.save();
 
-        // Send back the updated location as a response
+       
         res.json({ updatedLocation });
     } catch (error) {
         console.error('Error deleting place ID:', error);
@@ -285,7 +280,7 @@ app.put('/update-place/:sessionId/:placeId', async (req, res) => {
       // Set the corresponding image reference to null
       location.listOfImageReferenceIds[index] = null;
 
-      // Save the updated location document
+     
       await location.save();
 
       return res.status(200).json({ message: 'PlaceId updated successfully' });
@@ -331,7 +326,7 @@ app.put('/complete-place/:sessionId/:placeId', async (req, res) => {
             location.sessionComplete = true;
         }
 
-        // Save the updated location document
+      
         await location.save();
 
         return res.status(200).json({ message: 'Place marked as complete successfully' });
