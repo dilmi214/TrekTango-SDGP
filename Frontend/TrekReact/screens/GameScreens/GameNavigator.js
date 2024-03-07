@@ -6,7 +6,8 @@ import SelectStartLocationScreen from './StartLocationSetting';
 import StartGameScreen from './StartGameUI';
 import GameMapScreen from './MainGameUI';
 import LocationSelectionScreen from './LocationSelection2';
-import  CurrentLocationScreen from './CurrentInitialLocation';
+import  RadiusSetScreen from './RadiusSet';
+import SearchLocationScreen from './SearchInitialLocation';
 
 const Stack = createStackNavigator();
 
@@ -22,8 +23,16 @@ function GameNavigation() {
         }} 
       />
       <Stack.Screen
-        name="CurrentLocation"
-        component={CurrentLocationScreen}
+        name="RadiusSetScreen"
+        component={RadiusSetScreen}
+        options={{ 
+          headerShown: false, 
+          gestureEnabled: false 
+        }} 
+      />
+      <Stack.Screen
+        name="SearchLocation"
+        component={SearchLocationScreen}
         options={{ 
           headerShown: false, 
           gestureEnabled: false 

@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import * as Location from 'expo-location';
 import { useNavigation } from '@react-navigation/native';
+import NavBar from '../../NavBar';
 
 const LocationSelectionScreen = ({ navigation }) => {
   const handleCurrentLocationPress = async () => {
@@ -20,16 +21,15 @@ const LocationSelectionScreen = ({ navigation }) => {
       const latitude = location.coords.latitude;
       const longitude = location.coords.longitude;
       
-      // Handle the current location data, you can navigate to another screen or perform any other actions
       console.log('Current Location:', { latitude, longitude });
-      navigation.navigate('CurrentLocation', { latitude, longitude });
+      navigation.navigate('RadiusSetScreen', { latitude, longitude });
     } catch (error) {
       console.error('Error getting current location:', error);
     }
   };
 
   const handleSearchLocationPress = () => {
-    // Handle navigation or any other action for searching location
+    navigation.navigate('SearchLocation');
   };
 
   return (
@@ -42,7 +42,11 @@ const LocationSelectionScreen = ({ navigation }) => {
       <TouchableOpacity style={styles.button} onPress={handleSearchLocationPress}>
         <Text style={styles.buttonText}>Select from Search</Text>
       </TouchableOpacity>
+      <View style={styles.navBarContainer}>
+        <NavBar />
+      </View>
     </View>
+
   );
 };
 
@@ -74,6 +78,12 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontSize: 18,
+  },
+  navBarContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
 });
 

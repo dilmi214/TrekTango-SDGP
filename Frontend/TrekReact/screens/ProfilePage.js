@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import NavBar from '../NavBar';
 
 const ProfilePage = () => {
   const [likes, setLikes] = useState(Array(3).fill(0));
@@ -109,6 +110,9 @@ const ProfilePage = () => {
           ))}
         </View>
       </ScrollView>
+      <View style={styles.navBarContainer}>
+        <NavBar />
+      </View>
     </View>
   );
 };
@@ -246,6 +250,13 @@ const styles = StyleSheet.create({
   },
   scroll: {
     backgroundColor: '#010C33',
+  },
+  navBarContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#fff',
   },
 });
 
