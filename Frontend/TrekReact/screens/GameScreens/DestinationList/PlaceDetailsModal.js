@@ -17,12 +17,12 @@ const PlaceDetailsModal = ({ visible, place, onClose, onAddToList, selectedPlace
       name: place.name,
       latitude: place.geometry.location.lat,
       longitude: place.geometry.location.lng
+      //can get photos, address all that from here
     };
 
-    // Pass the added place data back to the parent component
     onAddToList(placeData);
   };
-  
+
   const handleNextReview = () => {
     setCurrentReviewIndex(currentReviewIndex === place.reviews.length - 1 ? 0 : currentReviewIndex + 1);
   };

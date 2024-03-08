@@ -79,16 +79,40 @@ const NearbyDestinationsScreen = () => {
 
   const handleAddToList = (placeData) => {
     const isPlaceAlreadyAdded = selectedPlacesIds.some(item => item.place_id === placeData.place_id);
-
+    
     if (isPlaceAlreadyAdded) {
       setPlaceDetailsModalVisible(false);
       setSnackbarMessage('Place is already in the list!');
       setShowSnackbar(true);
       setTimeout(() => {
         setShowSnackbar(false);
-      }, 1200); // Snackbar duration
+      }, 1201);
+    } else if (selectedPlacesIds.length >= 8) {
+      setPlaceDetailsModalVisible(false);
+      setSnackbarMessage('Max destination limit reached!');
+      setShowSnackbar(true);
+      setTimeout(() => {
+        setShowSnackbar(false);
+      }, 1201);
     } else {
       setSelectedPlacesIds(prevPlaces => [...prevPlaces, placeData]);
+      setPlaceDetailsModalVisible(false);
+      setSnackbarMessage('Destination added to list successfully!');
+      setShowSnackbar(true);
+      setTimeout(() => {
+        setShowSnackbar(false);
+      }, 1201); 
+    }
+  };
+  const checkSelectedPlacesCount = () => {
+    if (selectedPlacesIds.length > 3) {
+      navigation.navigate('SelectStartLocationScreen', { selectedPlacesIds });
+    } else {
+      setSnackbarMessage('You need to select at least three destinations.');
+      setShowSnackbar(true);
+      setTimeout(() => {
+        setShowSnackbar(false);
+      }, 1201); 
     }
   };
 
@@ -104,7 +128,7 @@ const NearbyDestinationsScreen = () => {
         <TouchableOpacity style={styles.button} onPress={() => setExpanded(!expanded)}>
           <Text style={styles.buttonText}>Edit List</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => setExpanded(!expanded)}>
+        <TouchableOpacity style={styles.button} onPress={checkSelectedPlacesCount}>
           <Text style={styles.buttonText}>Next</Text>
         </TouchableOpacity>
       </View>
