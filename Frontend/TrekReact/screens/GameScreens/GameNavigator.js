@@ -1,7 +1,7 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import App from './LocationSelection';
-import NearbyDestinationsScreen from './DestinationList/DestinationList'; // Import your second code component
+import NearbyDestinationsScreen from './DestinationList/DestinationList2'; // Import your second code component
 import SelectStartLocationScreen from './StartLocationSetting';
 import StartGameScreen from './StartGameUI';
 import GameMapScreen from './MainGameUI';

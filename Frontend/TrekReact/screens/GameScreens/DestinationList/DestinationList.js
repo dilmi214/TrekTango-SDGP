@@ -7,6 +7,7 @@ import Dialog from 'react-native-dialog';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import NavBar from '../../CustomComponents/NavBar';
 import CustomDialog from '../../CustomComponents/CustomDialog';
+import Snackbar from '../../CustomComponents/Snackbar';
 
 const GOOGLE_PLACES_API_KEY = "AIzaSyCCHxfnoWl-DNhLhKcjhCTiHYNY917ltL8";
 
@@ -22,7 +23,7 @@ const categories = [
   { label: "Museums", value: "museum" }
 ];
 
-const NearbyDestinationsScreen = () => {
+const NearbyDestinationsScreen2 = () => {
   
   const route = useRoute();
   const { longitude, latitude, radius} = route.params;
@@ -44,6 +45,9 @@ const NearbyDestinationsScreen = () => {
   const [confirmedModalVisible, setConfirmedModalVisible] = useState(false); 
   const [showBackDialog, setShowBackDialog] = useState(false); // State to track whether to show the back dialog
   const [showDialog, setShowDialog] = useState(false);
+
+
+
 
   const navigation = useNavigation();
   useEffect(() => {
@@ -329,8 +333,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#fff',
   },
 });
 
-export default NearbyDestinationsScreen;
+export default NearbyDestinationsScreen2;

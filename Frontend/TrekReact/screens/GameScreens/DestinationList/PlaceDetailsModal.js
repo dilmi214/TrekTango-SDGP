@@ -1,37 +1,13 @@
 import React, { useState } from 'react';
-import { View, Modal, Text, StyleSheet, Button, Image, ScrollView, TouchableWithoutFeedback, PanResponder, Animated, Alert } from 'react-native';
+import { View, Modal, Text, StyleSheet, Button, Image, ScrollView, Alert, TouchableOpacity } from 'react-native';
 
 const PlaceDetailsModal = ({ visible, place, onClose, onAddToList, selectedPlacesIds }) => {
   const [currentReviewIndex, setCurrentReviewIndex] = useState(0);
-  const panY = React.useRef(new Animated.Value(0)).current;
-  const maxContentHeight = 500; //height of modal
-
-  const handlePanResponderMove = (_, gestureState) => {
-    Animated.event([null, { dy: panY }], { useNativeDriver: false })(_, gestureState);
-  };
-
-  const handlePanResponderRelease = (_, gestureState) => {
-    if (gestureState.dy > 50) {
-      onClose();
-    } else {
-      Animated.spring(panY, {
-        toValue: 0,
-        useNativeDriver: false,
-      }).start();
-    }
-  };
-
-  const panResponder = React.useMemo(
-    () =>
-      PanResponder.create({
-        onMoveShouldSetPanResponder: () => true,
-        onPanResponderMove: handlePanResponderMove,
-        onPanResponderRelease: handlePanResponderRelease,
-      }),
-    [handlePanResponderMove, handlePanResponderRelease]
-  );
+  const GOOGLE_API_KEY = "AIzaSyCCHxfnoWl-DNhLhKcjhCTiHYNY917ltL8";
 
   const handleAddToList = () => {
+    if (!place) return;
+
     const placeData = {
       place_id: place.place_id,
       name: place.name,
@@ -39,14 +15,9 @@ const PlaceDetailsModal = ({ visible, place, onClose, onAddToList, selectedPlace
       longitude: place.geometry.location.lng
     };
 
-    
-  
-    // Check if the place object is already in the array
     const isPlaceAlreadyAdded = selectedPlacesIds.some(item => item.place_id === placeData.place_id);
-  
-    // Check if the array has more than 8 items
     const isLimitReached = selectedPlacesIds.length >= 8;
-  
+
     if (isPlaceAlreadyAdded) {
       Alert.alert("Alert", "Place is already in the list!");
     } else if (isLimitReached) {
@@ -56,10 +27,10 @@ const PlaceDetailsModal = ({ visible, place, onClose, onAddToList, selectedPlace
       Alert.alert("Success", "Place has been successfully added to the list!");
     }
   };
+
   const handleNextReview = () => {
     setCurrentReviewIndex(currentReviewIndex === place.reviews.length - 1 ? 0 : currentReviewIndex + 1);
   };
-
 
   const handlePreviousReview = () => {
     setCurrentReviewIndex(currentReviewIndex === 0 ? place.reviews.length - 1 : currentReviewIndex - 1);
@@ -68,36 +39,31 @@ const PlaceDetailsModal = ({ visible, place, onClose, onAddToList, selectedPlace
   if (!place) {
     return null; // If place is null, return null or display loading indicator
   }
-
-  return (
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={visible}
-      onRequestClose={onClose}
-    >
-      <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.overlay} />
-      </TouchableWithoutFeedback>
-      <Animated.View
-        style={[styles.modalContainer, { transform: [{ translateY: panY }] }]}
-        {...panResponder.panHandlers}
-      >
-        <ScrollView style={[styles.modalContent, { maxHeight: maxContentHeight }]}>
-          <Text style={styles.placeName}>{place && place.name}</Text>
-          <Text style={styles.placeAddress}>{place.vicinity}</Text>
-          {place.photos && place.photos.length > 0 && (
-            <ScrollView horizontal style={styles.imageContainer}>
-              {place.photos.map((photo, index) => (
-                <Image
-                  key={index}
-                  source={{ uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photo.photo_reference}&key=AIzaSyCCHxfnoWl-DNhLhKcjhCTiHYNY917ltL8` }}
-                  style={styles.placeImage}
-                />
-              ))}
+return (
+  <Modal visible={visible} onRequestClose={onClose} transparent={true}>
+  <View style={styles.modalContainer}>
+    <View style={styles.modalContent}>
+    <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+          <Text style={styles.closeButtonText}>X</Text>
+    </TouchableOpacity>
+      <ScrollView style={styles.scrollView}>
+        <Text style={styles.placeName}>{place && place.name}</Text>
+        <Text style={styles.placeAddress}>{place.vicinity}</Text>
+        {place.photos && place.photos.length > 0 && (
+          <View style={styles.imageContainer}>
+            <ScrollView horizontal={true}>
+              <View style={styles.imageRow}>
+                {place.photos.map((photo, index) => (
+                  <Image
+                    key={index}
+                    source={{ uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photo.photo_reference}&key=${GOOGLE_API_KEY}` }}
+                    style={styles.placeImage}
+                  />
+                ))}
+              </View>
             </ScrollView>
-          )}
-         
+          </View>
+        )}
           <View style={styles.ratingContainer}>
             <Text style={styles.detailsText}>Rating: {place.rating ? place.rating : "Not available"}</Text>
           </View>
@@ -106,19 +72,17 @@ const PlaceDetailsModal = ({ visible, place, onClose, onAddToList, selectedPlace
           ) : (
             'Not available'
           )}</Text>
-          <Text style={styles.detailsText}>Price Level: {place.price_level ? place.price_level : "Not available"}</Text>          
-          <Text style={styles.detailsText}>Types: {place.types ? place.types.join(", ") : "Not available"}</Text>
-          {/*<Text style={styles.detailsText}>Geometry: {place.geometry ? JSON.stringify(place.geometry) : "Not available"}</Text>
-          <Text style={styles.detailsText}>Place id: {place.place_id ? place.place_id : "Not available"}</Text>*/}
-          <Text style={styles.detailsText}>Website: {place.website ? place.website : "Not available"}</Text>
-          <Text style={styles.detailsText}>Phone Number: {place.formatted_phone_number ? place.formatted_phone_number : "Not available"}</Text>
+          <Text style={styles.detailsText}>Price Level: {place.price_level ? place.price_level : "Currently unavailable"}</Text>
+          <Text style={styles.detailsText}>Types: {place.types ? place.types.join(", ") : "Currently unavailable"}</Text>
+          <Text style={styles.detailsText}>Website: {place.website ? place.website : "Currently unavailable"}</Text>
+          <Text style={styles.detailsText}>Phone Number: {place.formatted_phone_number ? place.formatted_phone_number : "Currently unavailable"}</Text>
           {place.reviews && place.reviews.length > 0 ? (
             <View style={styles.reviewsContainer}>
               <View style={styles.reviewNavigation}>
                 <Button title="<" onPress={handlePreviousReview} />
+                <Text style={styles.reviewsTitle}>Review {currentReviewIndex + 1} of {place.reviews.length}:</Text>
                 <Button title=">" onPress={handleNextReview} />
               </View>
-              <Text style={styles.reviewsTitle}>Review {currentReviewIndex + 1} of {place.reviews.length}:</Text>
               {place.reviews[currentReviewIndex] && (
                 <Text style={styles.reviewText}>{place.reviews[currentReviewIndex].text}</Text>
               )}
@@ -126,29 +90,33 @@ const PlaceDetailsModal = ({ visible, place, onClose, onAddToList, selectedPlace
           ) : (
             <Text style={styles.noReviewsText}>No reviews available</Text>
           )}
-          <Button title="Add to List" onPress={handleAddToList} />
-          <Button title="Close" onPress={onClose} />
-        </ScrollView>
-      </Animated.View>
+          </ScrollView>
+          <View style={styles.buttonContainer}>
+            <Button title="Add to List" onPress={handleAddToList} />
+          </View>
+        </View>
+      </View>
     </Modal>
   );
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
   modalContainer: {
     flex: 1,
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
-  modalContent: {
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    padding: 20,
-    
+    modalContent: {
+      backgroundColor: 'white',
+      width: '90%',
+      height: 600, // Set a fixed height here
+      padding: 20,
+      borderRadius: 10,
+      alignItems: 'center',
+    },
+  scrollView: {
+    maxHeight: '100%',
   },
   placeName: {
     fontSize: 24,
@@ -163,49 +131,40 @@ const styles = StyleSheet.create({
   imageContainer: {
     marginBottom: 20,
   },
+  imageRow: {
+    flexDirection: 'row',
+  },
   placeImage: {
     width: 200,
     height: 150,
     marginRight: 10,
+    marginBottom: 10,
     borderRadius: 10,
   },
-  ratingContainer: {
-    backgroundColor: '#f0f0f0',
-    borderRadius: 5,
-    padding: 5,
-    alignItems: 'center',
-    marginBottom: 10,
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 20,
   },
-  ratingText: {
+  closeButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+  },
+  closeButtonText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
-  },
-  detailsText: {
-    fontSize: 16,
-    marginBottom: 10,
-  },
-  reviewsContainer: {
-    marginBottom: 20,
-  },
-  reviewsTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  reviewText: {
-    fontSize: 16,
-    marginBottom: 5,
+    color: 'black',
   },
   reviewNavigation: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
+    alignItems: 'center', // Align items vertically
+    justifyContent: 'center', // Center items horizontally
   },
-  noReviewsText: {
-    fontSize: 16,
-    fontStyle: 'italic',
-    color: '#666',
+  reviewsTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginHorizontal: 10, // Add spacing between the components
   },
 });
 

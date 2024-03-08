@@ -30,6 +30,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'light-blue',
     paddingBottom: 20,
+    backgroundColor: '#fff'
+  },
+  text: {
+    color: '#fff'
   },
   tab: {
     padding: 10,
