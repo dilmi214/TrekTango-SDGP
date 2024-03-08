@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, FlatList, StyleSheet, TouchableOpacity, Image, ScrollView, Button } from 'react-native';
+import { Text, View, FlatList, StyleSheet, TouchableOpacity, Image, ScrollView, Button, Alert } from 'react-native';
 import { ListItem } from 'react-native-elements';
 import PlaceDetailsModal from './PlaceDetailsModal';
 import ConfirmedDestinationListModal from './confirmedDestinationListModal'; 
@@ -36,6 +36,9 @@ const NearbyDestinationsScreen = () => {
   const [showBackDialog, setShowBackDialog] = useState(false);
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [isPlaceDetailsModalVisible, setPlaceDetailsModalVisible] = useState(false);
+  const [selectedPlacesIds, setSelectedPlacesIds] = useState([]);
+  const [showSnackbar, setShowSnackbar] = useState(false); 
+  const [snackbarMessage, setSnackbarMessage] = useState('');
 
   useEffect(() => {
     fetchNearbyDestinations();
@@ -74,6 +77,21 @@ const NearbyDestinationsScreen = () => {
     setPlaceDetailsModalVisible(true);
   };
 
+  const handleAddToList = (placeData) => {
+    const isPlaceAlreadyAdded = selectedPlacesIds.some(item => item.place_id === placeData.place_id);
+
+    if (isPlaceAlreadyAdded) {
+      setPlaceDetailsModalVisible(false);
+      setSnackbarMessage('Place is already in the list!');
+      setShowSnackbar(true);
+      setTimeout(() => {
+        setShowSnackbar(false);
+      }, 1200); // Snackbar duration
+    } else {
+      setSelectedPlacesIds(prevPlaces => [...prevPlaces, placeData]);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -82,6 +100,12 @@ const NearbyDestinationsScreen = () => {
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={() => setExpanded(!expanded)}>
           <Text style={styles.buttonText}>Categories</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => setExpanded(!expanded)}>
+          <Text style={styles.buttonText}>Edit List</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => setExpanded(!expanded)}>
+          <Text style={styles.buttonText}>Next</Text>
         </TouchableOpacity>
       </View>
       {expanded && (
@@ -137,12 +161,21 @@ const NearbyDestinationsScreen = () => {
         options={['Cancel', 'Back']}
         onSelect={handleBackDialogResponse}
       />
-
+      {showSnackbar && (
+        <Snackbar
+          visible={showSnackbar}
+          message={snackbarMessage}
+          duration={1200}
+          action={{ label: 'Dismiss', onPress: () => setShowSnackbar(false) }}
+        />
+      )}
       {isPlaceDetailsModalVisible && (
-        <PlaceDetailsModal
-          place={selectedPlace}
-          isVisible={isPlaceDetailsModalVisible}
-          onClose={() => setPlaceDetailsModalVisible(false)}
+          <PlaceDetailsModal
+            visible={isPlaceDetailsModalVisible}
+            place={selectedPlace}
+            onClose={() => setPlaceDetailsModalVisible(false)}
+            onAddToList={handleAddToList}
+            selectedPlacesIds={selectedPlacesIds}
         />
       )}
       <View style={styles.navBarContainer}>
