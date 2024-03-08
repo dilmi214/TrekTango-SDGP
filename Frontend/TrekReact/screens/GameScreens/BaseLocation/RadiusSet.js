@@ -2,9 +2,8 @@ import React, { useRef, useState, useEffect } from 'react';
 import { View, StyleSheet, Dimensions, TouchableOpacity, Text, ScrollView } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker, Circle } from 'react-native-maps';
 import Constants from 'expo-constants';
-import NavBar from '../../NavBar';
-
-import CustomDialog from '../CustomDialog';
+import NavBar from '../../CustomComponents/NavBar';
+import CustomDialog from '../../CustomComponents/CustomDialog';
 
 const RadiusSetScreen = ({ route, navigation }) => {
   const { longitude, latitude } = route.params;

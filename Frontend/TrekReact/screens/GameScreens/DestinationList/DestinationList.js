@@ -5,8 +5,8 @@ import PlaceDetailsModal from './PlaceDetailsModal';
 import ConfirmedDestinationListModal from './confirmedDestinationListModal'; // Import the modal
 import Dialog from 'react-native-dialog';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import NavBar from '../../NavBar';
-import CustomDialog from '../CustomDialog';
+import NavBar from '../../CustomComponents/NavBar';
+import CustomDialog from '../../CustomComponents/CustomDialog';
 
 const GOOGLE_PLACES_API_KEY = "AIzaSyCCHxfnoWl-DNhLhKcjhCTiHYNY917ltL8";
 
