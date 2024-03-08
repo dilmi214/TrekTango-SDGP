@@ -13,7 +13,7 @@ const GOOGLE_PLACES_API_KEY = "AIzaSyCCHxfnoWl-DNhLhKcjhCTiHYNY917ltL8";
 
 
 const categories = [
-  { label: "All Categories", value: "" },
+  { label: "All Categories", value: "all_categories" },
   { label: "Tourist Attractions", value: "tourist_attraction" },
   { label: "Restaurant & Cafe", value: "restaurant_cafe" },
   { label: "Shopping Malls/Stores", value: "shopping_mall|store" },
@@ -40,14 +40,37 @@ const NearbyDestinationsScreen = () => {
   const [showSnackbar, setShowSnackbar] = useState(false); 
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
+  const [nextPageToken, setNextPageToken] = useState(null);
+
+  const allowedPlaceTypes = [
+    "tourist_attraction",
+    "restaurant_cafe",
+    "shopping_mall|store",
+    "park|amusement_park|bowling_alley|stadium|zoo|parking",
+    "church|hindu_temple|mosque|synagogue", 
+    "movie_theater|night_club|casino", 
+    "museum",
+    "hotel|lodging" 
+  ];
+
   useEffect(() => {
+    setDestinations([]); // reset destinations on category change
+    setNextPageToken(null); // reset nextPageToken for pagination if possible
     fetchNearbyDestinations();
   }, [selectedType]);
 
-  const fetchNearbyDestinations = async () => {
+  const fetchNearbyDestinations = async (pageToken = '') => { // Accepts optional pageToken
     try {
       let url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&key=${GOOGLE_PLACES_API_KEY}`;
-     
+
+      if (selectedType) {
+        if (selectedType === "all_categories") { // value for "All Categories"
+          url += `&type=${allowedPlaceTypes.join("|")}`; // combine allowed place types with pipe (|) separator
+        } else {
+          url += `&type=${selectedType}`;
+        }
+      }
+      
       if (selectedType) {
         if (selectedType === "restaurant_cafe") {
           url += `&type=restaurant|cafe`;
@@ -55,15 +78,31 @@ const NearbyDestinationsScreen = () => {
           url += `&type=${selectedType}`;
         }
       }
- 
+
+      if (pageToken) {
+        url += `&pagetoken=${pageToken}`; // pageToken for pagination
+      }
+
       const response = await fetch(url);
       const data = await response.json();
-      setDestinations(data.results);
- 
+
+      setNextPageToken(data.next_page_token); // update nextPageToken
+      
+
+      setDestinations(prevDestinations => [...prevDestinations, ...data.results]); //append results
     } catch (error) {
       console.error('Error fetching nearby destinations: ', error);
     }
   };
+
+    // load more data when user reaches the end of the list
+    const loadMoreData = () => {
+      if (nextPageToken) {
+        fetchNearbyDestinations(nextPageToken); // Fetch more results using nextPageToken
+      }
+    };
+  
+
 
   const handleBackDialogResponse = (option) => {
     if (option === 'Back') {
@@ -174,6 +213,8 @@ const NearbyDestinationsScreen = () => {
        );
      }}
      keyExtractor={(item) => item.place_id}
+     onEndReachedThreshold={0.9} // call loadMoreData when close to the end
+     onEndReached={loadMoreData} 
    />
       ) : (
         <Text>No places available in this category</Text>
