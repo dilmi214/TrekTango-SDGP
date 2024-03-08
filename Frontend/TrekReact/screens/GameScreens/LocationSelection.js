@@ -7,7 +7,7 @@ import * as Location from 'expo-location';
 import Dialog from 'react-native-dialog';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
-import CustomLoadingIndicator from './CustomLoadingIndicator';
+import CustomLoadingIndicator from '../CustomComponents/CustomLoadingIndicator';
 import { Picker } from '@react-native-picker/picker';
 
 const GOOGLE_API_KEY = "AIzaSyCCHxfnoWl-DNhLhKcjhCTiHYNY917ltL8";

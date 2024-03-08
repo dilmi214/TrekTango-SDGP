@@ -3,9 +3,10 @@ import { View, StyleSheet, Dimensions, Text, TouchableOpacity } from 'react-nati
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import Constants from 'expo-constants';
-import CustomDialog from '../CustomDialog';
-import Snackbar from '../Snackbar';
-import NavBar from '../../NavBar';
+
+import Snackbar from '../../CustomComponents/Snackbar';
+import NavBar from '../../CustomComponents/NavBar';
+import CustomDialog from '../../CustomComponents/CustomDialog';
 
 const SearchLocationScreen = ({ navigation }) => {
   //  default coordinates
@@ -43,7 +44,9 @@ const SearchLocationScreen = ({ navigation }) => {
       navigation.navigate('RadiusSetScreen', { latitude, longitude });
     } else {
       setShowSnackbar(true);
-
+      setTimeout(() => {
+        setShowSnackbar(false);
+      }, 1201); 
     }
   };
 
@@ -114,7 +117,7 @@ const SearchLocationScreen = ({ navigation }) => {
       <Snackbar
         visible={showSnackbar}
         message="No place has been selected."
-        duration={3000}
+        duration={1200}
         action={{ label: 'Dismiss', onPress: () => setShowSnackbar(false) }}
       />
     )}

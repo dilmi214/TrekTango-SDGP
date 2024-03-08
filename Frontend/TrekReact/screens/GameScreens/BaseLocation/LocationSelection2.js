@@ -2,7 +2,8 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import * as Location from 'expo-location';
 import { useNavigation } from '@react-navigation/native';
-import NavBar from '../../NavBar';
+import NavBar from '../../CustomComponents/NavBar';
+
 
 const LocationSelectionScreen = ({ navigation }) => {
   const handleCurrentLocationPress = async () => {
