@@ -57,19 +57,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
+    backgroundColor: '#010C33',
   },
   header: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
+    color: '#fff',
   },
   description: {
     fontSize: 16,
     textAlign: 'center',
     marginBottom: 20,
+    color: '#fff',
   },
   button: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#fff',
     padding: 15,
     borderRadius: 8,
     marginBottom: 20,
@@ -77,7 +80,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonText: {
-    color: '#fff',
+    color: '#010C33',
     fontSize: 18,
   },
   navBarContainer: {

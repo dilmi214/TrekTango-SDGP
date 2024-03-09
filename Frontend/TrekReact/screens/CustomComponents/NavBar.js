@@ -6,7 +6,7 @@ const NavBar = () => {
   const navigation = useNavigation();
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, styles.navBar]}>
       <TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.tab}>
         <Text>Home</Text>
       </TouchableOpacity>
@@ -28,8 +28,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    backgroundColor: 'light-blue',
     paddingBottom: 20,
+    backgroundColor: '#fff',
+    elevation: 8, 
+  },
+  navBar: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
   tab: {
     padding: 10,
