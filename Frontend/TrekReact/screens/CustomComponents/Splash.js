@@ -8,7 +8,7 @@ const SplashScreen = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       // Navigate to the Home screen after 4 seconds
-      navigation.navigate('Home');
+      navigation.navigate('LogInNav');
     }, 4000);
 
     // Clear the timeout if the component is unmounted
