@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Modal, Text, StyleSheet, Button, Image, ScrollView, TouchableOpacity, Alert } from 'react-native';
 
-const PlaceDetailsModal = ({ visible, place, onClose, onAddToList, selectedPlacesIds }) => {
+const PlaceDetailsModal = ({ visible, place, onClose, onAddToList}) => {
   const [currentReviewIndex, setCurrentReviewIndex] = useState(0);
 
   const GOOGLE_API_KEY = "AIzaSyCCHxfnoWl-DNhLhKcjhCTiHYNY917ltL8";
@@ -47,18 +47,24 @@ const PlaceDetailsModal = ({ visible, place, onClose, onAddToList, selectedPlace
             <Text style={styles.placeAddress}>{place.vicinity}</Text>
             {place.photos && place.photos.length > 0 && (
               <View style={styles.imageContainer}>
-                <ScrollView horizontal={true}>
-                  <View style={styles.imageRow}>
-                    {place.photos.map((photo, index) => (
-                      <Image
-                        key={index}
-                        source={{ uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photo.photo_reference}&key=${GOOGLE_API_KEY}` }}
-                        style={styles.placeImage}
-                      />
-                    ))}
-                  </View>
-                </ScrollView>
+                  <ScrollView horizontal={true}>
+                    <View style={styles.imageRow}>
+                      {place.photos && place.photos.map((photo, index) => (
+                        <Image
+                          key={index}
+                          source={{ uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photo.photo_reference}&key=${GOOGLE_API_KEY}` }}
+                          style={styles.placeImage}
+                        />
+                      ))}
+                    </View>
+                  </ScrollView>
               </View>
+            )}
+            {(!place.photos || place.photos.length == 0) && (
+              <Image
+              source={require('../../CustomComponents/ImgUnavailable.png')}
+              style={{ width: 200, height: 150 }} 
+              />
             )}
             <Text style={styles.detailsText}>Rating: {place.rating ? place.rating : "Not available"}</Text>
             <Text style={styles.detailsText}>Opening Hours: {place.opening_hours ? (

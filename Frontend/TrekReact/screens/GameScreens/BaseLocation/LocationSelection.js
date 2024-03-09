@@ -1,18 +1,24 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import * as Location from 'expo-location';
 import { useNavigation } from '@react-navigation/native';
 import NavBar from '../../CustomComponents/NavBar';
+import Layout from '../../CustomComponents/ScreenLayout';
+import CustomLoadingIndicator from '../../CustomComponents/CustomLoadingIndicator';
 
 
-const LocationSelectionScreen = ({ navigation }) => {
+const LocationSelectionScreen = () => {
+  const navigation = useNavigation();
+  const [loading, setLoading] = useState(false);
+
   const handleCurrentLocationPress = async () => {
     try {
+      setLoading(true); 
       const { status } = await Location.requestForegroundPermissionsAsync();  // request permission
       
       if (status !== 'granted') {           // if permission permission denied
-
         console.log('Location permission not granted');
+        setLoading(false); 
         return;
       }
 
@@ -26,28 +32,29 @@ const LocationSelectionScreen = ({ navigation }) => {
       navigation.navigate('RadiusSetScreen', { latitude, longitude });
     } catch (error) {
       console.error('Error getting current location:', error);
+    } finally {
+      setLoading(false); 
     }
-  };
+  }
 
   const handleSearchLocationPress = () => {
     navigation.navigate('SearchLocation');
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Let's Get Started!</Text>
-      <Text style={styles.description}>Select your initial location to start the game:</Text>
-      <TouchableOpacity style={styles.button} onPress={handleCurrentLocationPress}>
-        <Text style={styles.buttonText}>Select Current Location</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={handleSearchLocationPress}>
-        <Text style={styles.buttonText}>Select from Search</Text>
-      </TouchableOpacity>
-      <View style={styles.navBarContainer}>
-        <NavBar />
+    <Layout>
+      <View style={styles.container}>
+        <Text style={styles.header}>Let's Get Started!</Text>
+        <Text style={styles.description}>Select your initial location to start the game:</Text>
+        <TouchableOpacity style={styles.button} onPress={handleCurrentLocationPress}>
+          <Text style={styles.buttonText}>Select Current Location</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={handleSearchLocationPress}>
+          <Text style={styles.buttonText}>Select from Search</Text>
+        </TouchableOpacity>
+        {loading && <CustomLoadingIndicator />} 
       </View>
-    </View>
-
+    </Layout>
   );
 };
 
@@ -82,12 +89,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#010C33',
     fontSize: 18,
-  },
-  navBarContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
   },
 });
 

@@ -20,7 +20,7 @@ function App() {
       <Stack.Screen
         name="Splash"
         component={SplashScreen}
-        options={{ headerShown: false, gestureEnabled: false }} 
+        options={{ headerShown: false, gestureEnabled: false, }} 
       />
       <Stack.Screen
         name="LogInNav"

@@ -8,6 +8,8 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import NavBar from '../../CustomComponents/NavBar';
 import CustomDialog from '../../CustomComponents/CustomDialog';
 import Snackbar from '../../CustomComponents/Snackbar';
+import CustomLoadingIndicator from '../../CustomComponents/CustomLoadingIndicator';
+
 
 const GOOGLE_PLACES_API_KEY = "AIzaSyCCHxfnoWl-DNhLhKcjhCTiHYNY917ltL8";
 
@@ -39,7 +41,7 @@ const NearbyDestinationsScreen = () => {
   const [showSnackbar, setShowSnackbar] = useState(false); 
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [isConfirmedDestinationListModalVisible, setIsConfirmedDestinationListModalVisible] = useState(false); // New state for modal visibility
-
+  const [showLoadingIndicator, setShowLoadingIndicator] = useState(false);
   const [nextPageToken, setNextPageToken] = useState(null);
 
   const allowedPlaceTypes = [
@@ -60,7 +62,9 @@ const NearbyDestinationsScreen = () => {
   }, [selectedType]);
 
   const fetchNearbyDestinations = async (pageToken = '') => { 
+    
     try {
+      setShowLoadingIndicator(true); 
       let url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&key=${GOOGLE_PLACES_API_KEY}`;
 
       if (selectedType) {
@@ -87,11 +91,14 @@ const NearbyDestinationsScreen = () => {
       const data = await response.json();
 
       setNextPageToken(data.next_page_token); // update nextPageToken
-      
-
       setDestinations(prevDestinations => [...prevDestinations, ...data.results]); //append results
+
+      setTimeout(() => {
+        setShowLoadingIndicator(false); 
+      }, 300); 
     } catch (error) {
       console.error('Error fetching nearby destinations: ', error);
+      setShowLoadingIndicator(false);
     }
   };
 
@@ -102,10 +109,8 @@ const NearbyDestinationsScreen = () => {
       }
     };
   
-
-
   const handleBackDialogResponse = (option) => {
-    if (option === 'Back') {
+    if (option === 'Yes') {
       navigation.goBack();
     }
     setShowBackDialog(false);
@@ -143,6 +148,7 @@ const NearbyDestinationsScreen = () => {
       }, 1201); 
     }
   };
+  
   const checkSelectedPlacesCount = () => {
     if (selectedPlacesIds.length > 3) {
       navigation.navigate('SelectStartLocationScreen', { selectedPlacesIds });
@@ -214,7 +220,10 @@ const NearbyDestinationsScreen = () => {
                  style={{ width: 50, height: 50 }} 
                />
              ) : (
-               <Text>No image available</Text>
+              <Image
+              source={require('../../CustomComponents/ImgUnavailable.png')}
+              style={{ width: 50, height: 50 }} 
+            />
              )}
            </ListItem.Content>
          </ListItem>
@@ -231,9 +240,10 @@ const NearbyDestinationsScreen = () => {
         visible={showBackDialog}
         title="Confirmation"
         message="Do you want to go back?"
-        options={['Cancel', 'Back']}
+        options={['Yes', 'No']}
         onSelect={handleBackDialogResponse}
       />
+      {showLoadingIndicator && <CustomLoadingIndicator />}
       {showSnackbar && (
         <Snackbar
           visible={showSnackbar}

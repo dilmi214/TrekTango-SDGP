@@ -1,6 +1,11 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome6 } from '@expo/vector-icons';
+import { Octicons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 
 const NavBar = () => {
   const navigation = useNavigation();
@@ -8,16 +13,16 @@ const NavBar = () => {
   return (
     <View style={[styles.container, styles.navBar]}>
       <TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.tab}>
-        <Text>Home</Text>
+        <FontAwesome name="home" size={24} color="black" />
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate('Game')} style={styles.tab}>
-        <Text>Game</Text>
+      <FontAwesome6 name="map-location-dot" size={24} color="black" />
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate('Social')} style={styles.tab}>
-        <Text>Social</Text>
+        <MaterialIcons name="perm-media" size={24} color="black" />
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate('Profile')} style={styles.tab}>
-        <Text>Profile</Text>
+        <Octicons name="feed-person" size={24} color="black" />
       </TouchableOpacity>
     </View>
   );
