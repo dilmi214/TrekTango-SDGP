@@ -5,11 +5,12 @@ const { v4: uuidv4 } = require('uuid');
 const nodemailer = require('nodemailer');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const express = require('express');
 mongoose.connect(url);
 
 //create connection
 
-const connection = mongoose.connection;
+const db = mongoose.connection;
 
 const app = express();
 
@@ -91,15 +92,20 @@ app.post('/login', async (req, res) => {
     const user = await User.findOne({ username });
 
     if (!user) {
-      return res.status(401).json({ error: 'Invalid username or password' });
+      return res.status(401).json({ error: 'Invalid username' });
     }
 
     // Hash the input password with the retrieved salt
     const hashedPassword = hashPassword(password, user.salt);
+    
+    // console.log(hashedPassword)
 
+    // const hashedPassword2 = hashPassword(password, user.salt);
+    // console.log(hashedPassword2)
+    // //testing to see if the salt remains the same
     // Compare the hashed password with the stored hashed password
     if (hashedPassword !== user.password) {
-      return res.status(401).json({ error: 'Invalid username or password' });
+      return res.status(401).json({ error: 'There is an issue with the salted password' });
     }
 
     // Passwords match, user is authenticated
@@ -314,7 +320,13 @@ app.put('/update-profile-pic', async (req, res) => {
   }
 });
 
+const PORT = 3000;
 
+// Your routes and middleware setup here
+
+app.listen(PORT, () => {
+  console.log(`Server is listening on port ${PORT}`);
+});
 
 
 
