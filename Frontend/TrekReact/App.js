@@ -8,7 +8,7 @@ import ProfilePage from './screens/ProfilePage';
 import SplashScreen from './screens/CustomComponents/Splash';
 import NavBar from './screens/CustomComponents/NavBar';
 import ImageFeed from './screens/ImageFeed';
-import LoginScreen from './screens/LoginReg/LoginDummy';
+
 import LogInNavigation from './screens/LoginReg/LogInNavigator';
 
 const Stack = createNativeStackNavigator();
