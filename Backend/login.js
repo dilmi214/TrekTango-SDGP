@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const crypto = require('crypto');
 const { v4: uuidv4 } = require('uuid');
 const nodemailer = require('nodemailer');
-
+const bodyParser = require('body-parser');
+const cors = require('cors');
 mongoose.connect(url);
 
 //create connection
@@ -12,8 +13,20 @@ const connection = mongoose.connection;
 
 const app = express();
 
+app.use(bodyParser.json()); // Parse incoming request bodies in JSON format
+app.use(cors()); // Enable Cross-Origin Resource Sharing (CORS)
+
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function () {
+  console.log('Connected to MongoDB database');
+});
+
 // Connect to MongoDB (Make sure to replace 'your-mongodb-uri' with your actual MongoDB connection URI)
-mongoose.connect(url);
+mongoose.connect(url, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  // Additional options can be specified here
+});
 
 // Define a mongoose schema for the user data
 const userSchema = new mongoose.Schema({
