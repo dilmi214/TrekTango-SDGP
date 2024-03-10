@@ -13,13 +13,13 @@ const Snackbar = ({ visible, message, duration, action }) => {
 
   const handleDismiss = () => {
     setIsVisible(false);
-    action?.onPress(); // Call action onPress if provided
+    action?.onPress(); 
   };
 
   if (!isVisible) return null;
 
   return (
-    <View style={[styles.container, { position: 'absolute', bottom: 20, left: 0, right: 0, zIndex: 999 }]}>
+    <View style={[styles.container, styles.absolute]}>
       <Text style={styles.text}>{message}</Text>
       {action && (
         <TouchableOpacity style={styles.action} onPress={handleDismiss}>
@@ -31,8 +31,9 @@ const Snackbar = ({ visible, message, duration, action }) => {
 };
 
 const styles = StyleSheet.create({
+
   container: {
-    backgroundColor: '#000',
+    backgroundColor: '#0047AB',
     padding: 10,
     borderRadius: 4,
     shadowColor: '#000',
@@ -42,19 +43,26 @@ const styles = StyleSheet.create({
     elevation: 5,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    width: 390, 
+    position: 'absolute',
+    bottom: 30, 
+    left: '3%', // left edge is from 3% of the containing element
+    right: '98%', // right edge is from 98% of the containing element
+    zIndex: 999,
   },
-  text: {
-    color: '#fff',
-    fontSize: 16,
-    flex: 1,
-  },
-  action: {
-    marginLeft: 10,
-  },
-  actionText: {
-    color: '#fff',
-    fontSize: 14,
-  },
-});
+    text: {
+      color: '#fff',
+      fontSize: 16,
+      flex: 1,
+    },
+    action: {
+      marginLeft: 10,
+    },
+    actionText: {
+      color: '#fff',
+      fontSize: 14,
+    },
+  });
 
 export default Snackbar;

@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { StyleSheet, TextInput, Text, View, TouchableOpacity, ScrollView } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
-export default function CreateAccountScreen({ navigation }) {
+const CreateAccountScreen = () => {
+  const navigation = useNavigation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
   const handleCreateAccount = () => {
+    navigation.navigate('Home');
   };
 
   return (
@@ -77,3 +80,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
+
+export default CreateAccountScreen;

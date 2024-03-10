@@ -1,10 +1,18 @@
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image, TextInput } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import CreateAccountScreen from './CreateAccountScreen';
+import { useNavigation } from '@react-navigation/native';
 
-function App({ navigation }) {
+const LoginScreen = () => {
+  const navigation = useNavigation();
+
+  const handleSignInPress = () => {
+    navigation.navigate('Home');
+  };
+
+  const handleCreateAccountPress = () => {
+    navigation.navigate('CreateAccountScreen');
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Image
@@ -26,7 +34,7 @@ function App({ navigation }) {
         secureTextEntry={true}
         autoCapitalize="none"
       />
-      <TouchableOpacity style={styles.signInButton}>
+      <TouchableOpacity style={styles.signInButton} onPress={handleSignInPress}>
         <Text style={styles.signInButtonText}>Sign In</Text>
       </TouchableOpacity>
       <View style={styles.space}></View>
@@ -35,7 +43,7 @@ function App({ navigation }) {
         <Text style={styles.orText}>or</Text>
         <View style={styles.smallLine}></View>
       </View>
-      <TouchableOpacity style={styles.createAccountButton} onPress={() => navigation.navigate('CreateAccount')}>
+      <TouchableOpacity style={styles.createAccountButton} onPress={handleCreateAccountPress}>
         <Text style={styles.createAccountText}>Create an account</Text>
       </TouchableOpacity>
     </ScrollView>
@@ -115,15 +123,4 @@ const styles = StyleSheet.create({
   },
 });
 
-const Stack = createStackNavigator();
-
-export default function AppWithNavigation() {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="App">
-        <Stack.Screen name="App" component={App} />
-        <Stack.Screen name="CreateAccount" component={CreateAccountScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-}
+export default LoginScreen;

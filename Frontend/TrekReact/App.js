@@ -9,6 +9,8 @@ import SplashScreen from './screens/CustomComponents/Splash';
 import NavBar from './screens/CustomComponents/NavBar';
 import ImageFeed from './screens/ImageFeed';
 
+import LogInNavigation from './screens/LoginReg/LogInNavigator';
+
 const Stack = createNativeStackNavigator();
 
 function App() {
@@ -18,6 +20,11 @@ function App() {
       <Stack.Screen
         name="Splash"
         component={SplashScreen}
+        options={{ headerShown: false, gestureEnabled: false, }} 
+      />
+      <Stack.Screen
+        name="LogInNav"
+        component={LogInNavigation}
         options={{ headerShown: false, gestureEnabled: false }} 
       />
       <Stack.Screen

@@ -4,6 +4,7 @@ import MapView, { PROVIDER_GOOGLE, Marker, Circle } from 'react-native-maps';
 import Constants from 'expo-constants';
 import NavBar from '../../CustomComponents/NavBar';
 import CustomDialog from '../../CustomComponents/CustomDialog';
+import Layout from '../../CustomComponents/ScreenLayout';
 
 const RadiusSetScreen = ({ route, navigation }) => {
   const { longitude, latitude } = route.params;
@@ -23,7 +24,7 @@ const RadiusSetScreen = ({ route, navigation }) => {
           latitudeDelta: 0.02,
           longitudeDelta: 0.02,
         });
-      }, 500); // Delaying the animation by 1 second to ensure the map is ready
+      }, 300); // Delaying the animation by 1 second to ensure the map is ready
     }
   }, [mapRef]);
 
@@ -53,71 +54,70 @@ const RadiusSetScreen = ({ route, navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <MapView
-        ref={mapRef}
-        style={styles.map}
-        provider={PROVIDER_GOOGLE}
-        initialRegion={{
-          latitude,
-          longitude,
-          latitudeDelta: 10,
-          longitudeDelta: 10,
-        }}
-      >
-        <Marker
-          coordinate={{ latitude, longitude }}
-          title="Current Location"
-          description="You are here"
+    <Layout>
+      <View style={styles.container}>
+        <MapView
+          ref={mapRef}
+          style={styles.map}
+          provider={PROVIDER_GOOGLE}
+          initialRegion={{
+            latitude,
+            longitude,
+            latitudeDelta: 10,
+            longitudeDelta: 10,
+          }}
+        >
+          <Marker
+            coordinate={{ latitude, longitude }}
+            title="Current Location"
+            description="You are here"
+          />
+          <Circle
+            center={{ latitude, longitude }}
+            radius={radius}
+            fillColor="rgba(106, 120, 220, 0.3)"
+            strokeColor="rgba(0, 0, 255, 0.8)"
+            strokeWidth={2}
+          />
+        </MapView>
+
+        <View style={styles.buttonsContainer}>
+          <TouchableOpacity onPress={handleBackPress} style={styles.button}>
+            <Text style={styles.buttonText}>Back</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleNextPress} style={styles.button}>
+            <Text style={styles.buttonText}>Next</Text>
+          </TouchableOpacity>
+        </View>
+
+        <CustomDialog
+          visible={showDialog}
+          title="Are you sure you want to go back?"
+          message="Your unsaved changes will be lost."
+          options={['Yes', 'No']}
+          onSelect={handleDialogSelect}
         />
-        <Circle
-          center={{ latitude, longitude }}
-          radius={radius}
-          fillColor="rgba(106, 120, 220, 0.3)"
-          strokeColor="rgba(0, 0, 255, 0.8)"
-          strokeWidth={2}
-        />
-      </MapView>
 
-      <View style={styles.buttonsContainer}>
-        <TouchableOpacity onPress={handleBackPress} style={styles.button}>
-          <Text style={styles.buttonText}>Back</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleNextPress} style={styles.button}>
-          <Text style={styles.buttonText}>Next</Text>
-        </TouchableOpacity>
+        <View style={styles.radiusContainer}>
+          <TouchableOpacity onPress={toggleDropdown} style={styles.selectedRadiusContainer}>
+            <Text style={styles.selectedRadiusText}>{selectedRadiusValue} m</Text>
+            {isDropdownOpen && (
+              <ScrollView style={styles.dropdownContainer}>
+                {radiusValues.map(value => (
+                  <TouchableOpacity
+                    key={value}
+                    onPress={() => onRadiusChange(value)}
+                    style={styles.dropdownItem}
+                  >
+                    <Text>{value} m</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            )}
+          </TouchableOpacity>
+        </View>
       </View>
-
-      <CustomDialog
-        visible={showDialog}
-        title="Are you sure you want to go back?"
-        message="Your unsaved changes will be lost."
-        options={['Yes', 'No']}
-        onSelect={handleDialogSelect}
-      />
-
-      <View style={styles.radiusContainer}>
-        <TouchableOpacity onPress={toggleDropdown} style={styles.selectedRadiusContainer}>
-          <Text style={styles.selectedRadiusText}>{selectedRadiusValue} m</Text>
-          {isDropdownOpen && (
-            <ScrollView style={styles.dropdownContainer}>
-              {radiusValues.map(value => (
-                <TouchableOpacity
-                  key={value}
-                  onPress={() => onRadiusChange(value)}
-                  style={styles.dropdownItem}
-                >
-                  <Text>{value} m</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          )}
-        </TouchableOpacity>
-      </View>
-      <View style={styles.navBarContainer}>
-        <NavBar />
-    </View>
-    </View>
+    </Layout>
   );
 };
 
@@ -184,13 +184,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
-  },
-  navBarContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: '#fff',
   },
 });
 
