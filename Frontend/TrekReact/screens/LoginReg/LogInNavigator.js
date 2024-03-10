@@ -1,9 +1,9 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import LoginScreen from './LoginDummy';
-import ForgotPasswordScreen from './ForgotPassDummy';
+import LoginScreen from './LoginPage';
+import ForgotPasswordScreen from './ForgotPassword';
 import RegisterScreen from './RegistrationDummy';
-import CreateAccountScreen from './CreateAccountDummy';
+import CreateAccountScreen from './CreateAccountScreen';
 
 const Stack = createStackNavigator();
 
@@ -18,14 +18,14 @@ function LogInNavigation() {
           gestureEnabled: false 
         }} 
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="ForgotPassword"
         component={ForgotPasswordScreen}
         options={{ 
           headerShown: false, 
           gestureEnabled: false 
         }} 
-      />
+      /> */}
       <Stack.Screen
         name="Registration"
         component={RegisterScreen}
