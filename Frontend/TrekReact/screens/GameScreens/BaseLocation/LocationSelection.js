@@ -2,9 +2,8 @@ import React, {useState} from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import * as Location from 'expo-location';
 import { useNavigation } from '@react-navigation/native';
-import NavBar from '../../CustomComponents/NavBar';
-import Layout from '../../CustomComponents/ScreenLayout';
 import CustomLoadingIndicator from '../../CustomComponents/CustomLoadingIndicator';
+import Layout from '../../CustomComponents/ScreenLayout';
 
 
 const LocationSelectionScreen = () => {

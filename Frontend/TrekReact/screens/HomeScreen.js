@@ -1,17 +1,19 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import NavBar from '../screens/CustomComponents/NavBar'; // Import the NavBar component
+import Layout from './CustomComponents/ScreenLayout';
 
 const HomeScreen = () => {
+  
   return (
-    <View style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.text}>Home</Text>
+    <Layout>
+      <View style={styles.container}>
+        <View style={styles.content}>
+          <Text style={styles.text}>Home</Text>
+        </View>
+
       </View>
-      <View style={styles.navBarContainer}>
-        <NavBar />
-      </View>
-    </View>
+    </Layout>
   );
 };
 

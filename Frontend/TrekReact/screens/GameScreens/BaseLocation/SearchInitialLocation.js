@@ -70,61 +70,60 @@ const SearchLocationScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-    <View style={styles.buttonsContainer}>
-      <TouchableOpacity onPress={handleBackPress}>
-        <Text style={styles.buttonText}>Back</Text>
-      </TouchableOpacity>
-      <CustomDialog
-        visible={showDialog}
-        title="Are you sure you want to go back?"
-        message="Your unsaved changes will be lost."
-        options={['Yes', 'No']}
-        onSelect={handleDialogSelect}
+    <Layout>
+      <View style={styles.container}>
+      <View style={styles.buttonsContainer}>
+        <TouchableOpacity onPress={handleBackPress}>
+          <Text style={styles.buttonText}>Back</Text>
+        </TouchableOpacity>
+        <CustomDialog
+          visible={showDialog}
+          title="Are you sure you want to go back?"
+          message="Your unsaved changes will be lost."
+          options={['Yes', 'No']}
+          onSelect={handleDialogSelect}
+        />
+        <TouchableOpacity onPress={handleNextPress}>
+          <Text style={styles.buttonText}>Next</Text>
+        </TouchableOpacity>
+      </View>
+      <GooglePlacesAutocomplete
+        placeholder='Search Location'
+        onPress={(data, details = null) => handlePlaceSelect(data, details)}
+        query={{
+          key: GOOGLE_API_KEY,
+          language: 'en', 
+        }}
+        styles={autoCompleteStyles}
+        fetchDetails={true}
+        enablePoweredByContainer={false}
       />
-      <TouchableOpacity onPress={handleNextPress}>
-        <Text style={styles.buttonText}>Next</Text>
-      </TouchableOpacity>
+      <View style={styles.mapContainer}>
+        <MapView
+          ref={mapRef}
+          style={styles.map}
+          provider={PROVIDER_GOOGLE}
+          mapType={"standard"} 
+          initialRegion={INITIAL_POSITION}
+        >
+          {selectedLocation && (
+            <Marker
+              coordinate={selectedLocation}
+              title="Selected Location"
+            />
+          )}
+        </MapView>
+      </View>
+      {showSnackbar && (
+        <Snackbar
+          visible={showSnackbar}
+          message="No place has been selected."
+          duration={1200}
+          action={{ label: 'Dismiss', onPress: () => setShowSnackbar(false) }}
+        />
+      )}
     </View>
-    <GooglePlacesAutocomplete
-      placeholder='Search Location'
-      onPress={(data, details = null) => handlePlaceSelect(data, details)}
-      query={{
-        key: GOOGLE_API_KEY,
-        language: 'en', 
-      }}
-      styles={autoCompleteStyles}
-      fetchDetails={true}
-      enablePoweredByContainer={false}
-    />
-    <View style={styles.mapContainer}>
-      <MapView
-        ref={mapRef}
-        style={styles.map}
-        provider={PROVIDER_GOOGLE}
-        mapType={"standard"} 
-        initialRegion={INITIAL_POSITION}
-      >
-        {selectedLocation && (
-          <Marker
-            coordinate={selectedLocation}
-            title="Selected Location"
-          />
-        )}
-      </MapView>
-    </View>
-    {showSnackbar && (
-      <Snackbar
-        visible={showSnackbar}
-        message="No place has been selected."
-        duration={1200}
-        action={{ label: 'Dismiss', onPress: () => setShowSnackbar(false) }}
-      />
-    )}
-    <View style={styles.navBarContainer}>
-        <NavBar />
-    </View>
-  </View>
+  </Layout>
   );
 };
 
