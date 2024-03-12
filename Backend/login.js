@@ -105,7 +105,7 @@ app.post('/login', async (req, res) => {
     // //testing to see if the salt remains the same
     // Compare the hashed password with the stored hashed password
     if (hashedPassword !== user.password) {
-      return res.status(401).json({ error: 'There is an issue with the salted password' });
+      return res.status(401).json({ error: 'Incorrect username or password entered' });
     }
 
     // Passwords match, user is authenticated
