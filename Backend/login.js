@@ -1,4 +1,6 @@
-const url = "mongodb+srv://rithik20222011:Harpyeagle12345@cluster0.my4g36v.mongodb.net/";
+const { myEmailUsername, myEmailpassword, databaseLink} = require('./Credentials');
+const url = databaseLink;
+// const { myEmailUsername, myEmailpassword, databaseLink} = require('./credentials');
 const mongoose = require('mongoose');
 const crypto = require('crypto');
 const { v4: uuidv4 } = require('uuid');
@@ -142,8 +144,8 @@ app.put('/users/send-verification-email', async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: 'Randomemail@gmail.com', // Replace with your email address
-        pass: 'My password', // Replace with your email password
+        user: myEmailUsername, // Replace with your email address
+        pass: myEmailpassword, // Replace with your email password
       },
     });
 
