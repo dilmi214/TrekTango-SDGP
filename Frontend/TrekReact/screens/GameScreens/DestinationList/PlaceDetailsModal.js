@@ -100,20 +100,23 @@ const PlaceDetailsModal = ({ visible, place, onClose, onAddToList}) => {
   );
 };
 
+
+
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(1, 12, 51, 0.8)',
   },
   modalContent: {
-    backgroundColor: 'white',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
     width: '90%',
-    height: 600,
-    padding: 20,
-    borderRadius: 10,
+    maxHeight: '100%',
+    borderRadius: 20,
     alignItems: 'center',
+    padding: 20,
+    justifyContent: 'space-between',
   },
   scrollView: {
     maxHeight: '100%',
@@ -125,8 +128,8 @@ const styles = StyleSheet.create({
   },
   placeAddress: {
     fontSize: 16,
-    marginBottom: 10,
     color: '#666',
+    marginBottom: 10,
   },
   imageContainer: {
     marginBottom: 20,
@@ -135,16 +138,35 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   placeImage: {
-    width: 200,
+    width: 340,
     height: 150,
     marginRight: 10,
     marginBottom: 10,
     borderRadius: 10,
   },
+  infoContainer: {
+    marginBottom: 20,
+  },
+  detailsText: {
+    fontSize: 16,
+    marginBottom: 5,
+  },
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 20,
+    width: '100%',
+    alignItems: 'center',
+  },
+  addButton: {
+    position: 'absolute',
+    bottom: 20,
+    backgroundColor: '#007bff',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  addButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
   closeButton: {
     position: 'absolute',
@@ -152,7 +174,7 @@ const styles = StyleSheet.create({
     right: 10,
   },
   closeButtonText: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     color: 'black',
   },

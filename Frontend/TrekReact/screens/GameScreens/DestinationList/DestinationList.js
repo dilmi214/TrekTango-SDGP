@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, FlatList, StyleSheet, TouchableOpacity, Image, ScrollView, Button, Alert } from 'react-native';
+import { Text, View, FlatList, StyleSheet, TouchableOpacity, Image, ScrollView, Button, Alert, Platform } from 'react-native';
 import { ListItem } from 'react-native-elements';
 import PlaceDetailsModal from './PlaceDetailsModal';
 import ConfirmedDestinationListModal from './confirmedDestinationListModal'; 
@@ -279,23 +279,26 @@ const NearbyDestinationsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 70,
+    borderTopWidth: 50,
+    backgroundColor: '#222',
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
     marginBottom: 20,
+    borderWidth: 2,
+    borderRadius: 10,
+    borderColor: '#444',
+    padding: 10,
   },
   button: {
-    backgroundColor: 'blue',
+    backgroundColor: '#00aaff',
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 5,
+    borderRadius: 20,
   },
   buttonText: {
-    color: 'white',
+    color: '#fff',
     fontWeight: 'bold',
   },
   categories: {
@@ -307,11 +310,14 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
   },
-  navBarContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+  categoryText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  noPlacesText: {
+    color: '#fff',
+    textAlign: 'center',
+    marginTop: 20,
   },
 });
 
