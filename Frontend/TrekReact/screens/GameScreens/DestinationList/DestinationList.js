@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     borderTopWidth: 50,
-    backgroundColor: '#222',
+    backgroundColor: '#010C33', 
   },
   header: {
     flexDirection: 'row',
@@ -290,12 +290,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: '#444',
     padding: 10,
+    backgroundColor: '#010C33', 
   },
   button: {
-    backgroundColor: '#00aaff',
+    backgroundColor: '#007bff', 
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 20,
+    borderRadius: 5,
   },
   buttonText: {
     color: '#fff',
@@ -309,9 +310,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
+    backgroundColor: '#fff', 
+    borderRadius: 10,
+    marginHorizontal: 20,
+    marginVertical: 8,
+    elevation: 5, 
   },
   categoryText: {
-    color: '#fff',
+    color: '#000', 
     fontWeight: 'bold',
   },
   noPlacesText: {
@@ -319,6 +325,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 20,
   },
+  
 });
 
 export default NearbyDestinationsScreen;
