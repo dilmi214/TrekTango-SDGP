@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
     backgroundColor: '#fff', 
-    borderRadius: 10,
+    borderRadius: 5,
     marginHorizontal: 20,
     marginVertical: 8,
     elevation: 5, 
