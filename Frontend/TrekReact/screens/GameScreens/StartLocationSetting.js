@@ -24,46 +24,44 @@ const SelectStartLocationScreen = () => {
   const handleDetectCurrentLocation = async () => {
     setLoading(true); // Show loading indicator
     let { status } = await Location.getForegroundPermissionsAsync();
-  
+
     if (status !== 'granted') {
+      // req if permission has not been granted previously
+      
       const { status: newStatus } = await Location.requestForegroundPermissionsAsync();
       status = newStatus;
     }
-  
+
     if (status !== 'granted') {
+      // ff permission is still not granted
       setLoading(false);
       Alert.alert('Permission Denied', 'Please grant location permission to detect your current location.');
       return;
     }
-  
+
     try {
+
       const location = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = location.coords;
-      setLoading(false); 
+      setLoading(false); // Show loading indicator
       console.log('Current Location:', { latitude, longitude });
       setSnackbarMessage('Location detected!');
       setShowSnackbar(true);
-  
       const confirmedStarterLocation = {
-        place_id : 'undefined',
-        name : 'start location',
         latitude,
-        longitude,
+        longitude
       };
-  
-      const finalDestinationList = [confirmedStarterLocation, ...selectedPlacesIds];
-  
       setTimeout(() => {
         setShowSnackbar(false);
-        console.log(finalDestinationList)
-        navigation.navigate('StartGameScreen', {finalDestinationList});
-      }, 601);
-  
+        navigation.navigate('StartGameScreen', {selectedPlacesIds, confirmedStarterLocation});
+      }, 601); 
+
     } catch (error) {
       console.error('Error getting current location:', error);
       Alert.alert('Error', 'Failed to get current location. Please try again later.');
     }
-  }
+  };
+
 
   const handleBack = (option) => {
     if (option === 'Yes') {
@@ -74,9 +72,15 @@ const SelectStartLocationScreen = () => {
 
   const handleNext = () => {
     if (selectedDestination) {
-      const finalDestinationList  = [selectedDestination, ...selectedPlacesIds.filter(place => place.place_id !== selectedDestination.place_id)];
-      navigation.navigate('StartGameScreen', {finalDestinationList});
-      console.log(finalDestinationList[0].name)
+      // If a destination is selected, navigate to StartGameScreen with its coordinates
+      const { latitude, longitude } = selectedDestination;
+      navigation.navigate('StartGameScreen', {
+        selectedPlacesIds,
+        confirmedStarterLocation: {
+          latitude,
+          longitude
+        }
+      });
     } else {
       // If no destination is selected, show a message
       setShowSnackbar(true);
@@ -86,7 +90,7 @@ const SelectStartLocationScreen = () => {
       }, 2000);
     }
   };
-  
+
   const handleSelectDestination = (destination) => {
     setSelectedDestination(destination);
   };

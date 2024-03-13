@@ -1,13 +1,15 @@
+
+
 import React from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 const StartGameScreen = ({ route }) => {
   const navigation = useNavigation();
-  const { finalDestinationList } = route.params;
+  const { selectedPlacesIds, confirmedStarterLocation } = route.params;
 
   const handleConfirm = () => {
-
+    console.log(confirmedStarterLocation.longitude,"confirmed starter location")
     Alert.alert(
       'Confirmation',
       'Are you sure you want to start the game?',
@@ -19,7 +21,13 @@ const StartGameScreen = ({ route }) => {
         {
           text: 'Yes',
           onPress: () => {
-            navigation.navigate('GameMapScreen', {finalDestinationList});
+            navigation.navigate('GameMapScreen', {
+              selectedPlacesIds: selectedPlacesIds,
+              confirmedStarterLocation: { 
+                latitude: confirmedStarterLocation.latitude, 
+                longitude: confirmedStarterLocation.longitude
+              },
+            });
           },
         },
       ],
@@ -39,7 +47,7 @@ const StartGameScreen = ({ route }) => {
       </TouchableOpacity>
       <Text>Selected Places:</Text>
       <View style={styles.destinationList}>
-        {finalDestinationList.map((destination, index) => (
+        {selectedPlacesIds.map((destination, index) => (
           <View key={destination.place_id} style={styles.destinationItem}>
             <Text style={styles.destinationText}>{destination.name}</Text>
           </View>
