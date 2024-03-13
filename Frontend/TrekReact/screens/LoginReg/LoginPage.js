@@ -1,25 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image, TextInput } from 'react-native';
-import axios from 'axios'; // Import Axios library
 import { useNavigation } from '@react-navigation/native';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
 
-  const handleSignInPress = async () => {
-    try {
-      const response = await axios.post('http://192.168.1.2:3000/login', { // Replace 'http://your-api-url/login' with your actual API endpoint
-        username: username,
-        password: password
-      });
-      console.log(response.data); // Log the response from the server
-      navigation.navigate('Home'); // Navigate to Home screen upon successful login
-    } catch (error) {
-      console.error(error.response.data); // Log any errors from the server
-      // Handle error message here, e.g., show error message to user
-    }
+  const handleSignInPress = () => {
+    navigation.navigate('Home');
   };
 
   const handleCreateAccountPress = () => {
@@ -39,8 +26,6 @@ const LoginScreen = () => {
         placeholderTextColor="white"
         placeholder="Email"
         autoCapitalize="none"
-        value={username}
-        onChangeText={text => setUsername(text)}
       />
       <TextInput
         style={styles.input}
@@ -48,8 +33,6 @@ const LoginScreen = () => {
         placeholder="Password"
         secureTextEntry={true}
         autoCapitalize="none"
-        value={password}
-        onChangeText={text => setPassword(text)}
       />
       <TouchableOpacity style={styles.signInButton} onPress={handleSignInPress}>
         <Text style={styles.signInButtonText}>Sign In</Text>
