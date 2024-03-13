@@ -1,19 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import { useNavigation } from '@react-navigation/native';
 import * as Location from 'expo-location';
-
+import GameLocationModal from './GameLocatonModal';
 
 const GameMapScreen = ({ route }) => {
   const navigation = useNavigation();
-  const { selectedPlacesIds, confirmedStarterLocation } = route.params;
+  const { finalDestinationList } = route.params;
+  const [selectedLocation, setSelectedLocation] = useState(null);
 
-  console.log('Details of the first two array items:');
-  console.log('Location 1 - Name', selectedPlacesIds[0].name, 'Longitude:', selectedPlacesIds[0].longitude, 'Latitude:', selectedPlacesIds[0].latitude, 'PlaceID', selectedPlacesIds[0].place_id,);
-  console.log('Location 2 - Name', selectedPlacesIds[1].name, 'Longitude:',  selectedPlacesIds[1].longitude, 'Latitude:', selectedPlacesIds[1].latitude, 'PlaceId', selectedPlacesIds[1].place_id);
+  const handleBack = () => {
+    navigation.goBack();
+  };
 
-  //function to get current location
+  const handlePinPress = (destination) => {
+     setSelectedLocation(destination);
+     console.log('Selected Location:', destination);
+  };
+
+  const closeModal = () => {
+    setSelectedLocation(null);
+  };
+
   const getUserCurrentLocation = async () => {
     try {
       const location = await Location.getCurrentPositionAsync({});
@@ -28,32 +37,32 @@ const GameMapScreen = ({ route }) => {
       // Handle error
     }
   };
-  
+
   return (
     <View style={styles.container}>
       <MapView
         provider={PROVIDER_GOOGLE}
         style={styles.map}
         initialRegion={{
-          latitude: confirmedStarterLocation.latitude,
-          longitude: confirmedStarterLocation.longitude,
+          latitude: finalDestinationList[0].latitude,
+          longitude: finalDestinationList[0].longitude,
           latitudeDelta: 0.02,
           longitudeDelta: 0.02,
         }}
         mapType="standard"
       >
-        {/* Marker for the start location */}
+        {/* Marker for the Start Location */}
         <Marker
           coordinate={{
-            latitude: confirmedStarterLocation.latitude,
-            longitude: confirmedStarterLocation.longitude,
+            latitude: finalDestinationList[0].latitude,
+            longitude: finalDestinationList[0].longitude,
           }}
           title="Start Location"
           pinColor="blue" 
         />
 
-        {/* Markers for selected places */}
-        {selectedPlacesIds.map((destination, index) => (
+        {/* Markers for all destinations except the first one */}
+        {finalDestinationList.slice(1).map((destination, index) => (
           <Marker
             key={destination.place_id}
             coordinate={{
@@ -62,9 +71,19 @@ const GameMapScreen = ({ route }) => {
             }}
             title={destination.name}
             pinColor="red"
+            onPress={() => handlePinPress(destination)} // Call handlePinPress function with the clicked destination
           />
         ))}
       </MapView>
+      
+      <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+        <Text style={styles.backButtonText}>Back</Text>
+      </TouchableOpacity>
+
+      {/* Location modal - render only when a pin is selected */}
+      {selectedLocation && (
+        <GameLocationModal isVisible={true} locations={finalDestinationList} clickedLocation={selectedLocation} onClose={closeModal} />
+      )}
     </View>
   );
 };
@@ -78,6 +97,18 @@ const styles = StyleSheet.create({
   map: {
     width: '100%',
     height: '100%',
+  },
+  backButton: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+    backgroundColor: 'white',
+    padding: 10,
+    borderRadius: 5,
+    zIndex: 999,
+  },
+  backButtonText: {
+    fontWeight: 'bold',
   },
 });
 

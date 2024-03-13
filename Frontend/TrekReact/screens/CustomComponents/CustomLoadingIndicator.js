@@ -19,8 +19,8 @@ const styles = StyleSheet.create({
     zIndex: 999,
   },
   loadingGif: {
-    width: 65, 
-    height:65,
+    width: 100, 
+    height:100,
   },
 });
 
