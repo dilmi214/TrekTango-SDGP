@@ -2,6 +2,7 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import LoginScreen from './LoginPage';
 import ForgotPasswordScreen from './ForgotPassword';
+import RegisterScreen from './RegistrationDummy';
 import CreateAccountScreen from './CreateAccountScreen';
 
 const Stack = createStackNavigator();
@@ -25,14 +26,14 @@ function LogInNavigation() {
           gestureEnabled: false 
         }} 
       /> */}
-      {/* <Stack.Screen
+      <Stack.Screen
         name="Registration"
         component={RegisterScreen}
         options={{ 
           headerShown: false, 
           gestureEnabled: false 
         }} 
-      /> */}
+      />
       <Stack.Screen
         name="CreateAccountScreen"
         component={CreateAccountScreen}
