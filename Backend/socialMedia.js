@@ -24,7 +24,7 @@ db.once('open', function () {
 
 const socialMediaSchema = new mongoose.Schema({
   username: { type: String, required: true }, // Already exists in the earlier schema
-  userID: { type: String, default: uuidv4, required: true },
+  userID: { type: String, required: true },
   lastRefreshedAt: { type: Date, default: Date.now },
   posts: [{
     postId: { type: String, default: uuidv4(), required: true, unique: true },
@@ -53,28 +53,28 @@ const SocialMedia = mongoose.model('SocialMedia', socialMediaSchema);
 module.exports = SocialMedia; //Just in case, I might need to access this from another script
 
 app.post('/social-media', async (req, res) => {
-    try {
-      
-      const { username, placeId, imageReferenceId, uploadToMedia, caption, likes } = req.body;
-  
-      //Does not include comments or post ID, Post ID is auto generated and comments are null when initiated
-      const newPost = new SocialMedia({
-        username,
-        placeId,
-        imageReferenceId,
-        uploadToMedia,
-        caption,
-        likes
-      });
-  
-      const savedPost = await newPost.save();
-  
-      res.status(200).json(savedPost);
-    } catch (error) {
-      // Handle errors
-      res.status(400).json({ message: error.message });
-    }
-  });
+  try {
+    const { username, userID, placeId, imageReferenceId, uploadToMedia, caption, likes } = req.body;
+
+    // Create a new post with default or auto-generated values
+    const newPost = new SocialMedia({
+      username,
+      userID,
+      placeId,
+      imageReferenceId,
+      uploadToMedia,
+      caption,
+      likes
+    });
+
+    const savedPost = await newPost.save();
+
+    res.status(200).json(savedPost);
+  } catch (error) {
+    // Handle errors
+    res.status(400).json({ message: error.message });
+  }
+});
 
   //
   app.get('/social-media/:username/posts', async (req, res) => {
