@@ -1,36 +1,27 @@
-import React from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import CustomDialog from '../CustomComponents/CustomDialog';
 
 const StartGameScreen = ({ route }) => {
   const navigation = useNavigation();
   const { finalDestinationList } = route.params;
+  const [showDialog, setShowDialog] = useState(false);
 
   const handleConfirm = () => {
-
-    Alert.alert(
-      'Confirmation',
-      'Are you sure you want to start the game?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Yes',
-          onPress: () => {
-            navigation.navigate('GameMapScreen', {finalDestinationList});
-          },
-        },
-      ],
-      { cancelable: false }
-    );
+    setShowDialog(true);
   };
 
   const handleBack = () => {
     navigation.goBack();
   };
 
+  const handleDialogSelect = (option) => {
+    setShowDialog(false);
+    if (option === 'Yes') {
+      navigation.navigate('GameMapScreen', { finalDestinationList });
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -48,6 +39,13 @@ const StartGameScreen = ({ route }) => {
       <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
         <Text style={styles.confirmButtonText}>Start Game</Text>
       </TouchableOpacity>
+      <CustomDialog
+        visible={showDialog}
+        title="Confirmation"
+        message="Are you sure you want to start the game?"
+        options={['Cancel', 'Yes']}
+        onSelect={handleDialogSelect}
+      />
     </View>
   );
 };

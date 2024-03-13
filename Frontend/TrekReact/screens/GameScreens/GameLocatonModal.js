@@ -35,6 +35,7 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation}) =>
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
             <Text style={styles.closeButtonText}>Close</Text>
           </TouchableOpacity>
+          <Text>Name: {clickedLocation?.name}</Text>
           <Text>Latitude: {clickedLocation?.latitude}</Text>
           <Text>Longitude: {clickedLocation?.longitude}</Text>
           <View style={styles.rowContainer}>
