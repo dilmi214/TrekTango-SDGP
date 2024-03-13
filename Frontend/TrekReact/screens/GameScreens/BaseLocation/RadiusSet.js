@@ -33,6 +33,7 @@ const RadiusSetScreen = ({ route, navigation }) => {
     }
   }, [mapLoaded]);
 
+
   const handleMapReady = () => {
     setMapLoaded(true);
   };
@@ -60,6 +61,21 @@ const RadiusSetScreen = ({ route, navigation }) => {
     setSelectedRadiusValue(value);
     setRadius(value);
     toggleDropdown();
+    
+    // new latitudeDelta and longitudeDelta based on the radius
+    const delta = value / 112300; // 1 degree = 111.3 kilometers
+    const latitudeDelta = value / 22000; // Adjust the division factor as needed for zoom level
+    const longitudeDelta = delta;
+  
+    // Update the map's region to fit the circle
+    if (mapRef.current) {
+      mapRef.current.animateToRegion({
+        latitude,
+        longitude,
+        latitudeDelta,
+        longitudeDelta,
+      });
+    }
   };
 
   return (
