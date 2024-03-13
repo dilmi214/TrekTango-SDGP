@@ -23,20 +23,30 @@ db.once('open', function () {
 
 
 const socialMediaSchema = new mongoose.Schema({
-  postId: { type: String, default: uuidv4(), required: true, unique: true },
-  username: { type: String, required: true }, //Already exists in the earlier schema
-  placeId: { type: String, required: true },
-  imageReferenceId: { type: String },
-  uploadToMedia: { type: Boolean, default: false }, //If true belongs to public feed, else belongs to personal feed. Will be useful during the profile page
-  caption: {type: String},
-  comments: { type: [{ 
-    commentID: { type: String, default: uuidv4(), required: true, unique: true },
-    username: { type: String, required: true },
-    comment: { type: String, required: true }
-  }], default: null },
-  likes: [{ type: String }], //Will consist of an array of usernames. Likes.length will determine the number of likes
-  createdAt: { type: Date, default: Date.now } //When refreshing feed, Will be used to upload the new posts
+  username: { type: String, required: true }, // Already exists in the earlier schema
+  userID: { type: String, default: uuidv4, required: true },
+  lastRefreshedAt: { type: Date, default: Date.now },
+  posts: [{
+    postId: { type: String, default: uuidv4(), required: true, unique: true },
+    placeId: { type: String, required: true },
+    imageReferenceId: { type: String },
+    uploadToMedia: { type: Boolean, default: false }, // If true belongs to public feed, else belongs to personal feed. Will be useful during the profile page
+    caption: { type: String },
+    comments: { type: [{ 
+      commentID: { type: String, default: uuidv4(), required: true, unique: true },
+      username: { type: String, required: true },
+      comment: { type: String, required: true }
+    }], default: null },
+    likes: [{ type: String }], // Will consist of an array of usernames. Likes.length will determine the number of likes
+    createdAt: { type: Date, default: Date.now }
+  }]
 });
+
+const mongoose = require('mongoose');
+const { v4: uuidv4 } = require('uuid');
+
+
+module.exports = mongoose
 
 const SocialMedia = mongoose.model('SocialMedia', socialMediaSchema);
 
