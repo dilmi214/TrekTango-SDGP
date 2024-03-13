@@ -5,7 +5,6 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import Constants from 'expo-constants';
 import Layout from '../../CustomComponents/ScreenLayout';
 import Snackbar from '../../CustomComponents/Snackbar';
-import NavBar from '../../CustomComponents/NavBar';
 import CustomDialog from '../../CustomComponents/CustomDialog';
 
 const SearchLocationScreen = ({ navigation }) => {
