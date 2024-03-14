@@ -4,74 +4,92 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import * as Location from 'expo-location';
 import Snackbar from '../CustomComponents/Snackbar';
 import CustomDialog from '../CustomComponents/CustomDialog';
+import CustomLoadingIndicator from '../CustomComponents/CustomLoadingIndicator';
 
 const SelectStartLocationScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const { selectedPlacesIds } = route.params;
-
   const [showDestinations, setShowDestinations] = useState(false);
   const [showSnackbar, setShowSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [showBackDialog, setShowBackDialog] = useState(false);
   const [selectedDestination, setSelectedDestination] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleSelectFromList = () => {
     setShowDestinations(true);
   };
 
   const handleDetectCurrentLocation = async () => {
+    setLoading(true); // Show loading indicator
     let { status } = await Location.getForegroundPermissionsAsync();
-
+  
     if (status !== 'granted') {
-      // req if permission has not been granted previously
       const { status: newStatus } = await Location.requestForegroundPermissionsAsync();
       status = newStatus;
     }
-
+  
     if (status !== 'granted') {
-      // ff permission is still not granted
+      setLoading(false);
       Alert.alert('Permission Denied', 'Please grant location permission to detect your current location.');
       return;
     }
-
+  
     try {
       const location = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = location.coords;
-
+      setLoading(false); 
       console.log('Current Location:', { latitude, longitude });
       setSnackbarMessage('Location detected!');
       setShowSnackbar(true);
+  
       const confirmedStarterLocation = {
+        place_id : 'undefined',
+        name : 'start location',
         latitude,
-        longitude
+        longitude,
       };
+  
+      const finalDestinationList = [confirmedStarterLocation, ...selectedPlacesIds];
+  
       setTimeout(() => {
         setShowSnackbar(false);
-        navigation.navigate('StartGameScreen', {selectedPlacesIds, confirmedStarterLocation});
-      }, 1201); 
-
+        console.log(finalDestinationList)
+        navigation.navigate('StartGameScreen', {finalDestinationList});
+      }, 601);
+  
     } catch (error) {
       console.error('Error getting current location:', error);
       Alert.alert('Error', 'Failed to get current location. Please try again later.');
     }
-  };
-
+  }
 
   const handleBack = (option) => {
-    if (option === 'Back') {
+    if (option === 'Yes') {
       navigation.goBack();
     }
     setShowBackDialog(false);
   };
 
   const handleNext = () => {
-  console.log('Next button pressed');
-};
-
-const handleSelectDestination = (destination) => {
-  setSelectedDestination(destination);
-};
+    if (selectedDestination) {
+      const finalDestinationList  = [selectedDestination, ...selectedPlacesIds.filter(place => place.place_id !== selectedDestination.place_id)];
+      navigation.navigate('StartGameScreen', {finalDestinationList});
+      console.log(finalDestinationList[0].name)
+    } else {
+      // If no destination is selected, show a message
+      setShowSnackbar(true);
+      setSnackbarMessage('Please select a destination.');
+      setTimeout(() => {
+        setShowSnackbar(false);
+      }, 2000);
+    }
+  };
+  
+  const handleSelectDestination = (destination) => {
+    setSelectedDestination(destination);
+  };
 
   return (
     <View style={styles.container}>
@@ -94,14 +112,20 @@ const handleSelectDestination = (destination) => {
       {showDestinations && (
         <>
           {selectedPlacesIds.map(destination => (
-            <TouchableOpacity key={destination.place_id} style={styles.destinationButton}>
+            <TouchableOpacity
+              key={destination.place_id}
+              style={[
+                styles.destinationButton,
+                selectedDestination === destination && styles.selectedDestinationButton
+              ]}
+              onPress={() => handleSelectDestination(destination)}
+            >
               <Text style={styles.destinationButtonText}>{destination.name}</Text>
             </TouchableOpacity>
-            
           ))}
-        <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-          <Text style={styles.buttonText}>Next</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+            <Text style={styles.buttonText}>Next</Text>
+          </TouchableOpacity>
         </>
       )}
 
@@ -109,17 +133,18 @@ const handleSelectDestination = (destination) => {
         <Snackbar
           visible={showSnackbar}
           message={snackbarMessage}
-          duration={1200}
+          duration={2000}
           action={{ label: 'Dismiss', onPress: () => setShowSnackbar(false) }}
         />
       )}
+      {loading && <CustomLoadingIndicator />}
       <CustomDialog
-      visible={showBackDialog}
-      title="Confirmation"
-      message="Do you want to go back?"
-      options={['Cancel', 'Back']}
-      onSelect={handleBack}
-    />
+        visible={showBackDialog}
+        title="Confirmation"
+        message="Do you want to go back?"
+        options={['Yes', 'No']}
+        onSelect={handleBack}
+      />
     </View>
   );
 };
@@ -151,6 +176,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 20,
     alignItems: 'center',
+  },
+  selectedDestinationButton: {
+    backgroundColor: '#ff6347', // Change background color when selected
   },
   destinationButtonText: {
     color: '#fff',
