@@ -9,6 +9,7 @@ import NavBar from '../../CustomComponents/NavBar';
 import CustomDialog from '../../CustomComponents/CustomDialog';
 import Snackbar from '../../CustomComponents/Snackbar';
 import CustomLoadingIndicator from '../../CustomComponents/CustomLoadingIndicator';
+import Layout from '../../CustomComponents/ScreenLayout';
 
 
 const GOOGLE_PLACES_API_KEY = "AIzaSyCCHxfnoWl-DNhLhKcjhCTiHYNY917ltL8";
@@ -170,109 +171,108 @@ const NearbyDestinationsScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.button} onPress={() => setShowBackDialog(true)}>
-          <Text style={styles.buttonText}>Back</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => setExpanded(!expanded)}>
-          <Text style={styles.buttonText}>Categories</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={toggleConfirmedDestinationListModal}>
-          <Text style={styles.buttonText}>Edit List</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={checkSelectedPlacesCount}>
-          <Text style={styles.buttonText}>Next</Text>
-        </TouchableOpacity>
-      </View>
-      {expanded && (
-        <View style={styles.categories}>
-          {categories.map((category, index) => (
-            <TouchableOpacity
-              key={index}
-              onPress={() => {
-                setSelectedType(category.value);
-                setExpanded(false);
-              }}
-              style={styles.categoryItem}
-            >
-              <Text>{category.label}</Text>
-            </TouchableOpacity>
-          ))}
+    <Layout>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.button} onPress={() => setShowBackDialog(true)}>
+            <Text style={styles.buttonText}>Back</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => setExpanded(!expanded)}>
+            <Text style={styles.buttonText}>Categories</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={toggleConfirmedDestinationListModal}>
+            <Text style={styles.buttonText}>Edit List</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={checkSelectedPlacesCount}>
+            <Text style={styles.buttonText}>Next</Text>
+          </TouchableOpacity>
         </View>
-      )}
-      {destinations.length > 0 ? (
-     <FlatList
-     data={destinations}
-     renderItem={({ item }) => {
-       const firstPhoto = item.photos ? item.photos[0] : null;
-       const photoUrl = firstPhoto ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${firstPhoto.photo_reference}&key=${GOOGLE_PLACES_API_KEY}` : null;
-       return (
-         <ListItem
-           bottomDivider
-           onPress={() => openPlaceDetailsModal(item)}
-         >
-           <ListItem.Content>
-             <ListItem.Title>{item.name}</ListItem.Title>
-             {photoUrl ? (
-               <Image
-                 source={{ uri: photoUrl }}
-                 style={{ width: 50, height: 50 }} 
-               />
-             ) : (
-              <Image
-              source={require('../../CustomComponents/ImgUnavailable.png')}
-              style={{ width: 50, height: 50 }} 
-            />
-             )}
-           </ListItem.Content>
-         </ListItem>
-       );
-     }}
-     keyExtractor={(item) => item.place_id}
-     onEndReachedThreshold={0.9} // call loadMoreData when close to the end
-     onEndReached={loadMoreData} 
-   />
-      ) : (
-        <Text>No places available in this category</Text>
-      )}
-      <CustomDialog
-        visible={showBackDialog}
-        title="Confirmation"
-        message="Do you want to go back?"
-        options={['Yes', 'No']}
-        onSelect={handleBackDialogResponse}
-      />
-      {showLoadingIndicator && <CustomLoadingIndicator />}
-      {showSnackbar && (
-        <Snackbar
-          visible={showSnackbar}
-          message={snackbarMessage}
-          duration={1200}
-          action={{ label: 'Dismiss', onPress: () => setShowSnackbar(false) }}
+        {expanded && (
+          <View style={styles.categories}>
+            {categories.map((category, index) => (
+              <TouchableOpacity
+                key={index}
+                onPress={() => {
+                  setSelectedType(category.value);
+                  setExpanded(false);
+                }}
+                style={styles.categoryItem}
+              >
+                <Text>{category.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+        {destinations.length > 0 ? (
+      <FlatList
+      data={destinations}
+      renderItem={({ item }) => {
+        const firstPhoto = item.photos ? item.photos[0] : null;
+        const photoUrl = firstPhoto ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${firstPhoto.photo_reference}&key=${GOOGLE_PLACES_API_KEY}` : null;
+        return (
+          <ListItem
+            bottomDivider
+            onPress={() => openPlaceDetailsModal(item)}
+          >
+            <ListItem.Content>
+              <ListItem.Title>{item.name}</ListItem.Title>
+              {photoUrl ? (
+                <Image
+                  source={{ uri: photoUrl }}
+                  style={{ width: 50, height: 50 }} 
+                />
+              ) : (
+                <Image
+                source={require('../../CustomComponents/ImgUnavailable.png')}
+                style={{ width: 50, height: 50 }} 
+              />
+              )}
+            </ListItem.Content>
+          </ListItem>
+        );
+      }}
+      keyExtractor={(item) => item.place_id}
+      onEndReachedThreshold={0.9} // call loadMoreData when close to the end
+      onEndReached={loadMoreData} 
+    />
+        ) : (
+          <Text>No places available in this category</Text>
+        )}
+        <CustomDialog
+          visible={showBackDialog}
+          title="Confirmation"
+          message="Do you want to go back?"
+          options={['Yes', 'No']}
+          onSelect={handleBackDialogResponse}
         />
-      )}
-      {isPlaceDetailsModalVisible && (
-          <PlaceDetailsModal
-            visible={isPlaceDetailsModalVisible}
-            place={selectedPlace}
-            onClose={() => setPlaceDetailsModalVisible(false)}
-            onAddToList={handleAddToList}
+        {showLoadingIndicator && <CustomLoadingIndicator />}
+        {showSnackbar && (
+          <Snackbar
+            visible={showSnackbar}
+            message={snackbarMessage}
+            duration={1200}
+            action={{ label: 'Dismiss', onPress: () => setShowSnackbar(false) }}
+          />
+        )}
+        {isPlaceDetailsModalVisible && (
+            <PlaceDetailsModal
+              visible={isPlaceDetailsModalVisible}
+              place={selectedPlace}
+              onClose={() => setPlaceDetailsModalVisible(false)}
+              onAddToList={handleAddToList}
+              selectedPlacesIds={selectedPlacesIds}
+          />
+        )}
+        {isConfirmedDestinationListModalVisible && (
+          <ConfirmedDestinationListModal
+            visible={isConfirmedDestinationListModalVisible}
+            onClose={toggleConfirmedDestinationListModal}
             selectedPlacesIds={selectedPlacesIds}
-        />
-      )}
-       {isConfirmedDestinationListModalVisible && (
-        <ConfirmedDestinationListModal
-          visible={isConfirmedDestinationListModalVisible}
-          onClose={toggleConfirmedDestinationListModal}
-          selectedPlacesIds={selectedPlacesIds}
-          onRemoveDestination={handleRemoveDestination}
-        />
-      )}
-      <View style={styles.navBarContainer}>
-        <NavBar />
+            onRemoveDestination={handleRemoveDestination}
+          />
+        )}
       </View>
-    </View>
+    </Layout>
   );
 };
 
