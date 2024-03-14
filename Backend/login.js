@@ -1,4 +1,4 @@
-const { myEmailUsername, myEmailpassword, databaseLink} = require('./Credentials');
+const { myEmailUsername, myEmailpassword, databaseLink} = require('./credentials');
 const url = databaseLink;
 // const { myEmailUsername, myEmailpassword, databaseLink} = require('./credentials');
 const mongoose = require('mongoose');
