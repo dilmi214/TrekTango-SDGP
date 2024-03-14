@@ -1,12 +1,35 @@
-import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image, TextInput } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image, TextInput, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const handleSignInPress = () => {
-    navigation.navigate('Home');
+  const handleSignInPress = async () => {
+    try {
+      const response = await fetch('http://192.168.1.2:3000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: email, password }),
+      });
+      
+      const data = await response.json();
+
+      if (response.ok) {
+        // Login successful, navigate to home screen
+        navigation.navigate('Home');
+      } else {
+        // Login failed, show error message
+        Alert.alert('Error', data.error);
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Failed to connect to server');
+    }
   };
 
   const handleCreateAccountPress = () => {
@@ -26,6 +49,8 @@ const LoginScreen = () => {
         placeholderTextColor="white"
         placeholder="Email"
         autoCapitalize="none"
+        value={email}
+        onChangeText={setEmail}
       />
       <TextInput
         style={styles.input}
@@ -33,6 +58,8 @@ const LoginScreen = () => {
         placeholder="Password"
         secureTextEntry={true}
         autoCapitalize="none"
+        value={password}
+        onChangeText={setPassword}
       />
       <TouchableOpacity style={styles.signInButton} onPress={handleSignInPress}>
         <Text style={styles.signInButtonText}>Sign In</Text>
