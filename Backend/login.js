@@ -110,6 +110,7 @@ app.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Incorrect username or password entered' });
     }
 
+    req.session.username = username; //Change this later into user ID (Then update the travelling schema)
     // Passwords match, user is authenticated
     res.status(200).json({ message: 'User authenticated successfully' });
   } catch (error) {
@@ -144,8 +145,8 @@ app.put('/users/send-verification-email', async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: myEmailUsername, // Replace with your email address
-        pass: myEmailpassword, // Replace with your email password
+        user: myEmailUsername, 
+        pass: myEmailpassword, 
       },
     });
 
