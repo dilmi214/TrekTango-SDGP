@@ -1,3 +1,4 @@
+//travellingSession
 const mongoose = require('mongoose');
 const express = require('express');
 const { v4: uuidv4 } = require('uuid');
@@ -26,6 +27,16 @@ db.once('open', function () {
     console.log('Connected to MongoDB database');
 });
 
+const getUsernameFromSession = (req, res, next) => {
+    // Assuming username is stored in the session under the key 'username'
+    const { username } = req.session;
+    if (!username) {
+        return res.status(401).json({ error: 'User not authenticated' });
+    }
+    req.username = username; // Add username to request object for use in subsequent middleware or routes
+    next();
+};
+
 /**
  * Create the schema for the locations with all its details
 */
@@ -43,6 +54,35 @@ const locationSchema = new mongoose.Schema({
 
 // Create Location model
 const Location = mongoose.model('Location', locationSchema);
+
+
+app.post('/sessions', getUsernameFromSession, async (req, res) => {
+    try {
+        const { username } = req; // Get username from request object
+
+        // Extract other required data from request body
+        const { startingPlaceId, listOfPlaceIds } = req.body;
+
+        // Generate a unique sessionId
+        const sessionId = uuidv4();
+
+        // Create a new session using the Location model
+        const newSession = new Location({
+            sessionId,
+            username,
+            startingPlaceId,
+            listOfPlaceIds
+        });
+
+        // Save the new session to the database
+        await newSession.save();
+
+        res.status(201).json({ message: 'Travelling session created successfully', sessionId });
+    } catch (error) {
+        console.error('Error creating travelling session:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 
 
     /**
@@ -118,10 +158,10 @@ app.put('/locations/:sessionId/add-place', async (req, res) => {
 /**
  * Sends back an array of locations that are under the same username
 */
-app.get('/locations/:username', async (req, res) => {
+app.get('/locations/:username', getUsernameFromSession, async (req, res) => {
     try {
-        // Extract username from request parameters
-        const { username } = req.params;
+        // Get username from the request object
+        const { username } = req;
 
         // Find all locations for the given username
         const locations = await Location.find({ username });
