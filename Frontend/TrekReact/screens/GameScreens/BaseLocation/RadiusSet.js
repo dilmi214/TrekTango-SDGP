@@ -2,21 +2,25 @@ import React, { useRef, useState, useEffect } from 'react';
 import { View, StyleSheet, Dimensions, TouchableOpacity, Text, ScrollView } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker, Circle } from 'react-native-maps';
 import Constants from 'expo-constants';
-import NavBar from '../../CustomComponents/NavBar';
 import CustomDialog from '../../CustomComponents/CustomDialog';
 import Layout from '../../CustomComponents/ScreenLayout';
+import CustomLoadingIndicator from '../../CustomComponents/CustomLoadingIndicator';
 
 const RadiusSetScreen = ({ route, navigation }) => {
   const { longitude, latitude } = route.params;
   const mapRef = useRef(null);
   const [showDialog, setShowDialog] = useState(false);
-  const [radius, setRadius] = useState(1000); // Initial radius 
+  const [radius, setRadius] = useState(1000); 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const radiusValues = [1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000];
   const [selectedRadiusValue, setSelectedRadiusValue] = useState(radiusValues[0]);
+  const [loading, setLoading] = useState(false);
+  const [mapLoaded, setMapLoaded] = useState(false); 
+
 
   useEffect(() => {
-    if (mapRef.current) {
+    setLoading(true); 
+    if (mapRef.current && mapLoaded) {
       setTimeout(() => {
         mapRef.current.animateToRegion({
           latitude,
@@ -24,9 +28,15 @@ const RadiusSetScreen = ({ route, navigation }) => {
           latitudeDelta: 0.02,
           longitudeDelta: 0.02,
         });
-      }, 300); // Delaying the animation by 1 second to ensure the map is ready
+        setLoading(false); 
+      }, 1000);
     }
-  }, [mapRef]);
+  }, [mapLoaded]);
+
+
+  const handleMapReady = () => {
+    setMapLoaded(true);
+  };
 
   const handleBackPress = () => {
     setShowDialog(true);
@@ -51,11 +61,27 @@ const RadiusSetScreen = ({ route, navigation }) => {
     setSelectedRadiusValue(value);
     setRadius(value);
     toggleDropdown();
+    
+    // new latitudeDelta and longitudeDelta based on the radius
+    const delta = value / 112300; // 1 degree = 111.3 kilometers
+    const latitudeDelta = value / 22000; // Adjust the division factor as needed for zoom level
+    const longitudeDelta = delta;
+  
+    // Update the map's region to fit the circle
+    if (mapRef.current) {
+      mapRef.current.animateToRegion({
+        latitude,
+        longitude,
+        latitudeDelta,
+        longitudeDelta,
+      });
+    }
   };
 
   return (
     <Layout>
-      <View style={styles.container}>
+       <View style={styles.container}>
+        {loading && <CustomLoadingIndicator />}
         <MapView
           ref={mapRef}
           style={styles.map}
@@ -66,6 +92,7 @@ const RadiusSetScreen = ({ route, navigation }) => {
             latitudeDelta: 10,
             longitudeDelta: 10,
           }}
+          onMapReady={handleMapReady}
         >
           <Marker
             coordinate={{ latitude, longitude }}
