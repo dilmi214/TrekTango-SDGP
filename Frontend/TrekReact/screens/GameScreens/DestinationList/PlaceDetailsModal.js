@@ -17,7 +17,6 @@ const PlaceDetailsModal = ({ visible, place, onClose, onAddToList}) => {
       name: place.name,
       latitude: place.geometry.location.lat,
       longitude: place.geometry.location.lng
-      //can get photos, address all that from here
     };
 
     onAddToList(placeData);
@@ -169,4 +168,3 @@ const styles = StyleSheet.create({
 });
 
 export default PlaceDetailsModal;
-
