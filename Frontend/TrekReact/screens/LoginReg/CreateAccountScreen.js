@@ -1,16 +1,54 @@
+import { baseURL } from './getIPAddress';
 import React, { useState } from 'react';
 import { StyleSheet, TextInput, Text, View, TouchableOpacity, ScrollView } from 'react-native';
+import axios from 'axios'; // Import axios for making HTTP requests
 import { useNavigation } from '@react-navigation/native';
 
 const CreateAccountScreen = () => {
-  const navigation = useNavigation();
+  // const navigation = useNavigation(); // Get navigation object
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [dob, setDob] = useState('');
 
-  const handleCreateAccount = () => {
-    navigation.navigate('Home');
+  const navigation = useNavigation(); // Get navigation object
+  
+
+  const handleCreateAccount = async () => {
+    try {
+      // Check if password and confirm password match
+      if (password !== confirmPassword) {
+        console.error('Passwords do not match');
+        return;
+      }
+  
+      // Make a POST request to the backend endpoint
+      const response = await axios.post(`${baseURL}/register`, {
+        username,
+        email,
+        password,
+        name: `${firstName} ${lastName}`, // Combine first name and last name
+        dob
+      });
+      
+      // Check if the request was successful
+      if (response.status === 201) {
+        console.log('User registered successfully');
+        navigation.navigate('Home'); //Can also navigate to the login page (Will be prompted to rewrite username and password)
+        
+      } else {
+        console.error('Failed to register user');
+        // Handle error appropriately
+      }
+    } catch (error) {
+      console.error('Error registering user:', error);
+      // Handle error appropriately
+    }
   };
+  
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -18,7 +56,28 @@ const CreateAccountScreen = () => {
       <TextInput
         style={styles.input}
         placeholderTextColor="white"
+        placeholder="First Name"
+        value={firstName}
+        onChangeText={(text) => setFirstName(text)}
+      />
+      <TextInput
+        style={styles.input}
+        placeholderTextColor="white"
+        placeholder="Last Name"
+        value={lastName}
+        onChangeText={(text) => setLastName(text)}
+      />
+      <TextInput
+        style={styles.input}
+        placeholderTextColor="white"
         placeholder="Enter email"
+        value={email}
+        onChangeText={(text) => setEmail(text)}
+      />
+      <TextInput
+        style={styles.input}
+        placeholderTextColor="white"
+        placeholder="Enter username"
         value={username}
         onChangeText={(text) => setUsername(text)}
       />
@@ -37,6 +96,13 @@ const CreateAccountScreen = () => {
         secureTextEntry={true}
         value={confirmPassword}
         onChangeText={(text) => setConfirmPassword(text)}
+      />
+      <TextInput
+        style={styles.input}
+        placeholderTextColor="white"
+        placeholder="Date of Birth (MM/DD/YYYY)"
+        value={dob}
+        onChangeText={(text) => setDob(text)}
       />
       <TouchableOpacity style={styles.createAccountButton} onPress={handleCreateAccount}>
         <Text style={styles.createAccountButtonText}>Create Account</Text>
