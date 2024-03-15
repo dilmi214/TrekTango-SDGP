@@ -111,9 +111,6 @@ const ProfilePage = () => {
           ))}
         </View>
       </ScrollView>
-      <View style={styles.navBarContainer}>
-        <NavBar />
-      </View>
     </View>
   );
 };

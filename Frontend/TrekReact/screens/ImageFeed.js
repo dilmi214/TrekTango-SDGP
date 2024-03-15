@@ -120,9 +120,6 @@ const ImageFeed = () => {
           </View>
         </Modal>
       )}
-      <View style={styles.navBarContainer}>
-        <NavBar />
-    </View>
     </View>
   );
 };
@@ -226,12 +223,6 @@ const styles = StyleSheet.create({
     top: 60,
     right: 20,
     zIndex: 1,
-  },
-  navBarContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
   },
 });
 

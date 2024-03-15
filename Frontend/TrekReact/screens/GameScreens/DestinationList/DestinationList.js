@@ -3,9 +3,7 @@ import { Text, View, FlatList, StyleSheet, TouchableOpacity, Image, ScrollView, 
 import { ListItem } from 'react-native-elements';
 import PlaceDetailsModal from './PlaceDetailsModal';
 import ConfirmedDestinationListModal from './confirmedDestinationListModal'; 
-import Dialog from 'react-native-dialog';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import NavBar from '../../CustomComponents/NavBar';
 import CustomDialog from '../../CustomComponents/CustomDialog';
 import Snackbar from '../../CustomComponents/Snackbar';
 import CustomLoadingIndicator from '../../CustomComponents/CustomLoadingIndicator';
@@ -171,7 +169,7 @@ const NearbyDestinationsScreen = () => {
   };
 
   return (
-    <Layout>
+
       <View style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity style={styles.button} onPress={() => setShowBackDialog(true)}>
@@ -272,7 +270,6 @@ const NearbyDestinationsScreen = () => {
           />
         )}
       </View>
-    </Layout>
   );
 };
 

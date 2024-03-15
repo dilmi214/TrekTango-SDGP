@@ -69,7 +69,6 @@ const SearchLocationScreen = ({ navigation }) => {
   };
 
   return (
-    <Layout>
       <View style={styles.container}>
         <View style={styles.buttonsContainer}>
           <TouchableOpacity onPress={handleBackPress}>
@@ -123,7 +122,6 @@ const SearchLocationScreen = ({ navigation }) => {
           />
         )}
       </View>
-    </Layout>
   );
 };
 

@@ -17,7 +17,6 @@ const RadiusSetScreen = ({ route, navigation }) => {
   const [loading, setLoading] = useState(false);
   const [mapLoaded, setMapLoaded] = useState(false); 
 
-
   useEffect(() => {
     setLoading(true); 
     if (mapRef.current && mapLoaded) {
@@ -79,7 +78,7 @@ const RadiusSetScreen = ({ route, navigation }) => {
   };
 
   return (
-    <Layout>
+
        <View style={styles.container}>
         {loading && <CustomLoadingIndicator />}
         <MapView
@@ -144,7 +143,6 @@ const RadiusSetScreen = ({ route, navigation }) => {
           </TouchableOpacity>
         </View>
       </View>
-    </Layout>
   );
 };
 
