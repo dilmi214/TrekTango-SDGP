@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
+// import { useEffect,} from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image, TextInput, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { baseURL } from './getIPAddress';
+import axios from 'axios';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
@@ -9,7 +12,7 @@ const LoginScreen = () => {
 
   const handleSignInPress = async () => {
     try {
-      const response = await axios.post('http://192.168.1.2:3000/login', {
+      const response = await axios.post(`${baseURL}/login`, {
         username: email,
         password,
       });
