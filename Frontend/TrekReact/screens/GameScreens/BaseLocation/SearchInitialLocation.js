@@ -97,7 +97,6 @@ const SearchLocationScreen = ({ navigation }) => {
           styles={autoCompleteStyles}
           fetchDetails={true}
           enablePoweredByContainer={false}
-          nearbyPlacesAPI="GooglePlacesSearch" 
         />
         <View style={styles.mapContainer}>
           <MapView
