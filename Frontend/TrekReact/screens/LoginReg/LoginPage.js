@@ -9,22 +9,17 @@ const LoginScreen = () => {
 
   const handleSignInPress = async () => {
     try {
-      const response = await fetch('http://192.168.1.2:3000/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username: email, password }),
+      const response = await axios.post('http://192.168.1.2:3000/login', {
+        username: email,
+        password,
       });
       
-      const data = await response.json();
-
-      if (response.ok) {
+      if (response.status === 200) {
         // Login successful, navigate to home screen
         navigation.navigate('Home');
       } else {
         // Login failed, show error message
-        Alert.alert('Error', data.error);
+        Alert.alert('Error', response.data.error);
       }
     } catch (error) {
       console.error(error);
