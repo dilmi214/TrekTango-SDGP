@@ -9,7 +9,7 @@ const CreateAccountScreen = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
 
   const handleCreateAccount = () => {
-    navigation.navigate('Home');
+    navigation.navigate('Main');
   };
 
   return (

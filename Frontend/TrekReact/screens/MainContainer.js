@@ -21,8 +21,7 @@ const Tab = createBottomTabNavigator();
 
 function MainContainer() {
   return (
-    <NavigationContainer>
-      <Tab.Navigator
+          <Tab.Navigator
         initialRouteName={homeName}
         screenOptions={({ route }) => ({
           tabBarIcon: ({ color, size }) => {
@@ -45,6 +44,7 @@ function MainContainer() {
           tabBarActiveTintColor: '#010C33',
           tabBarInactiveTintColor: 'grey',
           headerShown: false,
+          //tabBarShowLabel: false,
         })}
           
       >
@@ -53,7 +53,6 @@ function MainContainer() {
         <Tab.Screen name={feedName} component={ImageFeed} />
         <Tab.Screen name={profileName} component={ProfilePage} />
       </Tab.Navigator>
-    </NavigationContainer>
   );
 }
 
