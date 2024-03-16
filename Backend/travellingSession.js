@@ -2,10 +2,9 @@
 const mongoose = require('mongoose');
 const express = require('express');
 const { v4: uuidv4 } = require('uuid');
-const port = 3000;
 const bodyParser = require('body-parser');
 const cors = require('cors')
-
+const router = express.Router();
 
 const app = express();
 app.use(bodyParser.json()); // Parse incoming request bodies in JSON format
@@ -23,7 +22,7 @@ const db = mongoose.connection;
 // Error handling for MongoDB connection
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function () {
-    console.log('Connected to MongoDB database');
+    console.log('Connected to Travelling Session database');
 });
 
 
@@ -46,7 +45,7 @@ const locationSchema = new mongoose.Schema({
 const Location = mongoose.model('Location', locationSchema);
 
 
-app.post('/sessions', async (req, res) => { 
+router.post('/sessions', async (req, res) => { 
     try {
         const { username } = req; // Get username from request object
 
@@ -78,7 +77,7 @@ app.post('/sessions', async (req, res) => {
     /**
      * Allows to change the starting place ID 
     */
-  app.put('/locations/:sessionId', async (req, res) => {
+  router.put('/locations/:sessionId', async (req, res) => {
     try {
         // Extract sessionId from request parameters
         const { sessionId } = req.params;
@@ -109,7 +108,7 @@ app.post('/sessions', async (req, res) => {
 /**
  * Add a new place ID with the respective complete status and the image reference ID which will be set to False and null respectively by default
 */
-app.put('/locations/:sessionId/add-place', async (req, res) => {
+router.put('/locations/:sessionId/add-place', async (req, res) => {
     try {
         // Extract sessionId from request parameters
         const { sessionId } = req.params;
@@ -148,7 +147,7 @@ app.put('/locations/:sessionId/add-place', async (req, res) => {
 /**
  * Sends back an array of locations that are under the same username
 */
-app.get('/locations/:username', async (req, res) => {
+router.get('/locations/:username', async (req, res) => {
     try {
         // Get username from the request object
         const { username } = req;
@@ -166,7 +165,7 @@ app.get('/locations/:username', async (req, res) => {
 /**
  * Sends back an array of place ID's that belong to the same session ID
 */
-app.get('/places/:sessionId', async (req, res) => {
+router.get('/places/:sessionId', async (req, res) => {
   try {
       // Extract sessionId from request parameters
       const { sessionId } = req.params;
@@ -191,7 +190,7 @@ app.get('/places/:sessionId', async (req, res) => {
 /**
  * Extracts the previous place ID and replaces it with the needed new place ID
  * */ 
-app.put('/locations/:sessionId', async (req, res) => {
+router.put('/locations/:sessionId', async (req, res) => {
     try {
         // Extract sessionId and new placeId from request parameters and body
         const { sessionId } = req.params;
@@ -230,7 +229,7 @@ app.put('/locations/:sessionId', async (req, res) => {
 /**
  * Delete the session from the database
 */
-app.delete('/delete-location/:sessionId', async (req, res) => {
+router.delete('/delete-location/:sessionId', async (req, res) => {
   try {
       const { sessionId } = req.params;
 
@@ -251,7 +250,7 @@ app.delete('/delete-location/:sessionId', async (req, res) => {
 /**
  * Delete the needed place ID along with the relevant complete status and the image reference ID
 */
-app.delete('/locations/:sessionId/:placeId', async (req, res) => {
+router.delete('/locations/:sessionId/:placeId', async (req, res) => {
     try {
         // Extract sessionId and placeId from request parameters
         const { sessionId, placeId } = req.params;
@@ -289,7 +288,7 @@ app.delete('/locations/:sessionId/:placeId', async (req, res) => {
 /**
  * Extracts the place ID and deletes the relevant image in that place ID
 */
-app.put('/update-place/:sessionId/:placeId', async (req, res) => {
+router.put('/update-place/:sessionId/:placeId', async (req, res) => {
   try {
       const { sessionId, placeId } = req.params;
 
@@ -323,7 +322,7 @@ app.put('/update-place/:sessionId/:placeId', async (req, res) => {
 /**
  * Extract the relevant place ID and switch the complete status to true
 */
-app.put('/complete-place/:sessionId/:placeId', async (req, res) => {
+router.put('/complete-place/:sessionId/:placeId', async (req, res) => {
     try {
         const { sessionId, placeId } = req.params;
 
@@ -366,12 +365,9 @@ app.put('/complete-place/:sessionId/:placeId', async (req, res) => {
     }
 });
 
+module.exports = router;
 
 
-
-  app.listen(port, ()=>{
-    console.log("Running on port number" + port);
-})
 
 
   

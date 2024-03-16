@@ -15,14 +15,14 @@ mongoose.connect(url);
 
 const db = mongoose.connection;
 
-const app = express();
+const router = express.Router();
 
-app.use(bodyParser.json()); // Parse incoming request bodies in JSON format
-app.use(cors()); // Enable Cross-Origin Resource Sharing (CORS)
+router.use(bodyParser.json()); // Parse incoming request bodies in JSON format
+router.use(cors()); // Enable Cross-Origin Resource Sharing (CORS)
 
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function () {
-  console.log('Connected to MongoDB database');
+  console.log('Connected to Login database');
 });
 
 // Connect to MongoDB (Make sure to replace 'your-mongodb-uri' with your actual MongoDB connection URI)
@@ -54,7 +54,7 @@ function hashPassword(password, salt) {
 }
 
 // POST /register route
-app.post('/register', async (req, res) => {
+router.post('/register', async (req, res) => {
     const { username, email, password, name, dob } = req.body;
   
     try {
@@ -87,7 +87,7 @@ app.post('/register', async (req, res) => {
   const User = mongoose.model('User', userSchema);
 
 // POST /login route
-app.post('/login', async (req, res) => {
+router.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
   try {
@@ -124,7 +124,7 @@ function generateVerificationCode() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-app.put('/users/send-verification-email', async (req, res) => {
+router.put('/users/send-verification-email', async (req, res) => {
   const email = req.body.email; // Assuming the email is sent in the request body
 
   try {
@@ -205,7 +205,7 @@ const changePassword = async (username, oldPassword, newPassword) => {
   }
 };
 
-app.put('/users/change-password', async (req, res) => {
+router.put('/users/change-password', async (req, res) => {
   const { username, oldPassword, newPassword } = req.body;
 
   try {
@@ -254,7 +254,7 @@ const resetPassword = async (username, newPassword) => {
   }
 };
 
-app.put('/users/forget-password', async (req, res) => {
+router.put('/users/forget-password', async (req, res) => {
   const { email, verificationCode, newPassword } = req.body;
 
   try {
@@ -300,7 +300,7 @@ app.put('/users/forget-password', async (req, res) => {
 
 
 
-app.put('/update-profile-pic', async (req, res) => {
+router.put('/update-profile-pic', async (req, res) => {
   const { username, profilePic } = req.body;
 
   try {
@@ -324,13 +324,10 @@ app.put('/update-profile-pic', async (req, res) => {
   }
 });
 
-const PORT = 3000;
+module.exports = router;
 
-// Your routes and middleware setup here
 
-app.listen(PORT, () => {
-  console.log(`Server is listening on port ${PORT}`);
-});
+
 
 
 

@@ -4,6 +4,7 @@ const express = require('express');
 const { v4: uuidv4 } = require('uuid'); // Creates a unique ID to identify the primary keys
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const router = express.Router();
 
 const app = express();
 
@@ -19,7 +20,7 @@ app.use(cors()); // Enable Cross-Origin Resource Sharing (CORS)
 
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function () {
-  console.log('Connected to MongoDB database');
+  console.log('Connected to Social media database');
 });
 
 
@@ -303,10 +304,7 @@ app.put('/social-media/:postId/add-comment', async (req, res) => {
 });
 
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server is listening on port ${PORT}`);
-});
+
 
 
 
