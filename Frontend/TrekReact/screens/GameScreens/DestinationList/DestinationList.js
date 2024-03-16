@@ -32,7 +32,7 @@ const NearbyDestinationsScreen = ({navigation}) => {
   const [expanded, setExpanded] = useState(false);
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [isPlaceDetailsModalVisible, setPlaceDetailsModalVisible] = useState(false);
-  const [selectedPlacesIds, setSelectedPlacesIds] = useState([]);
+  const [selectedPlaces, setSelectedPlaces] = useState([]);
   const [showSnackbar, setShowSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [isConfirmedDestinationListModalVisible, setIsConfirmedDestinationListModalVisible] = useState(false);
@@ -98,7 +98,7 @@ const NearbyDestinationsScreen = ({navigation}) => {
   // Add a place to the list of selected destinations
   const handleAddToList = (placeData) => {
     // Check if place is already added
-    const isPlaceAlreadyAdded = selectedPlacesIds.some(item => item.place_id === placeData.place_id);
+    const isPlaceAlreadyAdded = selectedPlaces.some(item => item.place_id === placeData.place_id);
 
     if (isPlaceAlreadyAdded) {
       setPlaceDetailsModalVisible(false);
@@ -107,7 +107,7 @@ const NearbyDestinationsScreen = ({navigation}) => {
       setTimeout(() => {
         setShowSnackbar(false);
       }, 1201);
-    } else if (selectedPlacesIds.length >= 8) {
+    } else if (selectedPlaces.length >= 8) {
       setPlaceDetailsModalVisible(false);
       setSnackbarMessage('Max destination limit reached!');
       setShowSnackbar(true);
@@ -115,7 +115,7 @@ const NearbyDestinationsScreen = ({navigation}) => {
         setShowSnackbar(false);
       }, 1201);
     } else {
-      setSelectedPlacesIds(prevPlaces => [...prevPlaces, placeData]);
+      setSelectedPlaces(prevPlaces => [...prevPlaces, placeData]);
       setPlaceDetailsModalVisible(false);
       setSnackbarMessage('Destination added to list successfully!');
       setShowSnackbar(true);
@@ -127,9 +127,9 @@ const NearbyDestinationsScreen = ({navigation}) => {
 
   // Check if minimum selected places count is met before navigating to next screen
   const checkSelectedPlacesCount = () => {
-    if (selectedPlacesIds.length > 3) {
+    if (selectedPlaces.length > 3) {
       // Navigate to next screen
-      navigation.navigate('SelectStartLocationScreen', { selectedPlacesIds });
+      navigation.navigate('SelectStartLocationScreen', { selectedPlaces });
     } else {
       // Show snackbar message if minimum count is not met
       setSnackbarMessage('You need to select at least three destinations.');
@@ -147,7 +147,7 @@ const NearbyDestinationsScreen = ({navigation}) => {
 
   // Remove a destination from the selected list
   const handleRemoveDestination = (placeId) => {
-    setSelectedPlacesIds(prevSelectedPlacesIds => prevSelectedPlacesIds.filter(item => item.place_id !== placeId));
+    setSelectedPlaces(prevSelectedPlaces => prevSelectedPlaces.filter(item => item.place_id !== placeId));
   };
 
   const handleBackDialogResponse = (option) => {
@@ -257,7 +257,7 @@ const NearbyDestinationsScreen = ({navigation}) => {
             place={selectedPlace}
             onClose={() => setPlaceDetailsModalVisible(false)}
             onAddToList={handleAddToList}
-            selectedPlacesIds={selectedPlacesIds}
+            selectedPlaces={selectedPlaces}
           />
         )}
 
@@ -265,7 +265,7 @@ const NearbyDestinationsScreen = ({navigation}) => {
           <ConfirmedDestinationListModal
             visible={isConfirmedDestinationListModalVisible}
             onClose={toggleConfirmedDestinationListModal}
-            selectedPlacesIds={selectedPlacesIds}
+            selectedPlaces={selectedPlaces}
             onRemoveDestination={handleRemoveDestination}
           />
         )}

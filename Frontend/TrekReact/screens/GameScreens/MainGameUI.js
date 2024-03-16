@@ -1,12 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, FlatList } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from 'react-native-maps';
 import { useNavigation } from '@react-navigation/native';
 import * as Location from 'expo-location';
+import GameLocationModal from './GameLocationModal';
 
 const GameMapScreen = ({ route }) => {
   const navigation = useNavigation();
-  const { selectedPlacesIds, confirmedStarterLocation } = route.params;
+  const { selectedPlaces, detected, confirmedStarterLocation } = route.params;
+  const [selectedLocation, setSelectedLocation] = useState(null);
 
   useEffect(() => {
     const getUserCurrentLocation = async () => {
@@ -37,6 +39,20 @@ const GameMapScreen = ({ route }) => {
     </View>
   );
 
+  const handleRedMarkerPress = (location) => {
+    setSelectedLocation(location);
+  };
+
+  const handleBlueMarkerPress = (location) => {
+    if (!detected) {
+      setSelectedLocation(location);
+      console.log("Detected is true");
+    } else {
+
+    }
+
+  };
+
   return (
     <View style={styles.container}>
       {confirmedStarterLocation && (
@@ -54,7 +70,7 @@ const GameMapScreen = ({ route }) => {
           <Polyline
             coordinates={[
               { latitude: confirmedStarterLocation.latitude, longitude: confirmedStarterLocation.longitude },
-              ...selectedPlacesIds.map(destination => ({ latitude: destination.latitude, longitude: destination.longitude }))
+              ...selectedPlaces.map(destination => ({ latitude: destination.latitude, longitude: destination.longitude }))
             ]}
             strokeWidth={3}
             strokeColor="#FF5733"
@@ -67,18 +83,23 @@ const GameMapScreen = ({ route }) => {
             }}
             title="Start Location"
             pinColor="blue"
+            onPress={() => handleBlueMarkerPress(selectedPlaces[0])} // Handle marker press
           />
 
-          {selectedPlacesIds.map((destination, index) => (
-            <Marker
-              key={destination.place_id}
-              coordinate={{
-                latitude: destination.latitude,
-                longitude: destination.longitude,
-              }}
-              title={destination.name}
-              pinColor="red"
-            />
+          {selectedPlaces.map((destination, index) => (
+            // Check if detected is false and if it's the first item, skip rendering
+            !detected && index === 0 ? null : (
+              <Marker
+                key={destination.place_id}
+                coordinate={{
+                  latitude: destination.latitude,
+                  longitude: destination.longitude,
+                }}
+                title={destination.name}
+                pinColor="red"
+                onPress={() => handleRedMarkerPress(destination)} // Handle marker press
+              />
+            )
           ))}
         </MapView>
       )}
@@ -88,12 +109,22 @@ const GameMapScreen = ({ route }) => {
       <View style={styles.destinationListContainer}>
         <Text style={styles.destinationListHeader}>Your Trek Points</Text>
         <FlatList
-          data={selectedPlacesIds}
+          data={selectedPlaces}
           renderItem={renderDestinationItem}
           keyExtractor={item => item.place_id.toString()}
           style={styles.destinationList}
         />
       </View>
+
+      {/* Render the GameLocationModal when selectedLocation is not null */}
+      {selectedLocation && (
+        <GameLocationModal
+          isVisible={true}  // Ensure the modal is visible
+          locations={selectedPlaces}  // Pass the selectedPlaces array
+          clickedLocation={selectedLocation}  // Pass the selected location
+          onClose={() => setSelectedLocation(null)}
+        />
+      )}
     </View>
   );
 };
@@ -122,7 +153,7 @@ const styles = StyleSheet.create({
   destinationListContainer: {
     position: 'absolute',
     bottom: 40,
-    maxWidth:'100%',
+    maxWidth: '100%',
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
     padding: 10,
     borderRadius: 10,
