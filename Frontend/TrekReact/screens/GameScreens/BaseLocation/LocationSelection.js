@@ -36,7 +36,6 @@ const LocationSelectionScreen = () => {
   }; 
 
   return ( 
-    <Layout> 
       <View style={styles.container}> 
         <Text style={styles.header}>Let's Get Started!</Text> 
         <Text style={styles.description}>Select your initial location to start the game:</Text> 
@@ -48,7 +47,6 @@ const LocationSelectionScreen = () => {
         </TouchableOpacity> 
         {loading && <CustomLoadingIndicator />} 
       </View> 
-    </Layout> 
   ); 
 }; 
 

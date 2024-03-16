@@ -14,6 +14,7 @@ export default function CreateAccountScreen({ navigation }) {
 
   const handleCreateAccount = () => {
     // Implement rithiks account creation logic here
+    navigation.navigate('Main')
   };
 
   const handleDateChange = (event, selectedDate) => {
