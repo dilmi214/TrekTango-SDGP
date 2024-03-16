@@ -39,50 +39,49 @@ const GameMapScreen = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      <MapView
-        provider={PROVIDER_GOOGLE}
-        style={styles.map}
-        initialRegion={{
-          latitude: confirmedStarterLocation.latitude,
-          longitude: confirmedStarterLocation.longitude,
-          latitudeDelta: 0.02,
-          longitudeDelta: 0.02,
-        }}
-        mapType="standard"
-      >
-        
-        <Polyline
-          coordinates={[
-            { latitude: confirmedStarterLocation.latitude, longitude: confirmedStarterLocation.longitude },
-            ...selectedPlacesIds.map(destination => ({ latitude: destination.latitude, longitude: destination.longitude }))
-          ]}
-          strokeWidth={3}
-          strokeColor="#FF5733"
-        />
-
-        
-        <Marker
-          coordinate={{
+      {confirmedStarterLocation && (
+        <MapView
+          provider={PROVIDER_GOOGLE}
+          style={styles.map}
+          initialRegion={{
             latitude: confirmedStarterLocation.latitude,
             longitude: confirmedStarterLocation.longitude,
+            latitudeDelta: 0.02,
+            longitudeDelta: 0.02,
           }}
-          title="Start Location"
-          pinColor="blue"
-        />
-
-        
-        {selectedPlacesIds.map((destination, index) => (
-          <Marker
-            key={destination.place_id}
-            coordinate={{
-              latitude: destination.latitude,
-              longitude: destination.longitude,
-            }}
-            title={destination.name}
-            pinColor="red"
+          mapType="standard"
+        >
+          <Polyline
+            coordinates={[
+              { latitude: confirmedStarterLocation.latitude, longitude: confirmedStarterLocation.longitude },
+              ...selectedPlacesIds.map(destination => ({ latitude: destination.latitude, longitude: destination.longitude }))
+            ]}
+            strokeWidth={3}
+            strokeColor="#FF5733"
           />
-        ))}
-      </MapView>
+
+          <Marker
+            coordinate={{
+              latitude: confirmedStarterLocation.latitude,
+              longitude: confirmedStarterLocation.longitude,
+            }}
+            title="Start Location"
+            pinColor="blue"
+          />
+
+          {selectedPlacesIds.map((destination, index) => (
+            <Marker
+              key={destination.place_id}
+              coordinate={{
+                latitude: destination.latitude,
+                longitude: destination.longitude,
+              }}
+              title={destination.name}
+              pinColor="red"
+            />
+          ))}
+        </MapView>
+      )}
       <TouchableOpacity style={styles.backButton} onPress={handleBackButtonPress}>
         <Text style={styles.backButtonText}>Back</Text>
       </TouchableOpacity>
@@ -124,11 +123,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 40,
     maxWidth:'100%',
-    // transform: [{ translateX: -100 }],
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
     padding: 10,
     borderRadius: 10,
-    // zIndex: 1,
   },
   destinationListHeader: {
     fontSize: 16,
