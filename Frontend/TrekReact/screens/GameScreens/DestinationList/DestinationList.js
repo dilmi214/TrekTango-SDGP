@@ -13,7 +13,7 @@ import Layout from '../../CustomComponents/ScreenLayout';
 
 
 const GOOGLE_PLACES_API_KEY = "AIzaSyCCHxfnoWl-DNhLhKcjhCTiHYNY917ltL8";
-
+// Define categories for filtering destinations
 const categories = [
   { label: "All Categories", value: "all_categories" },
   { label: "Tourist Attractions", value: "tourist_attraction" },
@@ -27,104 +27,75 @@ const categories = [
 ];
 
 const NearbyDestinationsScreen = () => {
-  
-  const route = useRoute();
-  const { longitude, latitude, radius } = route.params;
-  const navigation = useNavigation();
 
   const [destinations, setDestinations] = useState([]);
   const [selectedType, setSelectedType] = useState("");
   const [expanded, setExpanded] = useState(false);
-  const [showBackDialog, setShowBackDialog] = useState(false);
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [isPlaceDetailsModalVisible, setPlaceDetailsModalVisible] = useState(false);
   const [selectedPlacesIds, setSelectedPlacesIds] = useState([]);
-  const [showSnackbar, setShowSnackbar] = useState(false); 
+  const [showSnackbar, setShowSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [isConfirmedDestinationListModalVisible, setIsConfirmedDestinationListModalVisible] = useState(false); // New state for modal visibility
+  const [isConfirmedDestinationListModalVisible, setIsConfirmedDestinationListModalVisible] = useState(false);
   const [showLoadingIndicator, setShowLoadingIndicator] = useState(false);
   const [nextPageToken, setNextPageToken] = useState(null);
 
-  const allowedPlaceTypes = [
-    "tourist_attraction",
-    "restaurant_cafe",
-    "shopping_mall|store",
-    "park|amusement_park|bowling_alley|stadium|zoo|parking",
-    "church|hindu_temple|mosque|synagogue", 
-    "movie_theater|night_club|casino", 
-    "museum",
-    "hotel|lodging" 
-  ];
-
   useEffect(() => {
-    setDestinations([]); // reset destinations on category change
-    setNextPageToken(null); // reset nextPageToken for pagination if possible
+    setDestinations([]);
+    setNextPageToken(null);
     fetchNearbyDestinations();
   }, [selectedType]);
 
-  const fetchNearbyDestinations = async (pageToken = '') => { 
-    
+  // Fetch nearby destinations based on selected category
+  const fetchNearbyDestinations = async (pageToken = '') => {
+    // Construct the URL for Google Places API
+    let url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=${GOOGLE_PLACES_API_KEY}`;
+
+    if (selectedType) {
+      url += `&type=${selectedType}`;
+    }
+
+    if (pageToken) {
+      url += `&pagetoken=${pageToken}`;
+    }
+
+    // Fetch data from the URL
     try {
-      setShowLoadingIndicator(true); 
-      let url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&key=${GOOGLE_PLACES_API_KEY}`;
-
-      if (selectedType) {
-        if (selectedType === "all_categories") { 
-          url += `&type=${allowedPlaceTypes.join("|")}`; 
-        } else {
-          url += `&type=${selectedType}`;
-        }
-      }
-      
-      if (selectedType) {
-        if (selectedType === "restaurant_cafe") {
-          url += `&type=restaurant|cafe`;
-        } else {
-          url += `&type=${selectedType}`;
-        }
-      }
-
-      if (pageToken) {
-        url += `&pagetoken=${pageToken}`; // pageToken for pagination
-      }
-
+      setShowLoadingIndicator(true);
       const response = await fetch(url);
       const data = await response.json();
 
-      setNextPageToken(data.next_page_token); // update nextPageToken
-      setDestinations(prevDestinations => [...prevDestinations, ...data.results]); //append results
+      setNextPageToken(data.next_page_token);
+      setDestinations(prevDestinations => [...prevDestinations, ...data.results]);
 
+      // Hide loading indicator after data is fetched
       setTimeout(() => {
-        setShowLoadingIndicator(false); 
-      }, 300); 
+        setShowLoadingIndicator(false);
+      }, 300);
     } catch (error) {
       console.error('Error fetching nearby destinations: ', error);
       setShowLoadingIndicator(false);
     }
   };
 
-    // load more data when user reaches the end of the list
-    const loadMoreData = () => {
-      if (nextPageToken) {
-        fetchNearbyDestinations(nextPageToken); // fetch more results using nextPageToken
-      }
-    };
-  
-  const handleBackDialogResponse = (option) => {
-    if (option === 'Yes') {
-      navigation.goBack();
+  // Load more data when user reaches the end of the list
+  const loadMoreData = () => {
+    if (nextPageToken) {
+      fetchNearbyDestinations(nextPageToken);
     }
-    setShowBackDialog(false);
   };
 
+  // Open modal to view details of a place
   const openPlaceDetailsModal = (place) => {
     setSelectedPlace(place);
     setPlaceDetailsModalVisible(true);
   };
 
+  // Add a place to the list of selected destinations
   const handleAddToList = (placeData) => {
+    // Check if place is already added
     const isPlaceAlreadyAdded = selectedPlacesIds.some(item => item.place_id === placeData.place_id);
-    
+
     if (isPlaceAlreadyAdded) {
       setPlaceDetailsModalVisible(false);
       setSnackbarMessage('Place is already in the list!');
@@ -146,26 +117,31 @@ const NearbyDestinationsScreen = () => {
       setShowSnackbar(true);
       setTimeout(() => {
         setShowSnackbar(false);
-      }, 1201); 
+      }, 1201);
     }
   };
-  
+
+  // Check if minimum selected places count is met before navigating to next screen
   const checkSelectedPlacesCount = () => {
     if (selectedPlacesIds.length > 3) {
+      // Navigate to next screen
       navigation.navigate('SelectStartLocationScreen', { selectedPlacesIds });
     } else {
+      // Show snackbar message if minimum count is not met
       setSnackbarMessage('You need to select at least three destinations.');
       setShowSnackbar(true);
       setTimeout(() => {
         setShowSnackbar(false);
-      }, 1201); 
+      }, 1201);
     }
   };
 
+  // Toggle visibility of confirmed destination list modal
   const toggleConfirmedDestinationListModal = () => {
     setIsConfirmedDestinationListModalVisible(!isConfirmedDestinationListModalVisible);
   };
 
+  // Remove a destination from the selected list
   const handleRemoveDestination = (placeId) => {
     setSelectedPlacesIds(prevSelectedPlacesIds => prevSelectedPlacesIds.filter(item => item.place_id !== placeId));
   };
@@ -173,6 +149,7 @@ const NearbyDestinationsScreen = () => {
   return (
     <Layout>
       <View style={styles.container}>
+        //Header with navigation and actions
         <View style={styles.header}>
           <TouchableOpacity style={styles.button} onPress={() => setShowBackDialog(true)}>
             <Text style={styles.buttonText}>Back</Text>
@@ -187,6 +164,8 @@ const NearbyDestinationsScreen = () => {
             <Text style={styles.buttonText}>Next</Text>
           </TouchableOpacity>
         </View>
+
+        //Display categories for filtering
         {expanded && (
           <View style={styles.categories}>
             {categories.map((category, index) => (
@@ -198,54 +177,56 @@ const NearbyDestinationsScreen = () => {
                 }}
                 style={styles.categoryItem}
               >
-                <Text>{category.label}</Text>
+                <Text style={styles.categoryText}>{category.label}</Text>
               </TouchableOpacity>
             ))}
           </View>
         )}
+
+        // List of nearby destinations 
         {destinations.length > 0 ? (
-      <FlatList
-      data={destinations}
-      renderItem={({ item }) => {
-        const firstPhoto = item.photos ? item.photos[0] : null;
-        const photoUrl = firstPhoto ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${firstPhoto.photo_reference}&key=${GOOGLE_PLACES_API_KEY}` : null;
-        return (
-          <ListItem
-            bottomDivider
-            onPress={() => openPlaceDetailsModal(item)}
-          >
-            <ListItem.Content>
-              <ListItem.Title>{item.name}</ListItem.Title>
-              {photoUrl ? (
-                <Image
-                  source={{ uri: photoUrl }}
-                  style={{ width: 50, height: 50 }} 
-                />
-              ) : (
-                <Image
-                source={require('../../CustomComponents/ImgUnavailable.png')}
-                style={{ width: 50, height: 50 }} 
-              />
-              )}
-            </ListItem.Content>
-          </ListItem>
-        );
-      }}
-      keyExtractor={(item) => item.place_id}
-      onEndReachedThreshold={0.9} // call loadMoreData when close to the end
-      onEndReached={loadMoreData} 
-    />
+          <FlatList
+            data={destinations}
+            renderItem={({ item }) => {
+              const firstPhoto = item.photos ? item.photos[0] : null;
+              const photoUrl = firstPhoto ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${firstPhoto.photo_reference}&key=${GOOGLE_PLACES_API_KEY}` : null;
+
+              return (
+                <TouchableOpacity onPress={() => openPlaceDetailsModal(item)}>
+                  <View style={styles.listItemContainer}>
+                    {photoUrl ? (
+                      <Image
+                        source={{ uri: photoUrl }}
+                        style={styles.listItemImage}
+                      />
+                    ) : (
+                      <Image
+                        source={require('../../CustomComponents/ImgUnavailable.png')}
+                        style={styles.listItemImage}
+                      />
+                    )}
+                    <View style={styles.listItemContent}>
+                      <Text style={styles.listItemTitle}>{item.name}</Text>
+                      <Text style={styles.listItemDescription}>Type: {item.types.join(', ')}</Text>
+                      <Text style={styles.listItemDescription}>Rating: {item.rating || 'N/A'}</Text>
+                      <Text style={styles.listItemDescription}>Open Now: {item.opening_hours && item.opening_hours.open_now ? 'Yes' : 'No'}</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              );
+            }}
+            keyExtractor={(item) => item.place_id}
+            onEndReachedThreshold={0.9} // call loadMoreData when close to the end
+            onEndReached={loadMoreData}
+          />
         ) : (
-          <Text>No places available in this category</Text>
+          <Text style={styles.noPlacesText}>No places available in this category</Text>
         )}
-        <CustomDialog
-          visible={showBackDialog}
-          title="Confirmation"
-          message="Do you want to go back?"
-          options={['Yes', 'No']}
-          onSelect={handleBackDialogResponse}
-        />
+
+        //Show loading indicator while fetching data
         {showLoadingIndicator && <CustomLoadingIndicator />}
+
+        //Show snackbar for notifications
         {showSnackbar && (
           <Snackbar
             visible={showSnackbar}
@@ -254,15 +235,19 @@ const NearbyDestinationsScreen = () => {
             action={{ label: 'Dismiss', onPress: () => setShowSnackbar(false) }}
           />
         )}
+
+        //Modal for viewing place details
         {isPlaceDetailsModalVisible && (
-            <PlaceDetailsModal
-              visible={isPlaceDetailsModalVisible}
-              place={selectedPlace}
-              onClose={() => setPlaceDetailsModalVisible(false)}
-              onAddToList={handleAddToList}
-              selectedPlacesIds={selectedPlacesIds}
+          <PlaceDetailsModal
+            visible={isPlaceDetailsModalVisible}
+            place={selectedPlace}
+            onClose={() => setPlaceDetailsModalVisible(false)}
+            onAddToList={handleAddToList}
+            selectedPlacesIds={selectedPlacesIds}
           />
         )}
+
+        //Modal for confirmed destination list
         {isConfirmedDestinationListModalVisible && (
           <ConfirmedDestinationListModal
             visible={isConfirmedDestinationListModalVisible}
@@ -279,21 +264,17 @@ const NearbyDestinationsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    borderTopWidth: 50,
-    backgroundColor: '#010C33', 
+    backgroundColor: '#010C33',
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
     marginBottom: 20,
-    borderWidth: 2,
-    borderRadius: 10,
-    borderColor: '#444',
-    padding: 10,
-    backgroundColor: '#010C33', 
+    paddingHorizontal: 20,
+    marginTop: 80,
   },
   button: {
-    backgroundColor: '#007bff', 
+    backgroundColor: '#007bff',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
@@ -307,25 +288,50 @@ const styles = StyleSheet.create({
   },
   categoryItem: {
     paddingVertical: 8,
-    paddingHorizontal: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    backgroundColor: '#fff', 
+    borderBottomColor: '#000',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)', 
     borderRadius: 5,
     marginHorizontal: 20,
     marginVertical: 8,
-    elevation: 5, 
+    elevation: 5,
   },
   categoryText: {
-    color: '#000', 
+    color: '#FFF',
+    textAlign:'center',
+  },
+  listItemImage: {
+    width: 110,
+    height: 150,
+    borderRadius: 5, 
+    marginRight: 15, 
+  },
+  listItemContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    backgroundColor: '#0056b3', 
+    borderRadius: 10, 
+    marginBottom: 15, 
+  },
+  listItemContent: {
+    flex: 1,
+  },
+  listItemTitle: {
+    color: '#fff',
+    fontSize: 18,
     fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  listItemDescription: {
+    color: '#ccc',
   },
   noPlacesText: {
     color: '#fff',
     textAlign: 'center',
     marginTop: 20,
   },
-  
 });
 
 export default NearbyDestinationsScreen;

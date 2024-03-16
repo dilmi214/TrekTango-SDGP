@@ -158,12 +158,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#010C33',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+    color:'#FFF'
   },
   button: {
     backgroundColor: '#007bff',
@@ -190,14 +191,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   backButton: {
-    backgroundColor: '#007bff',
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 10,
-    marginBottom: 20,
+    // backgroundColor: '#007bff',
+    // paddingVertical: 0,
+    // paddingHorizontal: 0,
+    // borderRadius: 10,
+    // marginBottom: 20,
     alignItems: 'center',
     position: 'absolute',
-    top: 20,
+    top: 70,
     left: 20,
   },
   buttonText: {

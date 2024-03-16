@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   removeButtonText: {
     color: '#FFF',
     marginLeft: 10,
-    fontSize: '24',
+    // fontSize: '24',
   },
   emptyListText: {
     textAlign: 'center',
