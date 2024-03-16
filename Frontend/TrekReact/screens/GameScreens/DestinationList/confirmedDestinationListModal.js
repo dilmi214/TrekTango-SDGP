@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Alert } from 'react-native';
 import { CurrentRenderContext, useNavigation } from '@react-navigation/native';
 
-const ConfirmedDestinationListModal = ({ visible, onClose, selectedPlacesIds, onRemoveDestination }) => {
+const ConfirmedDestinationListModal = ({ visible, onClose, selectedPlaces, onRemoveDestination }) => {
   
   const handleRemoveDestination = (placeId) => {
     onRemoveDestination(placeId);
@@ -14,10 +14,10 @@ const ConfirmedDestinationListModal = ({ visible, onClose, selectedPlacesIds, on
         <View style={styles.modalContent}>
 
           <Text style={styles.modalTitle}>List of Confirmed Destinations</Text>
-          {selectedPlacesIds.length === 0 ? (
+          {selectedPlaces.length === 0 ? (
             <Text style={styles.emptyListText}>List is empty. Add places</Text>
           ) : (
-            selectedPlacesIds.map(destination => (
+            selectedPlaces.map(destination => (
               <View key={destination.place_id} style={styles.destinationContainer}>
                 <Text style={styles.destinationText}>{destination.name}</Text>
                 <TouchableOpacity onPress={() => handleRemoveDestination(destination.place_id)}>

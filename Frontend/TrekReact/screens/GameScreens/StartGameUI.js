@@ -4,10 +4,14 @@ import { useNavigation } from '@react-navigation/native';
 
 const StartGameScreen = ({ route }) => {
   const navigation = useNavigation();
-  const { selectedPlacesIds, confirmedStarterLocation } = route.params;
+  const { selectedPlaces, detected, confirmedStarterLocation } = route.params;
 
-  const handleConfirm = () => {
-    console.log(confirmedStarterLocation.longitude, "confirmed starter location")
+  const sendBackend = () => {
+    //implement logic for backend
+  };
+
+  const handleStartAdventure = () => {
+    console.log(confirmedStarterLocation.place_id, "confirmed starter location")
     Alert.alert(
       'Confirmation',
       'Are you sure you want to start the game?',
@@ -19,12 +23,10 @@ const StartGameScreen = ({ route }) => {
         {
           text: 'Yes',
           onPress: () => {
-            navigation.navigate('GameMapScreen', {
-              selectedPlacesIds: selectedPlacesIds,
-              confirmedStarterLocation: {
-                latitude: confirmedStarterLocation.latitude,
-                longitude: confirmedStarterLocation.longitude
-              },
+            navigation.navigate('GameMapScreen', {              
+              selectedPlaces,
+              detected,
+              confirmedStarterLocation,            
             });
           },
         },
@@ -44,13 +46,13 @@ const StartGameScreen = ({ route }) => {
       </TouchableOpacity>
       <Text style={styles.selectedPlaces}>Selected Destinations:</Text>
       <View style={styles.destinationList}>
-        {selectedPlacesIds.map((destination, index) => (
+        {selectedPlaces.map((destination, index) => (
           <View key={destination.place_id} style={styles.destinationItem}>
             <Text style={styles.destinationName}>📍 {destination.name}</Text>
           </View>
         ))}
       </View>
-      <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
+      <TouchableOpacity style={styles.confirmButton} onPress={handleStartAdventure}>
         <Text style={styles.confirmButtonText}>Start the Adventure!</Text>
       </TouchableOpacity>
     </View>
