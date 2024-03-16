@@ -7,10 +7,10 @@ const cors = require('cors');
 
 const app = express();
 
-mongoose.connect("mongodb+srv://rithik20222011:Harpyeagle12345@cluster0.my4g36v.mongodb.net/", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-});
+mongoose.connect("mongodb+srv://rithik20222011:Harpyeagle12345@cluster0.my4g36v.mongodb.net/"
+    // useNewUrlParser: true,
+    // useUnifiedTopology: true
+);
 
 const db = mongoose.connection;
 
@@ -24,27 +24,27 @@ db.once('open', function () {
 
 
 const socialMediaSchema = new mongoose.Schema({
-  username: { type: String, required: true }, // Already exists in the earlier schema
+  username: { type: String, required: true },
   userID: { type: String, required: true },
   lastRefreshedAt: { type: Date, default: Date.now },
   posts: [{
     postId: { type: String, default: uuidv4(), required: true, unique: true },
     placeId: { type: String, required: true },
     imageReferenceId: { type: String },
-    uploadToMedia: { type: Boolean, default: false }, // If true belongs to public feed, else belongs to personal feed. Will be useful during the profile page
+    uploadToMedia: { type: Boolean, default: false },
     caption: { type: String },
-    comments: { type: [{ 
-      commentID: { type: String, default: uuidv4(), required: true, unique: true },
-      username: { type: String, required: true },
-      comment: { type: String, required: true }
-    }], default: null },
-    likes: [{ type: String }], // Will consist of an array of usernames. Likes.length will determine the number of likes
+    comments: {
+      type: [{
+        commentID: { type: String, default: uuidv4(), required: true, unique: true },
+        username: { type: String, required: true },
+        comment: { type: String, required: true }
+      }],
+      default: [] // Default value set to an empty array
+    },
+    likes: [{ type: String }],
     createdAt: { type: Date, default: Date.now }
   }]
 });
-
-const mongoose = require('mongoose');
-const { v4: uuidv4 } = require('uuid');
 
 
 module.exports = mongoose
@@ -53,27 +53,59 @@ const SocialMedia = mongoose.model('SocialMedia', socialMediaSchema);
 
 module.exports = SocialMedia; //Just in case, I might need to access this from another script
 
-app.post('/social-media', async (req, res) => {
+app.post('/social-media/posts', async (req, res) => {
   try {
-    const { username, userID, placeId, imageReferenceId, uploadToMedia, caption, likes } = req.body;
+    const { username, userID, placeId, imageReferenceId, caption, comments, likes } = req.body;
 
-    // Create a new post with default or auto-generated values
-    const newPost = new SocialMedia({
-      username,
-      userID,
+    // Create a new post
+    const newPost = {
+      postId: uuidv4(),
       placeId,
       imageReferenceId,
-      uploadToMedia,
       caption,
-      likes
+      comments: comments || [], // Ensure comments is an array or default to an empty array
+      likes: likes || [],
+      createdAt: new Date()
+    };
+
+    // Save the new post directly
+    const createdPost = await SocialMedia.create({
+      username,
+      userID,
+      posts: [newPost]
     });
 
-    const savedPost = await newPost.save();
-
-    res.status(200).json(savedPost);
+    res.status(201).json({ message: 'Post created successfully', post: createdPost.posts[0] });
   } catch (error) {
-    // Handle errors
-    res.status(400).json({ message: error.message });
+    console.error('Error creating post:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+app.get('/posts/:postId', async (req, res) => {
+  try {
+    const postId = req.params.postId;
+
+    // Find the post by ID
+    const post = await SocialMedia.findOne({ 'posts.postId': postId });
+
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    // Find the specific post within the array
+    const foundPost = post.posts.find((p) => p.postId === postId);
+
+    if (!foundPost) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    // Return the post as JSON
+    res.json(foundPost);
+  } catch (error) {
+    console.error('Error fetching post:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 

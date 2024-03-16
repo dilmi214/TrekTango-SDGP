@@ -6,7 +6,6 @@ const port = 3000;
 const bodyParser = require('body-parser');
 const cors = require('cors')
 
-//Remember to put the body parser as it will allow me to receive json objects.
 
 const app = express();
 app.use(bodyParser.json()); // Parse incoming request bodies in JSON format
@@ -27,15 +26,6 @@ db.once('open', function () {
     console.log('Connected to MongoDB database');
 });
 
-const getUsernameFromSession = (req, res, next) => {
-    // Assuming username is stored in the session under the key 'username'
-    const { username } = req.session;
-    if (!username) {
-        return res.status(401).json({ error: 'User not authenticated' });
-    }
-    req.username = username; // Add username to request object for use in subsequent middleware or routes
-    next();
-};
 
 /**
  * Create the schema for the locations with all its details
@@ -56,7 +46,7 @@ const locationSchema = new mongoose.Schema({
 const Location = mongoose.model('Location', locationSchema);
 
 
-app.post('/sessions', getUsernameFromSession, async (req, res) => {
+app.post('/sessions', async (req, res) => { 
     try {
         const { username } = req; // Get username from request object
 
@@ -158,7 +148,7 @@ app.put('/locations/:sessionId/add-place', async (req, res) => {
 /**
  * Sends back an array of locations that are under the same username
 */
-app.get('/locations/:username', getUsernameFromSession, async (req, res) => {
+app.get('/locations/:username', async (req, res) => {
     try {
         // Get username from the request object
         const { username } = req;

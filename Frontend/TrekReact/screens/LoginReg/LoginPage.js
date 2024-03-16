@@ -4,6 +4,8 @@ import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image, TextInput,
 import { useNavigation } from '@react-navigation/native';
 import { baseURL } from './getIPAddress';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const LoginScreen = () => {
   const navigation = useNavigation();
@@ -12,23 +14,33 @@ const LoginScreen = () => {
 
   const handleSignInPress = async () => {
     try {
-      const response = await axios.post(`${baseURL}/login`, {
-        username: email,
-        password,
+      const response = await fetch(`${baseURL}/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: email,
+          password: password
+        }),
       });
-      
-      if (response.status === 200) {
-        // Login successful, navigate to home screen
+  
+      const responseData = await response.json();
+  
+      if (response.ok) {
+        // Login successful, navigate to the home screen
         navigation.navigate('Home');
       } else {
         // Login failed, show error message
-        Alert.alert('Error', response.data.error);
+        Alert.alert('Error', responseData.error);
       }
     } catch (error) {
       console.error(error);
       Alert.alert('Error', 'Failed to connect to server');
     }
   };
+  
+  
 
   const handleCreateAccountPress = () => {
     navigation.navigate('CreateAccountScreen');

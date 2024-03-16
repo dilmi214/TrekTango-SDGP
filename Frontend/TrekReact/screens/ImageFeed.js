@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { View, Text, Image, TouchableOpacity, TextInput, ScrollView, StyleSheet, Modal, Dimensions } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import NavBar from '../screens/CustomComponents/NavBar';
@@ -12,19 +13,29 @@ const ImageFeed = () => {
   const [commentSectionVisible, setCommentSectionVisible] = useState(Array(5).fill(false));
   const [maximizedImageIndex, setMaximizedImageIndex] = useState(null);
 
-  const handleLike = (index) => {
-    const newLikes = [...likes];
-    const newLiked = [...liked];
-    if (!newLiked[index]) {
-      newLikes[index]++;
-      newLiked[index] = true;
-    } else {
-      newLikes[index]--;
-      newLiked[index] = false;
+  const handleLike = async (index) => {
+    try {
+      // // Retrieve the username from AsyncStorage
+      // const username = await AsyncStorage.getItem('username');
+      // console.log('Username:', username);
+  
+      // Update the likes and liked state
+      const newLikes = [...likes];
+      const newLiked = [...liked];
+      if (!newLiked[index]) {
+        newLikes[index]++;
+        newLiked[index] = true;
+      } else {
+        newLikes[index]--;
+        newLiked[index] = false;
+      }
+      setLikes(newLikes);
+      setLiked(newLiked);
+    } catch (error) {
+      console.error('Error retrieving username:', error);
     }
-    setLikes(newLikes);
-    setLiked(newLiked);
   };
+  
 
   const handleCommentChange = (index, text) => {
     const newCommentTexts = [...newCommentText];
@@ -65,23 +76,34 @@ const ImageFeed = () => {
         {[...Array(5)].map((_, index) => (
           <TouchableOpacity key={index} onPress={() => handleImageClick(index)}>
             <View style={styles.postContainer}>
+              {/* Username */}
+              <Text style={styles.usernameText}>Username</Text>
+              {/* Location */}
+              <Text style={styles.locationText}>Location</Text>
+              {/* Image */}
               <Image
                 source={{
                   uri: 'https://imgur.com/mfO5v21.jpg',
                 }}
                 style={styles.image}
               />
+              {/* Interaction bar */}
               <View style={styles.interactionBar}>
+                {/* Like button */}
                 <TouchableOpacity onPress={() => handleLike(index)} style={styles.iconButton}>
                   <FontAwesome name={liked[index] ? "heart" : "heart-o"} size={24} color={liked[index] ? "#ff9999" : "#ccc"} />
                 </TouchableOpacity>
+                {/* Like count */}
                 <Text style={styles.likeText}>{likes[index]} Likes</Text>
+                {/* Comment button */}
                 <TouchableOpacity onPress={() => toggleCommentSection(index)} style={styles.iconButton}>
                   <FontAwesome name="comment" size={24} color="#ccc" />
                 </TouchableOpacity>
               </View>
+              {/* Comment section */}
               {commentSectionVisible[index] && (
                 <View style={styles.commentSection}>
+                  {/* Comments */}
                   {comments[index] && comments[index].map((comment, commentIndex) => (
                     <View key={commentIndex} style={styles.comment}>
                       <Text style={styles.commentText}>{comment}</Text>
@@ -89,6 +111,7 @@ const ImageFeed = () => {
                   ))}
                 </View>
               )}
+              {/* Comment input */}
               <View style={styles.commentInputContainer}>
                 <TextInput
                   placeholder="Add a comment..."
@@ -105,6 +128,7 @@ const ImageFeed = () => {
           </TouchableOpacity>
         ))}
       </ScrollView>
+      {/* Modal for maximized image */}
       {maximizedImageIndex !== null && (
         <Modal visible={maximizedImageIndex !== null} transparent={true}>
           <View style={styles.modalContainer}>
@@ -120,9 +144,10 @@ const ImageFeed = () => {
           </View>
         </Modal>
       )}
+      {/* Navigation bar */}
       <View style={styles.navBarContainer}>
         <NavBar />
-    </View>
+      </View>
     </View>
   );
 };
@@ -232,6 +257,17 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
+  },
+  usernameText: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 5,
+  },
+  locationText: {
+    fontSize: 12,
+    color: '#fff',
+    marginBottom: 10,
   },
 });
 
