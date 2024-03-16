@@ -1,26 +1,40 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import React from 'react';
+import { View, StyleSheet, Text, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import CustomDialog from '../CustomComponents/CustomDialog';
 
 const StartGameScreen = ({ route }) => {
   const navigation = useNavigation();
-  const { finalDestinationList } = route.params;
-  const [showDialog, setShowDialog] = useState(false);
+  const { selectedPlacesIds, confirmedStarterLocation } = route.params;
 
   const handleConfirm = () => {
-    setShowDialog(true);
+    console.log(confirmedStarterLocation.longitude, "confirmed starter location")
+    Alert.alert(
+      'Confirmation',
+      'Are you sure you want to start the game?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Yes',
+          onPress: () => {
+            navigation.navigate('GameMapScreen', {
+              selectedPlacesIds: selectedPlacesIds,
+              confirmedStarterLocation: {
+                latitude: confirmedStarterLocation.latitude,
+                longitude: confirmedStarterLocation.longitude
+              },
+            });
+          },
+        },
+      ],
+      { cancelable: false }
+    );
   };
 
   const handleBack = () => {
     navigation.goBack();
-  };
-
-  const handleDialogSelect = (option) => {
-    setShowDialog(false);
-    if (option === 'Yes') {
-      navigation.navigate('GameMapScreen', { finalDestinationList });
-    }
   };
 
   return (
@@ -28,24 +42,17 @@ const StartGameScreen = ({ route }) => {
       <TouchableOpacity style={styles.backButton} onPress={handleBack}>
         <Text style={styles.backButtonText}>Back</Text>
       </TouchableOpacity>
-      <Text>Selected Places:</Text>
+      <Text style={styles.selectedPlaces}>Selected Destinations:</Text>
       <View style={styles.destinationList}>
-        {finalDestinationList.map((destination, index) => (
+        {selectedPlacesIds.map((destination, index) => (
           <View key={destination.place_id} style={styles.destinationItem}>
-            <Text style={styles.destinationText}>{destination.name}</Text>
+            <Text style={styles.destinationName}>📍 {destination.name}</Text>
           </View>
         ))}
       </View>
       <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
-        <Text style={styles.confirmButtonText}>Start Game</Text>
+        <Text style={styles.confirmButtonText}>Start the Adventure!</Text>
       </TouchableOpacity>
-      <CustomDialog
-        visible={showDialog}
-        title="Confirmation"
-        message="Are you sure you want to start the game?"
-        options={['Cancel', 'Yes']}
-        onSelect={handleDialogSelect}
-      />
     </View>
   );
 };
@@ -55,32 +62,39 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#010C33'
   },
   backButton: {
     position: 'absolute',
-    top: 50,
+    top: 60,
     left: 20,
   },
   backButtonText: {
-    color: 'blue',
+    color: '#FFF',
     fontSize: 16,
   },
   destinationList: {
     marginTop: 10,
+    width: '100%',
+    paddingHorizontal: 20,
   },
   destinationItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#203040',
+    borderRadius: 10,
     padding: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
     marginBottom: 10,
+    elevation: 5,
   },
-  destinationText: {
-    fontSize: 16,
+  destinationName: {
+    fontSize: 18,
+    color: '#FFF',
+    fontWeight: 'bold',
   },
   confirmButton: {
     marginTop: 20,
-    backgroundColor: 'blue',
+    backgroundColor: '#2196F3',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
@@ -88,6 +102,11 @@ const styles = StyleSheet.create({
   confirmButtonText: {
     color: 'white',
     fontSize: 16,
+  },
+  selectedPlaces: {
+    color: '#FFF',
+    fontSize: 25,
+    paddingBottom: 25,
   },
 });
 
