@@ -1,68 +1,55 @@
 import React, { useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { View, Text, Image, TouchableOpacity, TextInput, ScrollView, StyleSheet, Modal, Dimensions } from 'react-native';
+import { View, Text, Image, TouchableOpacity, TextInput, ScrollView, StyleSheet, Modal, RefreshControl } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import NavBar from '../screens/CustomComponents/NavBar';
 
-
 const ImageFeed = () => {
-  const [likes, setLikes] = useState(Array(5).fill(0));
-  const [liked, setLiked] = useState(Array(5).fill(false));
-  const [comments, setComments] = useState(Array(5).fill([]));
-  const [newCommentText, setNewCommentText] = useState(Array(5).fill(''));
-  const [commentSectionVisible, setCommentSectionVisible] = useState(Array(5).fill(false));
+  const [likes, setLikes] = useState(0);
+  const [liked, setLiked] = useState(false);
+  const [comments, setComments] = useState([]);
+  const [newCommentText, setNewCommentText] = useState('');
+  const [commentSectionVisible, setCommentSectionVisible] = useState(false);
   const [maximizedImageIndex, setMaximizedImageIndex] = useState(null);
+  const [refreshing, setRefreshing] = useState(false); // State for refresh indicator
 
-  const handleLike = async (index) => {
-    try {
-      // // Retrieve the username from AsyncStorage
-      // const username = await AsyncStorage.getItem('username');
-      // console.log('Username:', username);
-  
-      // Update the likes and liked state
-      const newLikes = [...likes];
-      const newLiked = [...liked];
-      if (!newLiked[index]) {
-        newLikes[index]++;
-        newLiked[index] = true;
-      } else {
-        newLikes[index]--;
-        newLiked[index] = false;
-      }
-      setLikes(newLikes);
-      setLiked(newLiked);
-    } catch (error) {
-      console.error('Error retrieving username:', error);
-    }
-  };
-  
-
-  const handleCommentChange = (index, text) => {
-    const newCommentTexts = [...newCommentText];
-    newCommentTexts[index] = text;
-    setNewCommentText(newCommentTexts);
+  // Function to handle refresh action
+  const onRefresh = () => {
+    setRefreshing(true);
+    // Perform refresh action here
+    setTimeout(() => {
+      // Simulate data fetching
+      setLikes(0);
+      setLiked(false);
+      setComments([]);
+      setNewCommentText('');
+      setCommentSectionVisible(false);
+      setMaximizedImageIndex(null);
+      setRefreshing(false);
+    }, 1000);
   };
 
-  const handlePostComment = (index) => {
-    if (newCommentText[index].trim() !== '') {
-      const newComments = [...comments];
-      const newComment = newCommentText[index];
-      newComments[index] = [...newComments[index], newComment];
-      setComments(newComments);
-      const newCommentTexts = [...newCommentText];
-      newCommentTexts[index] = '';
-      setNewCommentText(newCommentTexts);
+  const handleLike = () => {
+    setLikes(liked ? likes - 1 : likes + 1);
+    setLiked(!liked);
+  };
+
+  const handleCommentChange = (text) => {
+    setNewCommentText(text);
+  };
+
+  const handlePostComment = () => {
+    if (newCommentText.trim() !== '') {
+      setComments([...comments, newCommentText]);
+      setNewCommentText('');
     }
   };
 
-  const toggleCommentSection = (index) => {
-    const newCommentSectionVisible = [...commentSectionVisible];
-    newCommentSectionVisible[index] = !newCommentSectionVisible[index];
-    setCommentSectionVisible(newCommentSectionVisible);
+  const toggleCommentSection = () => {
+    setCommentSectionVisible(!commentSectionVisible);
   };
 
-  const handleImageClick = (index) => {
-    setMaximizedImageIndex(index);
+  const handleImageClick = () => {
+    setMaximizedImageIndex(0);
   };
 
   const exitMaximizedImage = () => {
@@ -72,61 +59,68 @@ const ImageFeed = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Trek Tango</Text>
-      <ScrollView contentContainerStyle={styles.feed}>
-        {[...Array(5)].map((_, index) => (
-          <TouchableOpacity key={index} onPress={() => handleImageClick(index)}>
-            <View style={styles.postContainer}>
-              {/* Username */}
-              <Text style={styles.usernameText}>Username</Text>
-              {/* Location */}
-              <Text style={styles.locationText}>Location</Text>
-              {/* Image */}
-              <Image
-                source={{
-                  uri: 'https://imgur.com/mfO5v21.jpg',
-                }}
-                style={styles.image}
-              />
-              {/* Interaction bar */}
-              <View style={styles.interactionBar}>
-                {/* Like button */}
-                <TouchableOpacity onPress={() => handleLike(index)} style={styles.iconButton}>
-                  <FontAwesome name={liked[index] ? "heart" : "heart-o"} size={24} color={liked[index] ? "#ff9999" : "#ccc"} />
-                </TouchableOpacity>
-                {/* Like count */}
-                <Text style={styles.likeText}>{likes[index]} Likes</Text>
-                {/* Comment button */}
-                <TouchableOpacity onPress={() => toggleCommentSection(index)} style={styles.iconButton}>
-                  <FontAwesome name="comment" size={24} color="#ccc" />
-                </TouchableOpacity>
-              </View>
-              {/* Comment section */}
-              {commentSectionVisible[index] && (
-                <View style={styles.commentSection}>
-                  {/* Comments */}
-                  {comments[index] && comments[index].map((comment, commentIndex) => (
-                    <View key={commentIndex} style={styles.comment}>
-                      <Text style={styles.commentText}>{comment}</Text>
-                    </View>
-                  ))}
-                </View>
-              )}
-              {/* Comment input */}
-              <View style={styles.commentInputContainer}>
-                <TextInput
-                  placeholder="Add a comment..."
-                  placeholderTextColor="#ccc"
-                  style={styles.commentInput}
-                  value={newCommentText[index]}
-                  onChangeText={(text) => handleCommentChange(index, text)}
-                />
-                <TouchableOpacity onPress={() => handlePostComment(index)} style={styles.postCommentButton}>
-                  <Text style={styles.postCommentButtonText}>Post</Text>
-                </TouchableOpacity>
-              </View>
+      <ScrollView
+        contentContainerStyle={styles.feed}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#000']} // Color of the refresh indicator (optional)
+          />
+        }
+      >
+        <TouchableOpacity onPress={handleImageClick}>
+          <View style={styles.postContainer}>
+            {/* Username */}
+            <Text style={styles.usernameText}>Username</Text>
+            {/* Location */}
+            <Text style={styles.locationText}>Location</Text>
+            {/* Image */}
+            <Image
+              source={{
+                uri: 'https://imgur.com/mfO5v21.jpg',
+              }}
+              style={styles.image}
+            />
+            {/* Interaction bar */}
+            <View style={styles.interactionBar}>
+              {/* Like button */}
+              <TouchableOpacity onPress={handleLike} style={styles.iconButton}>
+                <FontAwesome name={liked ? "heart" : "heart-o"} size={24} color={liked ? "#ff9999" : "#ccc"} />
+              </TouchableOpacity>
+              {/* Like count */}
+              <Text style={styles.likeText}>{likes} Likes</Text>
+              {/* Comment button */}
+              <TouchableOpacity onPress={toggleCommentSection} style={styles.iconButton}>
+                <FontAwesome name="comment" size={24} color="#ccc" />
+              </TouchableOpacity>
             </View>
-          </TouchableOpacity>
-        ))}
+            {/* Comment section */}
+            {commentSectionVisible && (
+              <View style={styles.commentSection}>
+                {/* Comments */}
+                {comments.map((comment, commentIndex) => (
+                  <View key={commentIndex} style={styles.comment}>
+                    <Text style={styles.commentText}>{comment}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+            {/* Comment input */}
+            <View style={styles.commentInputContainer}>
+              <TextInput
+                placeholder="Add a comment..."
+                placeholderTextColor="#ccc"
+                style={styles.commentInput}
+                value={newCommentText}
+                onChangeText={handleCommentChange}
+              />
+              <TouchableOpacity onPress={handlePostComment} style={styles.postCommentButton}>
+                <Text style={styles.postCommentButtonText}>Post</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </TouchableOpacity>
       </ScrollView>
       {/* Modal for maximized image */}
       {maximizedImageIndex !== null && (
@@ -137,7 +131,7 @@ const ImageFeed = () => {
             </TouchableOpacity>
             <Image
               source={{
-                uri: '',
+                uri: 'https://imgur.com/mfO5v21.jpg',
               }}
               style={styles.maximizedImage}
             />

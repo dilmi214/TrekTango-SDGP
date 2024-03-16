@@ -26,12 +26,18 @@ const CreateAccountScreen = () => {
       }
   
       // Make a POST request to the backend endpoint
-      const response = await axios.post(`${baseURL}/register`, {
-        username,
-        email,
-        password,
-        name: `${firstName} ${lastName}`, // Combine first name and last name
-        dob
+      const response = await fetch(`${baseURL}/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          email,
+          password,
+          name: `${firstName} ${lastName}`, // Combine first name and last name
+          dob
+        }),
       });
       
       // Check if the request was successful
