@@ -11,6 +11,7 @@ const ImageFeed = () => {
   const [commentSectionVisible, setCommentSectionVisible] = useState(false);
   const [maximizedImageIndex, setMaximizedImageIndex] = useState(null);
   const [refreshing, setRefreshing] = useState(false); // State for refresh indicator
+  const [caption, setCaption] = useState("Your caption from the backend"); // Fixed caption state
 
   // Function to handle refresh action
   const onRefresh = () => {
@@ -33,6 +34,10 @@ const ImageFeed = () => {
     setLiked(!liked);
   };
 
+  const handleCaptionChange = (text) => {
+    setCaption(text);
+  };
+
   const handleCommentChange = (text) => {
     setNewCommentText(text);
   };
@@ -48,9 +53,7 @@ const ImageFeed = () => {
     setCommentSectionVisible(!commentSectionVisible);
   };
 
-  const handleImageClick = () => {
-    setMaximizedImageIndex(0);
-  };
+ 
 
   const exitMaximizedImage = () => {
     setMaximizedImageIndex(null);
@@ -69,20 +72,24 @@ const ImageFeed = () => {
           />
         }
       >
-        <TouchableOpacity onPress={handleImageClick}>
-          <View style={styles.postContainer}>
-            {/* Username */}
-            <Text style={styles.usernameText}>Username</Text>
-            {/* Location */}
-            <Text style={styles.locationText}>Location</Text>
-            {/* Image */}
-            <Image
-              source={{
-                uri: 'https://imgur.com/mfO5v21.jpg',
-              }}
-              style={styles.image}
-            />
-            {/* Interaction bar */}
+        <View style={styles.postContainer}>
+  {/* Username */}
+  <Text style={styles.usernameText}>Username</Text>
+  {/* Location */}
+  <Text style={styles.locationText}>Location</Text>
+  {/* Image */}
+  <Image
+    source={{
+      uri: 'https://imgur.com/mfO5v21.jpg',
+    }}
+    style={styles.image}
+  />
+            <View style={styles.postContainer}>
+  {/* Caption */}
+  <Text style={styles.captionText}>{caption}</Text>
+  {/* Interaction bar */}
+  
+</View>
             <View style={styles.interactionBar}>
               {/* Like button */}
               <TouchableOpacity onPress={handleLike} style={styles.iconButton}>
@@ -120,7 +127,7 @@ const ImageFeed = () => {
               </TouchableOpacity>
             </View>
           </View>
-        </TouchableOpacity>
+        {/* </TouchableOpacity> */}
       </ScrollView>
       {/* Modal for maximized image */}
       {maximizedImageIndex !== null && (
@@ -252,6 +259,12 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
   },
+    captionText: {
+      fontSize: 16,
+      color: '#fff',
+      paddingHorizontal: 10,
+      paddingBottom: 10,
+    },
   usernameText: {
     fontSize: 15,
     fontWeight: 'bold',
