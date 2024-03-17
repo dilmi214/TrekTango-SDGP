@@ -58,6 +58,11 @@ router.post('/register', async (req, res) => {
     const { username, email, password, name, dob } = req.body;
   
     try {
+// Check if required fields are provided
+    if (!username || !email || !password || !name || !dob) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+
       // Generate a random salt
       const salt = crypto.randomBytes(16).toString('hex');
   
@@ -76,7 +81,7 @@ router.post('/register', async (req, res) => {
   
       // Save the user to the database
       await newUser.save();
-  
+      console.log('User registered successfully');
       res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {
       console.error(error);

@@ -5,9 +5,10 @@ const cors = require('cors');
 
 
 // Import the login router
-const loginRouter = require('./login');
 const socialMediaRouter = require('./socialMedia');
-const travellingSessionRouter = require('./travellingSession');
+const loginRouter = require('./login');
+
+// const travellingSessionRouter = require('./travellingSession');
 
 
 const app = express();
@@ -20,7 +21,9 @@ app.use(cors());
 
 // Use the login router
 app.use(loginRouter);
-app.use(travellingSessionRouter);
+// app.use(travellingSessionRouter);
+app.use(socialMediaRouter);
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

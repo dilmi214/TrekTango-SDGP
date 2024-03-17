@@ -69,6 +69,16 @@ app.post('/social-media/posts', async (req, res) => {
       createdAt: new Date()
     };
 
+    app.get('/socialMediaData', async (req, res) => {
+      try {
+        const data = await SocialMedia.find({});
+        res.json(data);
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
+    });
+
     // Save the new post directly
     const createdPost = await SocialMedia.create({
       username,
@@ -82,6 +92,38 @@ app.post('/social-media/posts', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+/**
+ * takes in the user ID as a parameter
+ * Returns all the posts that are public from the same user
+*/
+app.get('/mediaPosts/:userID', async (req, res) => {
+  const userID = req.params.userID;
+
+  try {
+    // Find the user by userID
+    const user = await User.findOne({ userID });
+
+    if (!user) {
+      console.log('User not found');
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Extract media posts with uploadToMedia as true
+    const mediaPosts = user.posts.filter(post => post.uploadToMedia === true);
+
+    // Log the number of media posts found
+    console.log(`Found ${mediaPosts.length} media posts for user ${userID}`);
+
+    // Return the media posts
+    res.json(mediaPosts);
+  } catch (error) {
+    console.error('Error retrieving media posts:', error);
+    // Handle errors
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 
 app.get('/posts/:postId', async (req, res) => {
@@ -109,6 +151,52 @@ app.get('/posts/:postId', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+/**
+ * Takes the last refreshed at as the request body
+ * Returns all the posts along with the usernames of the objects that are public as well as created after the last refresh tab
+*/
+app.get('/socialMediaData', async (req, res) => {
+  try {
+    // Get the lastRefreshedAt value from the request body
+    const lastRefreshedAt = req.body.lastRefreshedAt;
+
+    // Check if lastRefreshedAt is provided
+    if (!lastRefreshedAt) {
+      console.error('Error: lastRefreshedAt has not been provided');
+      return res.status(400).json({ error: 'lastRefreshedAt not provided' });
+    }
+
+    // Find the social media data based on lastRefreshedAt
+    const socialMediaData = await SocialMedia.findOne({ lastRefreshedAt });
+
+    // Check if social media data is found
+    if (!socialMediaData) {
+      console.error('Error: Social media data not found');
+      return res.status(404).json({ error: 'Data not found' });
+    }
+    //ERROR HERERGYQEFJLEHFULWHFHQWRKQWRJHKKWRH
+    // Filter the posts based on the condition uploadToMedia being true
+    const filteredPosts = socialMediaData.posts.filter(post => {
+      return post.uploadToMedia === true && new Date(post.createdAt) > new Date(lastRefreshedAt);
+    });
+
+    // Modify the social media data to include only filtered posts. This way only posts with the certain condition is used
+    const modifiedSocialMediaData = { ...socialMediaData.toJSON(), posts: filteredPosts };
+
+    // Log the modified social media data
+    console.log('Social media data with the filtered content:', modifiedSocialMediaData);
+
+    // Send the modified social media data as response
+    res.json(modifiedSocialMediaData);
+  } catch (error) {
+    console.error('Error encountered when retrieving the social media data:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+
+  //Create a set of code here to update the last refresh date to now
+});
+
 
   //
   app.get('/social-media/:username/posts', async (req, res) => {
