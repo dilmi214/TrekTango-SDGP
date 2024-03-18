@@ -6,7 +6,7 @@ const LoginScreen = () => {
   const navigation = useNavigation();
 
   const handleSignInPress = () => {
-    navigation.navigate('Home');
+    navigation.navigate('Main');
   };
 
   const handleCreateAccountPress = () => {

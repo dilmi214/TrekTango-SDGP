@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Alert } from 'react-native';
 import { CurrentRenderContext, useNavigation } from '@react-navigation/native';
 
-const ConfirmedDestinationListModal = ({ visible, onClose, selectedPlacesIds, onRemoveDestination }) => {
+const ConfirmedDestinationListModal = ({ visible, onClose, selectedPlaces, onRemoveDestination }) => {
   
   const handleRemoveDestination = (placeId) => {
     onRemoveDestination(placeId);
@@ -14,10 +14,10 @@ const ConfirmedDestinationListModal = ({ visible, onClose, selectedPlacesIds, on
         <View style={styles.modalContent}>
 
           <Text style={styles.modalTitle}>List of Confirmed Destinations</Text>
-          {selectedPlacesIds.length === 0 ? (
+          {selectedPlaces.length === 0 ? (
             <Text style={styles.emptyListText}>List is empty. Add places</Text>
           ) : (
-            selectedPlacesIds.map(destination => (
+            selectedPlaces.map(destination => (
               <View key={destination.place_id} style={styles.destinationContainer}>
                 <Text style={styles.destinationText}>{destination.name}</Text>
                 <TouchableOpacity onPress={() => handleRemoveDestination(destination.place_id)}>
@@ -43,10 +43,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
   },
   modalContent: {
-    backgroundColor: 'white',
+    backgroundColor: '#010C33', 
     width: '80%',
     padding: 20,
     borderRadius: 10,
@@ -56,42 +56,45 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
-  },
-  buttonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    width: '100%',
-    marginBottom: 10,
-  },
-  closeButton: {
-    backgroundColor: '#ccc',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: '#fff',
   },
   destinationContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 5,
+    borderWidth: 1, 
+    borderColor: '#FFF', 
+    padding: 10, 
+    borderRadius: 5, 
   },
   destinationText: {
     flex: 1,
     marginBottom: 5,
+    color:'#FFF',
   },
   removeButtonText: {
-    color: 'red',
+    color: '#FFF',
     marginLeft: 10,
+    // fontSize: '24',
   },
   emptyListText: {
     textAlign: 'center',
     fontStyle: 'italic',
     color: '#999',
   },
+  closeButton: {
+    backgroundColor: '#2E8AF7', 
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginTop: 10, 
+  },
+  buttonText: {
+    color: '#FFF', 
+    fontWeight: 'bold',
+  },
+   
 });
 
 export default ConfirmedDestinationListModal;

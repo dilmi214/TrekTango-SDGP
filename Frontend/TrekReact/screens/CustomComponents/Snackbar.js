@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: 390, 
     position: 'absolute',
-    bottom: 30, 
+    bottom: 80, 
     left: '3%', // left edge is from 3% of the containing element
     right: '98%', // right edge is from 98% of the containing element
     zIndex: 999,

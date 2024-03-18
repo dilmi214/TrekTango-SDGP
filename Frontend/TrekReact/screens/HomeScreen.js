@@ -8,9 +8,6 @@ const HomeScreen = () => {
       <View style={styles.content}>
         <Text style={styles.text}>Home</Text>
       </View>
-      <View style={styles.navBarContainer}>
-        <NavBar />
-      </View>
     </View>
   );
 };
@@ -27,12 +24,6 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 24,
     fontWeight: 'bold',
-  },
-  navBarContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
   },
 });
 

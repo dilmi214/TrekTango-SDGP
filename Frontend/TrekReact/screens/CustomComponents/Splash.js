@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Image, Text, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 const SplashScreen = () => {
@@ -17,7 +17,10 @@ const SplashScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Splash</Text>
+      <Image
+        source={{ uri: 'https://i.imgur.com/lCbsJVU.jpg' }}
+        style={styles.image}
+      />
     </View>
   );
 };
@@ -27,10 +30,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#010C33',
   },
-  text: {
-    fontSize: 24,
-    fontWeight: 'bold',
+  image: {
+    width: 200,
+    height: 200,
+    resizeMode: 'contain',
   },
 });
 

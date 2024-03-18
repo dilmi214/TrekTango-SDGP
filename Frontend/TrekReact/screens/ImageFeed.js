@@ -10,8 +10,6 @@ const ImageFeed = () => {
   const [comments, setComments] = useState(Array(5).fill([]));
   const [newCommentText, setNewCommentText] = useState(Array(5).fill(''));
   const [commentSectionVisible, setCommentSectionVisible] = useState(Array(5).fill(false));
-  const [maximizedImageIndex, setMaximizedImageIndex] = useState(null);
-
   const handleLike = (index) => {
     const newLikes = [...likes];
     const newLiked = [...liked];
@@ -50,13 +48,8 @@ const ImageFeed = () => {
     setCommentSectionVisible(newCommentSectionVisible);
   };
 
-  const handleImageClick = (index) => {
-    setMaximizedImageIndex(index);
-  };
+  
 
-  const exitMaximizedImage = () => {
-    setMaximizedImageIndex(null);
-  };
 
   return (
     <View style={styles.container}>
@@ -105,24 +98,6 @@ const ImageFeed = () => {
           </TouchableOpacity>
         ))}
       </ScrollView>
-      {maximizedImageIndex !== null && (
-        <Modal visible={maximizedImageIndex !== null} transparent={true}>
-          <View style={styles.modalContainer}>
-            <TouchableOpacity style={styles.largeCloseButton} onPress={exitMaximizedImage}>
-              <FontAwesome name="close" size={36} color="#fff" />
-            </TouchableOpacity>
-            <Image
-              source={{
-                uri: '',
-              }}
-              style={styles.maximizedImage}
-            />
-          </View>
-        </Modal>
-      )}
-      <View style={styles.navBarContainer}>
-        <NavBar />
-    </View>
     </View>
   );
 };
@@ -215,23 +190,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.8)',
-  },
-  maximizedImage: {
-    width: '90%',
-    height: '90%',
-    resizeMode: 'contain',
-  },
-  largeCloseButton: {
-    position: 'absolute',
-    top: 60,
-    right: 20,
-    zIndex: 1,
-  },
-  navBarContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
   },
 });
 
