@@ -9,25 +9,28 @@ const GameMapScreen = ({ route }) => {
   const navigation = useNavigation();
   const { selectedPlaces, detected, confirmedStarterLocation } = route.params;
   const [selectedLocation, setSelectedLocation] = useState(null);
+  const [directions, setDirections] = useState([]);
 
   useEffect(() => {
-    const getUserCurrentLocation = async () => {
-      try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') {
-          console.log('Permission to access location was denied');
-          return;
-        }
+    const fetchDirections = async () => {
+      const apiKey = 'AIzaSyCCHxfnoWl-DNhLhKcjhCTiHYNY917ltL8';
+      const waypoints = selectedPlaces.map(place => `place_id:${place.place_id}`).join('|');
+      const origin = `${confirmedStarterLocation.latitude},${confirmedStarterLocation.longitude}`;
+      const destination = `${selectedPlaces[selectedPlaces.length - 1].latitude},${selectedPlaces[selectedPlaces.length - 1].longitude}`;
 
-        const location = await Location.getCurrentPositionAsync({});
-        console.log('User current location:', location.coords);
-      } catch (error) {
-        console.error('Error getting user current location:', error);
+      const response = await fetch(`https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&waypoints=${waypoints}&key=${apiKey}`);
+      const data = await response.json();
+
+      if (data.status === 'OK') {
+        const polylinePoints = data.routes[0].overview_polyline.points;
+        setDirections(polylinePoints);
+      } else {
+        console.error('Error fetching directions:', data.status);
       }
     };
 
-    getUserCurrentLocation();
-  }, []);
+    fetchDirections();
+  }, [selectedPlaces, confirmedStarterLocation]);
 
   const handleBackButtonPress = () => {
     navigation.goBack();
@@ -46,11 +49,7 @@ const GameMapScreen = ({ route }) => {
   const handleBlueMarkerPress = (location) => {
     if (!detected) {
       setSelectedLocation(location);
-      console.log("Detected is true");
-    } else {
-
     }
-
   };
 
   return (
@@ -67,14 +66,13 @@ const GameMapScreen = ({ route }) => {
           }}
           mapType="standard"
         >
-          <Polyline
-            coordinates={[
-              { latitude: confirmedStarterLocation.latitude, longitude: confirmedStarterLocation.longitude },
-              ...selectedPlaces.map(destination => ({ latitude: destination.latitude, longitude: destination.longitude }))
-            ]}
-            strokeWidth={3}
-            strokeColor="#FF5733"
-          />
+          {directions.length > 0 && (
+            <Polyline
+              coordinates={decodePolyline(directions)}
+              strokeWidth={3}
+              strokeColor="#FF5733"
+            />
+          )}
 
           <Marker
             coordinate={{
@@ -147,7 +145,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   backButtonText: {
-    color: 'white',
+    color: 'black',
     fontSize: 16,
   },
   destinationListContainer: {
@@ -173,5 +171,41 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
+
+// Function to decode Google Maps polyline
+function decodePolyline(encoded) {
+  // array that holds the points
+  const points = []
+  let index = 0, len = encoded.length;
+  let lat = 0, lng = 0;
+
+  while (index < len) {
+    let b, shift = 0, result = 0;
+
+    do {
+      b = encoded.charCodeAt(index++) - 63; // finds ascii and substract it by 63
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+
+    const dlat = ((result & 1) !== 0 ? ~(result >> 1) : (result >> 1));
+    lat += dlat;
+
+    shift = 0;
+    result = 0;
+
+    do {
+      b = encoded.charCodeAt(index++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+
+    const dlng = ((result & 1) !== 0 ? ~(result >> 1) : (result >> 1));
+    lng += dlng;
+
+    points.push({ latitude: lat / 1e5, longitude: lng / 1e5 });
+  }
+  return points;
+}
 
 export default GameMapScreen;
