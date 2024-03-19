@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, FlatList, StyleSheet, TouchableOpacity, Image, ScrollView, Button, Alert, Platform } from 'react-native';
-import { ListItem } from 'react-native-elements';
 import PlaceDetailsModal from './PlaceDetailsModal';
 import ConfirmedDestinationListModal from './confirmedDestinationListModal'; 
-import Dialog from 'react-native-dialog';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import {  useRoute } from '@react-navigation/native';
 import CustomDialog from '../../CustomComponents/CustomDialog';
 import Snackbar from '../../CustomComponents/Snackbar';
 import CustomLoadingIndicator from '../../CustomComponents/CustomLoadingIndicator';
-import Layout from '../../CustomComponents/ScreenLayout';
-
 
 const GOOGLE_PLACES_API_KEY = "AIzaSyCCHxfnoWl-DNhLhKcjhCTiHYNY917ltL8";
 // Define categories for filtering destinations
