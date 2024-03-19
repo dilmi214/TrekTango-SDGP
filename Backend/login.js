@@ -15,10 +15,10 @@ mongoose.connect(url);
 
 const db = mongoose.connection;
 
-const router = express.Router();
+const app = express();
 
-router.use(bodyParser.json()); // Parse incoming request bodies in JSON format
-router.use(cors()); // Enable Cross-Origin Resource Sharing (CORS)
+app.use(bodyParser.json()); // Parse incoming request bodies in JSON format
+app.use(cors()); // Enable Cross-Origin Resource Sharing (CORS)
 
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function () {
@@ -54,45 +54,54 @@ function hashPassword(password, salt) {
 }
 
 // POST /register route
-router.post('/register', async (req, res) => {
-    const { username, email, password, name, dob } = req.body;
-  
-    try {
-// Check if required fields are provided
+app.post('/register', async (req, res) => {
+  const { username, email, password, name, dob } = req.body;
+
+  try {
+    // Check if required fields are provided
     if (!username || !email || !password || !name || !dob) {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
-      // Generate a random salt
-      const salt = crypto.randomBytes(16).toString('hex');
-  
-      // Hash the password using the salt
-      const hashedPassword = hashPassword(password, salt);
-  
-      // Create a new user instance
-      const newUser = new User({
-        username,
-        email,
-        password: hashedPassword,
-        salt,
-        name,
-        dob
-      });
-  
-      // Save the user to the database
-      await newUser.save();
-      console.log('User registered successfully');
-      res.status(201).json({ message: 'User registered successfully' });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Internal Server Error' });
+    // Generate a random salt
+    const salt = crypto.randomBytes(16).toString('hex');
+
+    // Hash the password using the salt
+    const hashedPassword = hashPassword(password, salt);
+
+    // Create a new user instance
+    const newUser = new User({
+      username,
+      email,
+      password: hashedPassword,
+      salt,
+      name,
+      dob
+    });
+
+    // Save the user to the database
+    await newUser.save();
+
+    // Log success message
+    console.log('User registered successfully');
+
+    res.status(201).json({ message: 'User registered successfully' });
+  } catch (error) {
+    console.error('Error registering user:', error);
+
+    // Check for specific error types
+    if (error.code === 11000) {
+      return res.status(400).json({ error: 'Username or email already exists' });
     }
-  });
+
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
   const User = mongoose.model('User', userSchema);
 
 // POST /login route
-router.post('/login', async (req, res) => {
+app.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
   try {
@@ -129,15 +138,20 @@ function generateVerificationCode() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-router.put('/users/send-verification-email', async (req, res) => {
-  const email = req.body.email; // Assuming the email is sent in the request body
-
+app.put('/users/send-verification-email', async (req, res) => {
   try {
+    const email = req.body.email; // Assuming the email is sent in the request body
+    const name = req.body.name; // Assuming the name is sent in the request body
+
+    if (!email) {
+      return res.status(400).json({ error: 'Please input the e-mail' });
+    }
+
     // Find user by email
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: 'No existing user with the provided e-mail' });
     }
 
     // Generate verification code
@@ -157,20 +171,38 @@ router.put('/users/send-verification-email', async (req, res) => {
     });
 
     const mailOptions = {
-      from: 'Some random e-mail address',
+      from: 'Trek Tango',
       to: user.email,
       subject: 'Verification Code',
-      text: `Your verification code is: ${verificationCode}`,
+      text: `Dear ${name},
+
+Thank you for choosing Trek Tango! To ensure the security of your account, we require verification before proceeding with any changes, including password resets.
+
+**Please use the following verification code to confirm your identity: ${verificationCode}.**
+
+Once you've received this email, kindly enter the provided code in the appropriate field within the Trek Tango application. This step helps us confirm that you are the rightful owner of the account and helps safeguard your personal information.
+
+If you did not initiate this action or have any concerns regarding your account security, please contact our support team immediately at (Insert e-mail address and phone number here). We're here to assist you and ensure your experience with Trek Tango remains safe and enjoyable.
+
+Thank you for your cooperation in maintaining the security of your account.
+
+Best regards,
+
+Team Trek Tango`,
     };
+    
+    // Log email options for debugging
+    console.log("Mail options:", mailOptions);
 
     await transporter.sendMail(mailOptions);
    
     res.status(200).json({ message: 'Verification code sent successfully' });
   } catch (error) {
-    console.error('Error sending verification email:', error);
+    console.error('There was an error encountered when sending the verification code:', error);
     res.status(500).json({ error: 'Failed to send verification email' });
   }
 });
+
 
 
 
@@ -210,7 +242,7 @@ const changePassword = async (username, oldPassword, newPassword) => {
   }
 };
 
-router.put('/users/change-password', async (req, res) => {
+app.put('/users/change-password', async (req, res) => {
   const { username, oldPassword, newPassword } = req.body;
 
   try {
@@ -259,7 +291,7 @@ const resetPassword = async (username, newPassword) => {
   }
 };
 
-router.put('/users/forget-password', async (req, res) => {
+app.put('/users/forget-password', async (req, res) => {
   const { email, verificationCode, newPassword } = req.body;
 
   try {
@@ -305,7 +337,7 @@ router.put('/users/forget-password', async (req, res) => {
 
 
 
-router.put('/update-profile-pic', async (req, res) => {
+app.put('/update-profile-pic', async (req, res) => {
   const { username, profilePic } = req.body;
 
   try {
@@ -329,7 +361,11 @@ router.put('/update-profile-pic', async (req, res) => {
   }
 });
 
-module.exports = router;
+const port = 3000
+
+app.listen(port, ()=>{
+  console.log('port is listening to port' + port)
+})
 
 
 

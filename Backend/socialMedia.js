@@ -54,6 +54,50 @@ const SocialMedia = mongoose.model('SocialMedia', socialMediaSchema);
 
 module.exports = SocialMedia; //Just in case, I might need to access this from another script
 
+/**
+ * takes the last refreshed at as the request body
+ * returns all the posts that were created (created at) after the last refreshed at
+*/
+router.get('/socialMediaData', async (req, res) => {
+  try {
+    // Get the lastRefreshedAt value from the request body
+    const lastRefreshedAt = req.body.lastRefreshedAt;
+
+    // Check if lastRefreshedAt is provided
+    if (!lastRefreshedAt) {
+      console.error('Error: lastRefreshedAt not provided');
+      return res.status(400).json({ error: 'lastRefreshedAt not provided' });
+    }
+
+    // Find the social media data based on lastRefreshedAt
+    const socialMediaData = await SocialMedia.findOne({ lastRefreshedAt });
+
+    // Check if social media data is found
+    if (!socialMediaData) {
+      console.error('Error: Social media data not found');
+      return res.status(404).json({ error: 'Social media data not found' });
+    }
+
+    // Filter the posts based on the condition uploadToMedia being true
+    const filteredPosts = socialMediaData.posts.filter(post => {
+      return post.uploadToMedia === true && new Date(post.createdAt) > new Date(lastRefreshedAt);
+    });
+
+    // Modify the social media data to include only filtered posts
+    const modifiedSocialMediaData = { ...socialMediaData.toJSON(), posts: filteredPosts };
+
+    // Log the modified social media data
+    console.log('Modified social media data:', modifiedSocialMediaData);
+
+    // Send the modified social media data as response
+    res.json(modifiedSocialMediaData);
+  } catch (error) {
+    console.error('Error retrieving social media data:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
 app.post('/social-media/posts', async (req, res) => {
   try {
     const { username, userID, placeId, imageReferenceId, caption, comments, likes } = req.body;
@@ -68,6 +112,8 @@ app.post('/social-media/posts', async (req, res) => {
       likes: likes || [],
       createdAt: new Date()
     };
+
+
 
     app.get('/socialMediaData', async (req, res) => {
       try {
@@ -123,6 +169,84 @@ app.get('/mediaPosts/:userID', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+async function getPostById(postId) {
+  try {
+    // Find the social media data containing the post with the specified postId
+    const socialMediaData = await SocialMedia.findOne({ 'posts.postId': postId });
+
+    // Check if social media data is found
+    if (!socialMediaData) {
+      console.error('Error: Social media data not found');
+      return { error: 'Social media data not found' };
+    }
+
+    // Log social media data for debugging
+    console.log('Social media data found:', socialMediaData);
+
+    // Find the post with the specified postId
+    const post = socialMediaData.posts.find(post => post.postId === postId);
+
+    // Check if post is found
+    if (!post) {
+      console.error('Error: Post not found');
+      return { error: 'Post not found' };
+    }
+
+    // Log the found post for debugging
+    console.log('Post found:', post);
+
+    // Return the JSON object containing username and the post
+    return {
+      username: socialMediaData.username,
+      userID: socialMediaData.userID,
+      post
+    };
+  } catch (error) {
+    console.error('Error retrieving post:', error);
+    return { error: 'Internal Server Error' };
+  }
+}
+
+async function getPostById(req, res) {
+  try {
+    const postId = req.params.postId;
+
+    // Find the social media data containing the post with the specified postId
+    const socialMediaData = await SocialMedia.findOne({ 'posts.postId': postId });
+
+    // Check if social media data is found
+    if (!socialMediaData) {
+      console.error('Error: Social media data not found');
+      return res.status(404).json({ error: 'Social media data not found' });
+    }
+
+    // Log social media data for debugging
+    console.log('Social media data found:', socialMediaData);
+
+    // Find the post with the specified postId
+    const post = socialMediaData.posts.find(post => post.postId === postId);
+
+    // Check if post is found
+    if (!post) {
+      console.error('Error: Post not found');
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    // Log the found post for debugging
+    console.log('Post found:', post);
+
+    // Return the JSON object containing username and the post
+    res.json({
+      username: socialMediaData.username,
+      userID: socialMediaData.userID,
+      post
+    });
+  } catch (error) {
+    console.error('Error retrieving post:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
 
 
 
