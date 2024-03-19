@@ -3,7 +3,7 @@ import { View, StyleSheet, Dimensions, TouchableOpacity, Text, ScrollView } from
 import MapView, { PROVIDER_GOOGLE, Marker, Circle } from 'react-native-maps';
 import Constants from 'expo-constants';
 import CustomDialog from '../../CustomComponents/CustomDialog';
-import CustomActivityIndicator from '../../CustomComponents/CustomActinityIndicator';
+import CustomLoadingIndicator from '../../CustomComponents/CustomActinityIndicator';
 
 const RadiusSetScreen = ({ route, navigation }) => {
   const { longitude, latitude } = route.params;

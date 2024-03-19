@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Linking, Animated, ScrollView } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; // Import MaterialCommunityIcons for the camera icon
 import * as Location from 'expo-location';
-import CustomLoadingIndicator from '../../CustomComponents/CustomLoadingIndicator'; 
+import CustomActivityIndicator from '../../CustomComponents/CustomActinityIndicator'; 
 
 const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) => {
   const [showFromDropdown, setShowFromDropdown] = useState(false);
@@ -10,6 +10,7 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
   const [currentLocation, setCurrentLocation] = useState(null);
   const [directionsClicked, setDirectionsClicked] = useState(false);
   const [loading, setLoading] = useState(true); // State to track location loading
+
 
   useEffect(() => {
     getLocationAsync();
@@ -49,6 +50,10 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
     setShowFromDropdown(false);
   };
 
+  const handleCameraOpen = () => {
+
+  };
+
   const filteredLocations = locations.filter(location => location.name !== clickedLocation.name);
 
   return (
@@ -61,7 +66,7 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
           <Text style={styles.title}>{clickedLocation?.name}</Text>
 
           {loading ? (
-            <CustomLoadingIndicator /> // Render custom loading indicator while loading location
+            <CustomActivityIndicator /> // Render custom loading indicator while loading location
           ) : (
             <>
               {/* Directions button */}
@@ -101,11 +106,14 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
                 </>
               )}
 
-              {/* Snap button */}
-              <TouchableOpacity style={styles.cameraButton}>
+              {/* Button to open camera */}
+              <TouchableOpacity style={styles.cameraButton} onPress={handleCameraOpen}>
                 <MaterialCommunityIcons name="camera" size={24} color="#fff" />
                 <Text style={styles.snapText}>Snap</Text>
               </TouchableOpacity>
+
+
+              
             </>
           )}
         </Animated.View>

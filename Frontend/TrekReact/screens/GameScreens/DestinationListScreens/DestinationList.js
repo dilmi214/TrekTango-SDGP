@@ -5,16 +5,16 @@ import ConfirmedDestinationListModal from './ConfirmedDestinationListModal';
 import {  useRoute } from '@react-navigation/native';
 import CustomDialog from '../../CustomComponents/CustomDialog';
 import Snackbar from '../../CustomComponents/Snackbar';
-import CustomLoadingIndicator from '../../CustomComponents/CustomLoadingIndicator';
+import CustomActivityIndicator from '../../CustomComponents/CustomActinityIndicator';
 
 const GOOGLE_PLACES_API_KEY = "AIzaSyCCHxfnoWl-DNhLhKcjhCTiHYNY917ltL8";
 // Define categories for filtering destinations
 const categories = [
   { label: "All Categories", value: "all_categories" },
   { label: "Tourist Attractions", value: "tourist_attraction" },
-  { label: "Restaurant & Cafe", value: "restaurant_cafe" },
+  { label: "Restaurant & Cafe", value: "restaurant|cafe" },
   { label: "Shopping Malls/Stores", value: "shopping_mall|store" },
-  { label: "Outdoor Activities", value: "park|amusement_park|bowling_alley|stadium|zoo|parking" },
+  { label: "Outdoor Activities", value: "park|amusement_park|bowling_alley|stadium|zoo|parking|night_club" },
   { label: "Cultural/Religious Sites", value: "church|hindu_temple|mosque|synagogue" },
   { label: "Entertainment", value: "movie_theater|night_club|casino" },
   { label: "Nature and Wildlife", value: "park|zoo|aquarium" },
@@ -50,24 +50,36 @@ const NearbyDestinationsScreen = ({navigation}) => {
   const fetchNearbyDestinations = async (pageToken = '') => {
     // Construct the URL for Google Places API
     let url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&key=${GOOGLE_PLACES_API_KEY}`;
-
+  
     if (selectedType) {
       url += `&type=${selectedType}`;
     }
-
+  
     if (pageToken) {
       url += `&pagetoken=${pageToken}`;
     }
-
+  
     // Fetch data from the URL
     try {
       setShowLoadingIndicator(true);
       const response = await fetch(url);
       const data = await response.json();
-
+  
       setNextPageToken(data.next_page_token);
-      setDestinations(prevDestinations => [...prevDestinations, ...data.results]);
-
+  
+      // Create promises to fetch details for each place concurrently
+      const placeDetailsPromises = data.results.map(async (place) => {
+        const placeDetailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&key=${GOOGLE_PLACES_API_KEY}`;
+        const placeDetailsResponse = await fetch(placeDetailsUrl);
+        const placeDetailsData = await placeDetailsResponse.json();
+        // Combine place ID and details
+        return { ...place, ...placeDetailsData.result };
+      });
+  
+      // Wait for all promises to resolve concurrently
+      const detailedPlaces = await Promise.all(placeDetailsPromises);
+      setDestinations(detailedPlaces);
+  
       // Hide loading indicator after data is fetched
       setTimeout(() => {
         setShowLoadingIndicator(false);
@@ -235,7 +247,7 @@ const NearbyDestinationsScreen = ({navigation}) => {
           onSelect={handleBackDialogResponse}
         />
 
-        {showLoadingIndicator && <CustomLoadingIndicator />}
+        {showLoadingIndicator && <CustomActivityIndicator />}
 
  
         {showSnackbar && (

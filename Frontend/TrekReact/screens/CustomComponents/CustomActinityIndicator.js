@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Image, StyleSheet } from 'react-native';
 import Spinner from '../CustomComponents/spinner.gif';
 
-const CustomLoadingIndicator = () => {
+const CustomActivityIndicator = () => {
   return (
     <View style={styles.overlay}>
       <Image source={Spinner} style={styles.loadingGif} />
@@ -24,4 +24,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CustomLoadingIndicator;
+export default CustomActivityIndicator;

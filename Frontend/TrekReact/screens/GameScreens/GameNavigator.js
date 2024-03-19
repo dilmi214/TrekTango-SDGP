@@ -3,7 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import NearbyDestinationsScreen from './DestinationListScreens/DestinationList'; // Import your second code component
 import SelectStartLocationScreen from './FinalizeGameScreens/StartLocationSetting';
 import StartGameScreen from './FinalizeGameScreens/StartGameUI';
-import GameMapScreen from './GameScreens/MainGameUI';
+import GameMapScreen from './MainGameScreens/MainGameUI';
 import LocationSelectionScreen from './InitialLocationRangeSelectionScreens/LocationSelection';
 import RadiusSetScreen from './InitialLocationRangeSelectionScreens/RadiusSet';
 import SearchInitialLocationScreen from './InitialLocationRangeSelectionScreens/SearchInitialLocation';

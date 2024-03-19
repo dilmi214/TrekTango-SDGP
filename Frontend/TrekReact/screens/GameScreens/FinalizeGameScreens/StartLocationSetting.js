@@ -4,7 +4,7 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import * as Location from 'expo-location';
 import Snackbar from '../../CustomComponents/Snackbar';
 import CustomDialog from '../../CustomComponents/CustomDialog';
-import CustomLoadingIndicator from '../../CustomComponents/CustomLoadingIndicator';
+import CustomActivityIndicator from '../../CustomComponents/CustomActinityIndicator';
 
 const SelectStartLocationScreen = () => {
   const route = useRoute();
@@ -153,7 +153,7 @@ const SelectStartLocationScreen = () => {
           action={{ label: 'Dismiss', onPress: () => setShowSnackbar(false) }}
         />
       )}
-      {loading && <CustomLoadingIndicator />}
+      {loading && <CustomActivityIndicator />}
       <CustomDialog
         visible={showBackDialog}
         title="Confirmation"

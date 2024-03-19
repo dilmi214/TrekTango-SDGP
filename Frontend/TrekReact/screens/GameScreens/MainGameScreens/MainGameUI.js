@@ -4,7 +4,7 @@ import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from 'react-native-maps';
 import { useNavigation } from '@react-navigation/native';
 import * as Location from 'expo-location';
 import GameLocationModal from './GameLocationModal';
-import CustomLoadingIndicator from '../../CustomComponents/CustomLoadingIndicator';
+import CustomActivityIndicator from '../../CustomComponents/CustomActinityIndicator';
 
 const GameMapScreen = ({ route }) => {
   const navigation = useNavigation();

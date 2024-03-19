@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'; 
 import * as Location from 'expo-location'; 
 import { useNavigation } from '@react-navigation/native'; 
-import CustomActivityIndicator from '../../CustomComponents/CustomActinityIndicator'; 
-
+import CustomLoadingIndicator from '../../CustomComponents/CustomActinityIndicator'; 
 
 const LocationSelectionScreen = () => { 
   const navigation = useNavigation(); 
@@ -45,7 +44,7 @@ const LocationSelectionScreen = () => {
         <TouchableOpacity style={styles.button} onPress={handleSearchLocationPress}> 
           <Text style={styles.buttonText}>Select from Search</Text> 
         </TouchableOpacity> 
-        {loading && <CustomActivityIndicator />} 
+        {loading && <CustomLoadingIndicator />} 
       </View> 
   ); 
 }; 

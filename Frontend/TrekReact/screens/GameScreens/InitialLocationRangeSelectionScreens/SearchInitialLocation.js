@@ -4,6 +4,7 @@ import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import Constants from 'expo-constants';
 import Snackbar from '../../CustomComponents/Snackbar';
 import CustomDialog from '../../CustomComponents/CustomDialog';
+import CustomActivityIndicator from '../../CustomComponents/CustomActinityIndicator';
 import axios from 'axios'; // Import axios for making HTTP requests
 
 const SearchInitialLocationScreen = ({ navigation }) => {
@@ -25,6 +26,7 @@ const SearchInitialLocationScreen = ({ navigation }) => {
   const [searchText, setSearchText] = useState('');
   const [predictions, setPredictions] = useState([]);
   const [showPredictions, setShowPredictions] = useState(false); // Control visibility of predictions
+  const [loading, setLoading] = useState(false); // State to control the loading indicator
   const mapRef = useRef(null);
 
   const handleBackPress = () => {
@@ -51,30 +53,38 @@ const SearchInitialLocationScreen = ({ navigation }) => {
   };
 
   const handlePlaceSelect = (placeId) => {
-    // Fetch details of the selected place using placeId
-    axios.get(`https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${GOOGLE_API_KEY}`)
-      .then(response => {
-        const result = response.data.result;
-        setSelectedLocation({
-          latitude: result.geometry.location.lat,
-          longitude: result.geometry.location.lng,
-        });
-  
-        // pan and zoom to the selected location
-        if (mapRef.current) {
-          mapRef.current.animateToRegion({
-            ...INITIAL_POSITION,
+    setLoading(true); // Show loading indicator when fetching place details 
+    try {
+      // Fetch details of the selected place using placeId
+      axios.get(`https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${GOOGLE_API_KEY}`)
+        .then(response => {
+          setLoading(false); // Hide loading indicator after fetching place details
+          const result = response.data.result;
+          setSelectedLocation({
             latitude: result.geometry.location.lat,
             longitude: result.geometry.location.lng,
           });
-        }
   
-        // Close the predictions dropdown
-        setShowPredictions(false);
-      })
-      .catch(error => {
-        console.error('Error fetching place details:', error);
-      });
+          // pan and zoom to the selected location
+          if (mapRef.current) {
+            mapRef.current.animateToRegion({
+              ...INITIAL_POSITION,
+              latitude: result.geometry.location.lat,
+              longitude: result.geometry.location.lng,
+            });
+          }
+  
+          // Close the predictions dropdown
+          setShowPredictions(false);
+        })
+        .catch(error => {
+          setLoading(false); // Hide loading indicator if there's an error
+          console.error('Error fetching place details:', error);
+        });
+    } catch (error) {
+      setLoading(false); // Hide loading indicator if there's an error
+      console.error('Error in handlePlaceSelect:', error);
+    }
   };
 
   const handleSearchTextChange = (text) => {
@@ -90,8 +100,6 @@ const SearchInitialLocationScreen = ({ navigation }) => {
       });
   };
 
-  
-
   return (
     <View style={styles.container}>
       <MapView
@@ -102,26 +110,27 @@ const SearchInitialLocationScreen = ({ navigation }) => {
         initialRegion={INITIAL_POSITION}
       >
         {selectedLocation && (
-          <Marker coordinate={selectedLocation} title="Selected Location" />
+          <Marker coordinate={selectedLocation} title="Selected Location" pinColor="blue" />
         )}
       </MapView>
+      {loading && <CustomActivityIndicator />}
       <View style={styles.overlay}>
         <View style={[styles.ButtonsInputContainer, !showPredictions && { marginBottom: 0 }]}>
-        <View style={styles.buttonsContainer}>
-          <TouchableOpacity onPress={handleBackPress}>
-            <Text style={styles.buttonText}>Back</Text>
-          </TouchableOpacity>
-          <CustomDialog
-            visible={showDialog}
-            title="Are you sure you want to go back?"
-            message="Your unsaved changes will be lost."
-            options={['Yes', 'No']}
-            onSelect={handleDialogSelect}
-          />
-          <TouchableOpacity onPress={handleNextPress}>
-            <Text style={styles.buttonText}>Next</Text>
-          </TouchableOpacity>
-        </View>
+          <View style={styles.buttonsContainer}>
+            <TouchableOpacity onPress={handleBackPress}>
+              <Text style={styles.buttonText}>Back</Text>
+            </TouchableOpacity>
+            <CustomDialog
+              visible={showDialog}
+              title="Are you sure you want to go back?"
+              message="Your unsaved changes will be lost."
+              options={['Yes', 'No']}
+              onSelect={handleDialogSelect}
+            />
+            <TouchableOpacity onPress={handleNextPress}>
+              <Text style={styles.buttonText}>Next</Text>
+            </TouchableOpacity>
+          </View>
           <TextInput
             style={styles.textInput}
             placeholder="Search City"
