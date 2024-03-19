@@ -36,7 +36,6 @@ const LocationSelectionScreen = () => {
   return (
     <ImageBackground source={{ uri: 'https://i.imgur.com/lCbsJVU.png' }} style={styles.background}>
       <View style={styles.container}>
-        <MaterialCommunityIcons name="map-marker" size={100} color="#fff" style={styles.icon} />
         <View style={styles.content}>
           <Text style={styles.header}>Let's get started!</Text>
           <Text style={styles.description}>Select your starting location to start your journey:</Text>
@@ -67,15 +66,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
   },
-  icon: {
-    marginTop:10,
-    marginBottom: 5,
-    color: '#010C33',
-  },
   content: {
-    borderWidth: 2,
+    borderWidth: 5,
     borderColor: '#A3AED5',
-    borderRadius: 8,
+    borderRadius: 15,
     padding: 20,
     marginBottom: 30,
     alignItems: 'center',
