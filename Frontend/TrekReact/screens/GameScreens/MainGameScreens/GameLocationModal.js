@@ -3,20 +3,22 @@ import { View, Text, StyleSheet, Modal, TouchableOpacity, Linking, Animated, Scr
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; // Import MaterialCommunityIcons for the camera icon
 import * as Location from 'expo-location';
 import CustomActivityIndicator from '../../CustomComponents/CustomActinityIndicator'; 
+import Snackbar from '../../CustomComponents/Snackbar';
+
 
 const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) => {
   const [showFromDropdown, setShowFromDropdown] = useState(false);
   const [selectedFromLocation, setSelectedFromLocation] = useState(null);
   const [currentLocation, setCurrentLocation] = useState(null);
   const [directionsClicked, setDirectionsClicked] = useState(false);
-  const [loading, setLoading] = useState(true); // State to track location loading
-
+  const [loading, setLoading] = useState(false); // Changed initial loading state to false
 
   useEffect(() => {
     getLocationAsync();
   }, []);
 
   const getLocationAsync = async () => {
+    setLoading(true); // Set loading to true before fetching location
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
       console.log('Permission to access location was denied');
@@ -50,8 +52,34 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
     setShowFromDropdown(false);
   };
 
-  const handleCameraOpen = () => {
+  const handleCameraOpen = async () => {
+    setLoading(true); // Show loading indicator when "Snap" button is clicked
+    // Your code to capture an image can go here
+    if (currentLocation) {
+      const modalLocation = clickedLocation;
+      const R = 6371e3;
+      const φ1 = currentLocation.latitude * Math.PI / 180;
+      const φ2 = modalLocation.latitude * Math.PI / 180;
+      const Δφ = (modalLocation.latitude - currentLocation.latitude) * Math.PI / 180;
+      const Δλ = (modalLocation.longitude - currentLocation.longitude) * Math.PI / 180;
+  
+      const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+                Math.cos(φ1) * Math.cos(φ2) *
+                Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      const distance = R * c;
+  
+      if (distance <= 1200) {
+        console.log("You are within 200 meters of the modal location. Action can be performed.");
+      } else {
+        // If the user is not within 200 meters, show the Snackbar
+        console.log(" Action can be performed.");
+      }
+    }
+    // Simulate a delay of 2 seconds for capturing the image (replace with actual camera logic)
+    await new Promise(resolve => setTimeout(resolve, 2000));
 
+    setLoading(false); // Close loading indicator once image capture process is complete
   };
 
   const filteredLocations = locations.filter(location => location.name !== clickedLocation.name);
@@ -110,10 +138,7 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
               <TouchableOpacity style={styles.cameraButton} onPress={handleCameraOpen}>
                 <MaterialCommunityIcons name="camera" size={24} color="#fff" />
                 <Text style={styles.snapText}>Snap</Text>
-              </TouchableOpacity>
-
-
-              
+              </TouchableOpacity>             
             </>
           )}
         </Animated.View>
