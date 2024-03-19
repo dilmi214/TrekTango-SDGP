@@ -1,11 +1,8 @@
 import * as React from 'react';
-import { View, Text } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
 import { FontAwesome5 } from '@expo/vector-icons';
 
-// Import screens (assuming correct file paths)
+// Import screens 
 import HomeScreen from './HomeScreen';
 import ImageFeed from './ImageFeed';
 import ProfilePage from './ProfilePage';
