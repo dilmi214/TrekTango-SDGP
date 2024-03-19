@@ -6,7 +6,7 @@ import Snackbar from '../../CustomComponents/Snackbar';
 import CustomDialog from '../../CustomComponents/CustomDialog';
 import axios from 'axios'; // Import axios for making HTTP requests
 
-const SearchLocationScreen = ({ navigation }) => {
+const SearchInitialLocationScreen = ({ navigation }) => {
   const GOOGLE_API_KEY = 'AIzaSyCCHxfnoWl-DNhLhKcjhCTiHYNY917ltL8';
   const { width, height } = Dimensions.get("window");
   const ASPECT_RATIO = width / height;
@@ -228,4 +228,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SearchLocationScreen;
+export default SearchInitialLocationScreen;

@@ -7,6 +7,7 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
   const [showFromDropdown, setShowFromDropdown] = useState(false);
   const [selectedFromLocation, setSelectedFromLocation] = useState(null);
   const [currentLocation, setCurrentLocation] = useState(null);
+  const [directionsClicked, setDirectionsClicked] = useState(false);
 
   useEffect(() => {
     getLocationAsync();
@@ -24,7 +25,7 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
     setSelectedFromLocation({ name: 'Current Location', place_id: 'current_location', latitude: location.coords.latitude, longitude: location.coords.longitude });
   };
 
-  const handleGetDirections = () => {
+  const handleConfirm = () => {
     if (selectedFromLocation) {
       let startLocation;
       if (selectedFromLocation.name === 'Current Location') {
@@ -34,6 +35,7 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
       }
       const destinationLocationName = encodeURIComponent(clickedLocation.name);
       const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${startLocation}&destination=${destinationLocationName}`;
+      setDirectionsClicked(false);
       Linking.openURL(googleMapsUrl);
     }
   };
@@ -54,33 +56,42 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
           </TouchableOpacity>
           <Text style={styles.title}>{clickedLocation?.name}</Text>
 
-          {/* From dropdown */}
-          <View style={styles.dropdownContainer}>
-            <Text style={styles.label}>From: </Text>
-            <TouchableOpacity style={styles.dropdownButton} onPress={() => setShowFromDropdown(!showFromDropdown)}>
-              <Text style={styles.dropdownText}>{selectedFromLocation ? selectedFromLocation.name : 'Select Location'}</Text>
-            </TouchableOpacity>
-          </View>
-
-          {showFromDropdown && (
-            <View style={styles.dropdown}>
-              <ScrollView>
-                <TouchableOpacity onPress={() => handleFromLocationSelect({ name: 'Current Location', place_id: 'current_location', latitude: currentLocation.latitude, longitude: currentLocation.longitude })}>
-                  <Text style={styles.dropdownItem}>Current Location</Text>
-                </TouchableOpacity>
-                {filteredLocations.map(location => (
-                  <TouchableOpacity key={location.place_id} onPress={() => handleFromLocationSelect(location)}>
-                    <Text style={styles.dropdownItem}>{location.name}</Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </View>
-          )}
-
           {/* Directions button */}
-          <TouchableOpacity style={styles.directionsButton} onPress={handleGetDirections}>
+          <TouchableOpacity style={styles.directionsButton} onPress={() => setDirectionsClicked(true)}>
             <Text style={styles.directionsButtonText}>Get Directions</Text>
           </TouchableOpacity>
+
+          {directionsClicked && (
+            <>
+              {/* From dropdown */}
+              <View style={styles.dropdownContainer}>
+                <Text style={styles.label}>From: </Text>
+                <TouchableOpacity style={styles.dropdownButton} onPress={() => setShowFromDropdown(!showFromDropdown)}>
+                  <Text style={styles.dropdownText}>{selectedFromLocation ? selectedFromLocation.name : 'Select Location'}</Text>
+                </TouchableOpacity>
+              </View>
+
+              {showFromDropdown && (
+                <View style={styles.dropdown}>
+                  <ScrollView>
+                    <TouchableOpacity onPress={() => handleFromLocationSelect({ name: 'Current Location', place_id: 'current_location', latitude: currentLocation.latitude, longitude: currentLocation.longitude })}>
+                      <Text style={styles.dropdownItem}>Current Location</Text>
+                    </TouchableOpacity>
+                    {filteredLocations.map(location => (
+                      <TouchableOpacity key={location.place_id} onPress={() => handleFromLocationSelect(location)}>
+                        <Text style={styles.dropdownItem}>{location.name}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+              )}
+
+              {/* Confirm button */}
+              <TouchableOpacity style={styles.directionsButton} onPress={handleConfirm}>
+                <Text style={styles.directionsButtonText}>Confirm</Text>
+              </TouchableOpacity>
+            </>
+          )}
 
           {/* Snap button */}
           <TouchableOpacity style={styles.cameraButton}>

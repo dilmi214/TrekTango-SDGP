@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, FlatList, StyleSheet, TouchableOpacity, Image, ScrollView, Button, Alert, Platform } from 'react-native';
 import PlaceDetailsModal from './PlaceDetailsModal';
-import ConfirmedDestinationListModal from './confirmedDestinationListModal'; 
+import ConfirmedDestinationListModal from './ConfirmedDestinationListModal'; 
 import {  useRoute } from '@react-navigation/native';
 import CustomDialog from '../../CustomComponents/CustomDialog';
 import Snackbar from '../../CustomComponents/Snackbar';
