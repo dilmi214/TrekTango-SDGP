@@ -1,87 +1,111 @@
-import React, { useState } from 'react'; 
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'; 
-import * as Location from 'expo-location'; 
-import { useNavigation } from '@react-navigation/native'; 
-import CustomLoadingIndicator from '../../CustomComponents/CustomLoadingIndicator'; 
-import Layout from '../../CustomComponents/ScreenLayout';  
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ImageBackground, ActivityIndicator } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import * as Location from 'expo-location';
+import { useNavigation } from '@react-navigation/native';
 
-const LocationSelectionScreen = () => { 
-  const navigation = useNavigation(); 
-  const [loading, setLoading] = useState(false); 
+const LocationSelectionScreen = () => {
+  const navigation = useNavigation();
+  const [loading, setLoading] = useState(false);
 
-  const handleCurrentLocationPress = async () => { 
-    try { 
-      setLoading(true); 
-      const { status } = await Location.requestForegroundPermissionsAsync(); // request permission 
-      if (status !== 'granted') { // if permission permission denied 
-        console.log('Location permission not granted'); 
-        setLoading(false); 
-        return; 
-      } 
-      const location = await Location.getCurrentPositionAsync({}); // get the user's current location to location object 
-      // get latitude and longitude 
-      const latitude = location.coords.latitude; 
-      const longitude = location.coords.longitude; 
-      console.log('Current Location:', { latitude, longitude }); 
-      navigation.navigate('RadiusSetScreen', { latitude, longitude }); 
-    } catch (error) { 
-      console.error('Error getting current location:', error); 
-    } finally { 
-      setLoading(false); 
-    } 
-  }; 
+  const handleCurrentLocationPress = async () => {
+    try {
+      setLoading(true);
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        console.log('Location permission not granted');
+        setLoading(false);
+        return;
+      }
+      const location = await Location.getCurrentPositionAsync({});
+      const latitude = location.coords.latitude;
+      const longitude = location.coords.longitude;
+      console.log('Current Location:', { latitude, longitude });
+      navigation.navigate('RadiusSetScreen', { latitude, longitude });
+    } catch (error) {
+      console.error('Error getting current location:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const handleSearchLocationPress = () => { 
-    navigation.navigate('SearchLocation'); 
-  }; 
+  const handleSearchLocationPress = () => {
+    navigation.navigate('SearchLocation');
+  };
 
-  return ( 
-      <View style={styles.container}> 
-        <Text style={styles.header}>Let's Get Started!</Text> 
-        <Text style={styles.description}>Select your initial location to start the game:</Text> 
-        <TouchableOpacity style={styles.button} onPress={handleCurrentLocationPress}> 
-          <Text style={styles.buttonText}>Select Current Location</Text> 
-        </TouchableOpacity> 
-        <TouchableOpacity style={styles.button} onPress={handleSearchLocationPress}> 
-          <Text style={styles.buttonText}>Select from Search</Text> 
-        </TouchableOpacity> 
-        {loading && <CustomLoadingIndicator />} 
-      </View> 
-  ); 
-}; 
+  return (
+    <ImageBackground source={{ uri: 'https://i.imgur.com/lCbsJVU.png' }} style={styles.background}>
+      <View style={styles.container}>
+        <MaterialCommunityIcons name="map-marker" size={100} color="#fff" style={styles.icon} />
+        <View style={styles.content}>
+          <Text style={styles.header}>Let's get started!</Text>
+          <Text style={styles.description}>Select your starting location to start your journey:</Text>
+        </View>
+        <TouchableOpacity style={styles.button} onPress={handleCurrentLocationPress}>
+          <Text style={styles.buttonText}>Use Current Location</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={handleSearchLocationPress}>
+          <Text style={styles.buttonText}>Search for a Location</Text>
+        </TouchableOpacity>
+        {loading && <ActivityIndicator color="#fff" />}
+      </View>
+    </ImageBackground>
+  );
+};
 
-const styles = StyleSheet.create({ 
-  container: { 
-    flex: 1, 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    paddingHorizontal: 20, 
-    backgroundColor: '#010C33', 
-  }, 
-  header: { 
-    fontSize: 24, 
-    fontWeight: 'bold', 
-    marginBottom: 10, 
-    color: '#fff', 
-  }, 
-  description: { 
-    fontSize: 16, 
-    textAlign: 'center', 
-    marginBottom: 20, 
-    color: '#fff', 
-  }, 
-  button: { 
-    backgroundColor: '#fff', 
-    padding: 15, 
-    borderRadius: 8, 
-    marginBottom: 20, 
-    width: '100%', 
-    alignItems: 'center', 
-  }, 
-  buttonText: { 
-    color: '#010C33', 
-    fontSize: 18, 
-  }, 
-}); 
+const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    resizeMode: 'cover',
+    justifyContent: 'center',
+    backgroundColor: '#010C33',
+    paddingRight: 14
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  icon: {
+    marginTop:10,
+    marginBottom: 5,
+    color: '#010C33',
+  },
+  content: {
+    borderWidth: 2,
+    borderColor: '#fff',
+    borderRadius: 8,
+    padding: 20,
+    marginBottom: 30,
+    alignItems: 'center',
+    backgroundColor:'rgba(1, 1, 40, 0.9)',
+  },
+  header: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#fff',
+    textAlign: 'center',
+  },
+  description: {
+    fontSize: 18,
+    textAlign: 'center',
+    color: '#fff',
+  },
+  button: {
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 8,
+    marginBottom: 20,
+  },
+  buttonText: {
+    color: '#010C33',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+});
 
 export default LocationSelectionScreen;

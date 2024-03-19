@@ -5,9 +5,7 @@ import * as Location from 'expo-location';
 
 const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) => {
   const [showFromDropdown, setShowFromDropdown] = useState(false);
-  const [showToDropdown, setShowToDropdown] = useState(false);
   const [selectedFromLocation, setSelectedFromLocation] = useState(null);
-  const [selectedToLocation, setSelectedToLocation] = useState(clickedLocation); // Set initial "To" location to clickedLocation
   const [currentLocation, setCurrentLocation] = useState(null);
 
   useEffect(() => {
@@ -23,15 +21,18 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
 
     let location = await Location.getCurrentPositionAsync({});
     setCurrentLocation(location.coords);
-    setSelectedFromLocation({ name: 'Current Location', place_id: 'current_location' });
+    setSelectedFromLocation({ name: 'Current Location', place_id: 'current_location', latitude: location.coords.latitude, longitude: location.coords.longitude });
   };
 
   const handleGetDirections = () => {
-    if (selectedFromLocation && selectedToLocation) {
-      const startPlaceId = selectedFromLocation.place_id || 'current_location';
-      const destinationPlaceId = selectedToLocation.place_id;
-      const startLocation = startPlaceId === 'current_location' ? `${currentLocation.latitude},${currentLocation.longitude}` : `place_id:${startPlaceId}`;
-      const destinationLocationName = encodeURIComponent(selectedToLocation.name);
+    if (selectedFromLocation) {
+      let startLocation;
+      if (selectedFromLocation.name === 'Current Location') {
+        startLocation = `${currentLocation.latitude},${currentLocation.longitude}`;
+      } else {
+        startLocation = `${selectedFromLocation.latitude},${selectedFromLocation.longitude}`;
+      }
+      const destinationLocationName = encodeURIComponent(clickedLocation.name);
       const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${startLocation}&destination=${destinationLocationName}`;
       Linking.openURL(googleMapsUrl);
     }
@@ -40,11 +41,6 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
   const handleFromLocationSelect = (selected) => {
     setSelectedFromLocation(selected);
     setShowFromDropdown(false);
-  };
-
-  const handleToLocationSelect = (selected) => {
-    setSelectedToLocation(selected);
-    setShowToDropdown(false);
   };
 
   const filteredLocations = locations.filter(location => location.name !== clickedLocation.name);
@@ -69,31 +65,11 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
           {showFromDropdown && (
             <View style={styles.dropdown}>
               <ScrollView>
-                <TouchableOpacity onPress={() => handleFromLocationSelect({ name: 'Current Location', place_id: 'current_location' })}>
+                <TouchableOpacity onPress={() => handleFromLocationSelect({ name: 'Current Location', place_id: 'current_location', latitude: currentLocation.latitude, longitude: currentLocation.longitude })}>
                   <Text style={styles.dropdownItem}>Current Location</Text>
                 </TouchableOpacity>
                 {filteredLocations.map(location => (
                   <TouchableOpacity key={location.place_id} onPress={() => handleFromLocationSelect(location)}>
-                    <Text style={styles.dropdownItem}>{location.name}</Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </View>
-          )}
-
-          {/* To dropdown */}
-          <View style={styles.dropdownContainer}>
-            <Text style={styles.label}>To: </Text>
-            <TouchableOpacity style={styles.dropdownButton} onPress={() => setShowToDropdown(!showToDropdown)}>
-              <Text style={styles.dropdownText}>{selectedToLocation ? selectedToLocation.name : 'Select Location'}</Text>
-            </TouchableOpacity>
-          </View>
-
-          {showToDropdown && (
-            <View style={styles.dropdown}>
-              <ScrollView>
-                {filteredLocations.map(location => (
-                  <TouchableOpacity key={location.place_id} onPress={() => handleToLocationSelect(location)}>
                     <Text style={styles.dropdownItem}>{location.name}</Text>
                   </TouchableOpacity>
                 ))}
