@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, TextInput, ScrollView, StyleSheet, Modal, Dimensions } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import NavBar from '../screens/CustomComponents/NavBar';
+
 
 
 const ImageFeed = () => {

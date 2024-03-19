@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import NavBar from '../screens/CustomComponents/NavBar'; // Import the NavBar component
+
 
 const HomeScreen = () => {
   return (

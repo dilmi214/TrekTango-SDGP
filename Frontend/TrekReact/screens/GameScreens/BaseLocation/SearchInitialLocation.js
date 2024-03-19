@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react';
 import { View, StyleSheet, Dimensions, Text, TouchableOpacity, TextInput, FlatList } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import Constants from 'expo-constants';
-import Layout from '../../CustomComponents/ScreenLayout';
 import Snackbar from '../../CustomComponents/Snackbar';
 import CustomDialog from '../../CustomComponents/CustomDialog';
 import axios from 'axios'; // Import axios for making HTTP requests

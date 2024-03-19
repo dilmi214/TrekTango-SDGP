@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import NavBar from '../screens/CustomComponents/NavBar';
+
 
 
 const ProfilePage = () => {
