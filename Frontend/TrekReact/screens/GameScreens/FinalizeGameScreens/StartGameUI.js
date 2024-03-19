@@ -15,8 +15,13 @@ const StartGameScreen = ({ route }) => {
   const handleDialogOptionSelect = (option) => {
     setShowDialog(false); // Hide the dialog
     if (option === 'Yes') {
+      const finalDestinationList = selectedPlaces.map(place => ({
+        ...place,
+        completed: false,
+      }));
+      
       navigation.navigate('GameMapScreen', {              
-        selectedPlaces,
+        finalDestinationList,
         detected,
         confirmedStarterLocation,            
       });

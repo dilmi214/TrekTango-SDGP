@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Linking, Animated, ScrollView } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; // Import MaterialCommunityIcons for the camera icon
-import * as Location from 'expo-location'; 
+import * as Location from 'expo-location';
+import CustomLoadingIndicator from '../../CustomComponents/CustomLoadingIndicator'; 
 
 const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) => {
   const [showFromDropdown, setShowFromDropdown] = useState(false);
   const [selectedFromLocation, setSelectedFromLocation] = useState(null);
   const [currentLocation, setCurrentLocation] = useState(null);
   const [directionsClicked, setDirectionsClicked] = useState(false);
+  const [loading, setLoading] = useState(true); // State to track location loading
 
   useEffect(() => {
     getLocationAsync();
@@ -17,12 +19,14 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
       console.log('Permission to access location was denied');
+      setLoading(false); // Stop loading indicator if permission is denied
       return;
     }
 
     let location = await Location.getCurrentPositionAsync({});
     setCurrentLocation(location.coords);
     setSelectedFromLocation({ name: 'Current Location', place_id: 'current_location', latitude: location.coords.latitude, longitude: location.coords.longitude });
+    setLoading(false); // Stop loading indicator once location is obtained
   };
 
   const handleConfirm = () => {
@@ -56,48 +60,54 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
           </TouchableOpacity>
           <Text style={styles.title}>{clickedLocation?.name}</Text>
 
-          {/* Directions button */}
-          <TouchableOpacity style={styles.directionsButton} onPress={() => setDirectionsClicked(true)}>
-            <Text style={styles.directionsButtonText}>Get Directions</Text>
-          </TouchableOpacity>
-
-          {directionsClicked && (
+          {loading ? (
+            <CustomLoadingIndicator /> // Render custom loading indicator while loading location
+          ) : (
             <>
-              {/* From dropdown */}
-              <View style={styles.dropdownContainer}>
-                <Text style={styles.label}>From: </Text>
-                <TouchableOpacity style={styles.dropdownButton} onPress={() => setShowFromDropdown(!showFromDropdown)}>
-                  <Text style={styles.dropdownText}>{selectedFromLocation ? selectedFromLocation.name : 'Select Location'}</Text>
-                </TouchableOpacity>
-              </View>
+              {/* Directions button */}
+              <TouchableOpacity style={styles.directionsButton} onPress={() => setDirectionsClicked(true)}>
+                <Text style={styles.directionsButtonText}>Get Directions</Text>
+              </TouchableOpacity>
 
-              {showFromDropdown && (
-                <View style={styles.dropdown}>
-                  <ScrollView>
-                    <TouchableOpacity onPress={() => handleFromLocationSelect({ name: 'Current Location', place_id: 'current_location', latitude: currentLocation.latitude, longitude: currentLocation.longitude })}>
-                      <Text style={styles.dropdownItem}>Current Location</Text>
+              {directionsClicked && (
+                <>
+                  {/* From dropdown */}
+                  <View style={styles.dropdownContainer}>
+                    <Text style={styles.label}>From: </Text>
+                    <TouchableOpacity style={styles.dropdownButton} onPress={() => setShowFromDropdown(!showFromDropdown)}>
+                      <Text style={styles.dropdownText}>{selectedFromLocation ? selectedFromLocation.name : 'Select Location'}</Text>
                     </TouchableOpacity>
-                    {filteredLocations.map(location => (
-                      <TouchableOpacity key={location.place_id} onPress={() => handleFromLocationSelect(location)}>
-                        <Text style={styles.dropdownItem}>{location.name}</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </ScrollView>
-                </View>
+                  </View>
+
+                  {showFromDropdown && (
+                    <View style={styles.dropdown}>
+                      <ScrollView>
+                        <TouchableOpacity onPress={() => handleFromLocationSelect({ name: 'Current Location', place_id: 'current_location', latitude: currentLocation.latitude, longitude: currentLocation.longitude })}>
+                          <Text style={styles.dropdownItem}>Current Location</Text>
+                        </TouchableOpacity>
+                        {filteredLocations.map(location => (
+                          <TouchableOpacity key={location.place_id} onPress={() => handleFromLocationSelect(location)}>
+                            <Text style={styles.dropdownItem}>{location.name}</Text>
+                          </TouchableOpacity>
+                        ))}
+                      </ScrollView>
+                    </View>
+                  )}
+
+                  {/* Confirm button */}
+                  <TouchableOpacity style={styles.directionsButton} onPress={handleConfirm}>
+                    <Text style={styles.directionsButtonText}>Confirm</Text>
+                  </TouchableOpacity>
+                </>
               )}
 
-              {/* Confirm button */}
-              <TouchableOpacity style={styles.directionsButton} onPress={handleConfirm}>
-                <Text style={styles.directionsButtonText}>Confirm</Text>
+              {/* Snap button */}
+              <TouchableOpacity style={styles.cameraButton}>
+                <MaterialCommunityIcons name="camera" size={24} color="#fff" />
+                <Text style={styles.snapText}>Snap</Text>
               </TouchableOpacity>
             </>
           )}
-
-          {/* Snap button */}
-          <TouchableOpacity style={styles.cameraButton}>
-            <MaterialCommunityIcons name="camera" size={24} color="#fff" />
-            <Text style={styles.snapText}>Snap</Text>
-          </TouchableOpacity>
         </Animated.View>
       </View>
     </Modal>

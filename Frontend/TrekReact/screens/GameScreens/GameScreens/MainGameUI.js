@@ -4,10 +4,11 @@ import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from 'react-native-maps';
 import { useNavigation } from '@react-navigation/native';
 import * as Location from 'expo-location';
 import GameLocationModal from './GameLocationModal';
+import CustomLoadingIndicator from '../../CustomComponents/CustomLoadingIndicator';
 
 const GameMapScreen = ({ route }) => {
   const navigation = useNavigation();
-  const { selectedPlaces, detected, confirmedStarterLocation } = route.params;
+  const { finalDestinationList, detected, confirmedStarterLocation } = route.params;
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [directions, setDirections] = useState([]);
 
@@ -15,9 +16,9 @@ const GameMapScreen = ({ route }) => {
     console.log(detected, confirmedStarterLocation, 'ahhhh')
     const fetchDirections = async () => {
       const apiKey = 'AIzaSyCCHxfnoWl-DNhLhKcjhCTiHYNY917ltL8';
-      const waypoints = selectedPlaces.map(place => `place_id:${place.place_id}`).join('|');
+      const waypoints = finalDestinationList.map(place => `place_id:${place.place_id}`).join('|');
       const origin = `${confirmedStarterLocation.latitude},${confirmedStarterLocation.longitude}`;
-      const destination = `${selectedPlaces[selectedPlaces.length - 1].latitude},${selectedPlaces[selectedPlaces.length - 1].longitude}`;
+      const destination = `${finalDestinationList[finalDestinationList.length - 1].latitude},${finalDestinationList[finalDestinationList.length - 1].longitude}`;
 
       const response = await fetch(`https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&waypoints=${waypoints}&key=${apiKey}`);
       const data = await response.json();
@@ -31,7 +32,7 @@ const GameMapScreen = ({ route }) => {
     };
 
     fetchDirections();
-  }, [selectedPlaces, confirmedStarterLocation]);
+  }, [finalDestinationList, confirmedStarterLocation]);
 
   const handleBackButtonPress = () => {
     navigation.goBack();
@@ -82,10 +83,10 @@ const GameMapScreen = ({ route }) => {
             }}
             title="Start Location"
             pinColor="blue"
-            onPress={() => handleBlueMarkerPress(selectedPlaces[0])} // Handle marker press
+            onPress={() => handleBlueMarkerPress(finalDestinationList[0])} // Handle marker press
           />
 
-          {selectedPlaces.map((destination, index) => (
+          {finalDestinationList.map((destination, index) => (
             // Check if detected is false and if it's the first item, skip rendering
             !detected && index === 0 ? null : (
               <Marker
@@ -108,7 +109,7 @@ const GameMapScreen = ({ route }) => {
       <View style={styles.destinationListContainer}>
         <Text style={styles.destinationListHeader}>Your Trek Points</Text>
         <FlatList
-          data={selectedPlaces}
+          data={finalDestinationList}
           renderItem={renderDestinationItem}
           keyExtractor={item => item.place_id.toString()}
           style={styles.destinationList}
@@ -119,7 +120,7 @@ const GameMapScreen = ({ route }) => {
       {selectedLocation && (
         <GameLocationModal
           isVisible={true}  // Ensure the modal is visible
-          locations={selectedPlaces}  // Pass the selectedPlaces array
+          locations={finalDestinationList}  // Pass the selectedPlaces array
           clickedLocation={selectedLocation}  // Pass the selected location
           onClose={() => setSelectedLocation(null)}
         />
