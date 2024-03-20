@@ -22,18 +22,10 @@ function LogInNavigation() {
       <Stack.Screen
         name="ForgotPassword"
         component={ForgotPasswordScreen}
-        options={({ navigation }) => ({
-          title: '',
-          headerLeft: () => (
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Text style={{ marginLeft: 10 }}>Back</Text>
-            </TouchableOpacity>
-          ),
-          headerStyle: {
-            backgroundColor: 'white', // Change this to your desired background color
-          },
-          headerTintColor: 'black', // Change this to your desired text color
-        })}
+        options={{ 
+          headerShown: false, 
+          gestureEnabled: false 
+        }} 
       />
       <Stack.Screen
         name="Registration"
@@ -46,18 +38,10 @@ function LogInNavigation() {
       <Stack.Screen
         name="CreateAccountScreen"
         component={CreateAccountScreen}
-        options={({ navigation }) => ({
-          title: '',
-          headerLeft: () => (
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Text style={{ marginLeft: 10 }}>Back</Text>
-            </TouchableOpacity>
-          ),
-          headerStyle: {
-            backgroundColor: 'white', // Change this to your desired background color
-          },
-          headerTintColor: 'black', // Change this to your desired text color
-        })}
+        options={{ 
+          headerShown: false, 
+          gestureEnabled: false 
+        }} 
       />
     </Stack.Navigator>
   );

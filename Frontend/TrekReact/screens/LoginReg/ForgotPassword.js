@@ -1,13 +1,20 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
-const ForgotPasswordScreen = ({navigation}) => {
+const ForgotPasswordScreen = () => {
+  const navigation = useNavigation();
+
   const handleContinuePress = () => {
-    navigation.navigate('LogIn')
+    navigation.navigate('LogIn');
   };
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        {/* Customize back button icon here (optional) */}
+        <Text style={styles.backButtonText}>Back</Text>
+      </TouchableOpacity>
       <View style={styles.content}>
         <Text style={styles.text}>Forgot Password?</Text>
         <Text style={styles.description}>
@@ -53,6 +60,15 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  backButton: {
+    position: 'absolute',
+    top: 40,
+    left: 10,
+    padding: 10,
+  },
+  backButtonText: {
+    color: 'black', // Adjust color based on your preference
   },
 });
 

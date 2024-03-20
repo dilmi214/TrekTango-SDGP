@@ -59,7 +59,11 @@ const CreateAccountScreen = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+
       <Text style={styles.createAccountText}>Create an account</Text>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Text style={styles.backButtonText}>Back</Text>
+      </TouchableOpacity>
       <TextInput
         style={styles.input}
         placeholderTextColor="white"
@@ -151,6 +155,15 @@ const styles = StyleSheet.create({
   createAccountButtonText: {
     color: 'white',
     textAlign: 'center',
+  },
+  backButton: {
+    position: 'absolute', // Place the button at the top left
+    top: 40,
+    left: 10,
+    padding: 10, // Adjust padding for visual consistency
+  },
+  backButtonText: {
+    color: 'white', // Adjust color based on your preference
   },
 });
 
