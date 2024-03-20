@@ -170,44 +170,9 @@ app.get('/mediaPosts/:userID', async (req, res) => {
   }
 });
 
-async function getPostById(postId) {
-  try {
-    // Find the social media data containing the post with the specified postId
-    const socialMediaData = await SocialMedia.findOne({ 'posts.postId': postId });
 
-    // Check if social media data is found
-    if (!socialMediaData) {
-      console.error('Error: Social media data not found');
-      return { error: 'Social media data not found' };
-    }
 
-    // Log social media data for debugging
-    console.log('Social media data found:', socialMediaData);
-
-    // Find the post with the specified postId
-    const post = socialMediaData.posts.find(post => post.postId === postId);
-
-    // Check if post is found
-    if (!post) {
-      console.error('Error: Post not found');
-      return { error: 'Post not found' };
-    }
-
-    // Log the found post for debugging
-    console.log('Post found:', post);
-
-    // Return the JSON object containing username and the post
-    return {
-      username: socialMediaData.username,
-      userID: socialMediaData.userID,
-      post
-    };
-  } catch (error) {
-    console.error('Error retrieving post:', error);
-    return { error: 'Internal Server Error' };
-  }
-}
-
+//Retrieve the post object using the post ID
 async function getPostById(req, res) {
   try {
     const postId = req.params.postId;
@@ -250,32 +215,6 @@ async function getPostById(req, res) {
 
 
 
-app.get('/posts/:postId', async (req, res) => {
-  try {
-    const postId = req.params.postId;
-
-    // Find the post by ID
-    const post = await SocialMedia.findOne({ 'posts.postId': postId });
-
-    if (!post) {
-      return res.status(404).json({ error: 'Post not found' });
-    }
-
-    // Find the specific post within the array
-    const foundPost = post.posts.find((p) => p.postId === postId);
-
-    if (!foundPost) {
-      return res.status(404).json({ error: 'Post not found' });
-    }
-
-    // Return the post as JSON
-    res.json(foundPost);
-  } catch (error) {
-    console.error('Error fetching post:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
 /**
  * Takes the last refreshed at as the request body
  * Returns all the posts along with the usernames of the objects that are public as well as created after the last refresh tab
@@ -299,7 +238,6 @@ app.get('/socialMediaData', async (req, res) => {
       console.error('Error: Social media data not found');
       return res.status(404).json({ error: 'Data not found' });
     }
-    //ERROR HERERGYQEFJLEHFULWHFHQWRKQWRJHKKWRH
     // Filter the posts based on the condition uploadToMedia being true
     const filteredPosts = socialMediaData.posts.filter(post => {
       return post.uploadToMedia === true && new Date(post.createdAt) > new Date(lastRefreshedAt);
@@ -515,6 +453,37 @@ app.put('/social-media/:postId/add-comment', async (req, res) => {
   }
 });
 
+//Get all the posts that are under the same username
+async function getPostsByUserID(req, res) {
+  const { userID } = req.params; // Assuming userID is passed as a parameter in the request
+
+  try {
+    const userPosts = await SocialMedia.findOne({ userID }); // Find the document with the given userID
+    if (!userPosts) {
+      return res.status(404).json({ message: "User not found or has no posts." });
+    }
+    res.json(userPosts.posts); // Return posts array of the user
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+//Get all the posts that are under the same user ID as well as public (To be posted to social media)
+async function getMediaPostsByUserID(req, res) {
+  const { userID } = req.body; // Assuming userID is passed in the request body
+
+  try {
+    const mediaPosts = await SocialMedia.findOne({ userID, 'posts.uploadToMedia': true }, { 'posts.$': 1 }); // Find the document with the given userID and where uploadToMedia is true
+    if (!mediaPosts || !mediaPosts.posts.length) {
+      return res.status(404).json({ message: "No media posts found for the user." });
+    }
+    res.json(mediaPosts.posts); // Return posts array of the user where uploadToMedia is true
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
 
 
 
