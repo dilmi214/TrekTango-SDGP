@@ -52,7 +52,7 @@ const SearchInitialLocationScreen = ({ navigation }) => {
     }
   };
 
-  const handlePlaceSelect = (placeId) => {
+  const handlePlaceSelect = (placeId, description) => {
     setLoading(true); // Show loading indicator when fetching place details 
     try {
       // Fetch details of the selected place using placeId
@@ -64,6 +64,9 @@ const SearchInitialLocationScreen = ({ navigation }) => {
             latitude: result.geometry.location.lat,
             longitude: result.geometry.location.lng,
           });
+  
+          // Update the searchText with the selected place description
+          setSearchText(predictions.find(item => item.place_id === placeId).description);
   
           // pan and zoom to the selected location
           if (mapRef.current) {
@@ -137,6 +140,7 @@ const SearchInitialLocationScreen = ({ navigation }) => {
             placeholderTextColor="white"
             value={searchText}
             onChangeText={handleSearchTextChange}
+            clearButtonMode="while-editing"
           />
           {showPredictions && (
             <FlatList
@@ -144,7 +148,7 @@ const SearchInitialLocationScreen = ({ navigation }) => {
               data={predictions}
               keyExtractor={(item) => item.place_id}
               renderItem={({ item }) => (
-                <TouchableOpacity onPress={() => handlePlaceSelect(item.place_id)}>
+                <TouchableOpacity onPress={() => handlePlaceSelect(item.place_id, item.description)}>
                   <Text style={styles.predictionText}>{item.description}</Text>
                 </TouchableOpacity>
               )}
