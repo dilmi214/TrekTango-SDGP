@@ -60,21 +60,21 @@ const registerUser = async(req, res) => {
 
 //Function to login the user
 const loginUser = async(req, res) => {
-    const {username, password} = req.body;
+    const {usernameOrEmail, password} = req.body;
 
     try {
         // Find the user by username
-        const user = await User.findOne({ username });
+        const user = await User.findOne({ $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }]});
     
         if (!user) {
-          return res.status(401).json({ error: 'Invalid username' });
+          return res.status(401).json({ error: 'Invalid Username or Email Address' });
         }
     
         // Hash the input password with the retrieved salt
         const hashedPassword = hashPassword(password, user.salt);
 
         if (hashedPassword !== user.password) {
-            return res.status(401).json({ error: 'Incorrect username or password entered' });
+            return res.status(401).json({ error: 'Invalid Password' });
           }    
           
         // Passwords match, user is authenticated
