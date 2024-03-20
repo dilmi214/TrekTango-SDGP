@@ -1,38 +1,31 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import CustomDialog from '../../CustomComponents/CustomDialog';
 
 const StartGameScreen = ({ route }) => {
   const navigation = useNavigation();
   const { selectedPlaces, detected, confirmedStarterLocation } = route.params;
-
-  const sendBackend = () => {
-    //implement logic for backend
-  };
+  const [showDialog, setShowDialog] = useState(false); // State to control dialog visibility
 
   const handleStartAdventure = () => {
-    console.log(confirmedStarterLocation.place_id, "confirmed starter location")
-    Alert.alert(
-      'Confirmation',
-      'Are you sure you want to start the game?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Yes',
-          onPress: () => {
-            navigation.navigate('GameMapScreen', {              
-              selectedPlaces,
-              detected,
-              confirmedStarterLocation,            
-            });
-          },
-        },
-      ],
-      { cancelable: false }
-    );
+    setShowDialog(true); // Show the custom dialog
+  };
+
+  const handleDialogOptionSelect = (option) => {
+    setShowDialog(false); // Hide the dialog
+    if (option === 'Yes') {
+      const finalDestinationList = selectedPlaces.map(place => ({
+        ...place,
+        completed: false,
+      }));
+      
+      navigation.navigate('GameMapScreen', {              
+        finalDestinationList,
+        detected,
+        confirmedStarterLocation,            
+      });
+    }
   };
 
   const handleBack = () => {
@@ -55,6 +48,15 @@ const StartGameScreen = ({ route }) => {
       <TouchableOpacity style={styles.confirmButton} onPress={handleStartAdventure}>
         <Text style={styles.confirmButtonText}>Start the Adventure!</Text>
       </TouchableOpacity>
+
+      {/* Custom Dialog */}
+      <CustomDialog
+        visible={showDialog}
+        title="Confirmation"
+        message="Once you start the adventure, no changes can be made. Are you sure you want to continue?"
+        options={['Cancel', 'Yes']}
+        onSelect={handleDialogOptionSelect}
+      />
     </View>
   );
 };

@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import * as Location from 'expo-location';
-import Snackbar from '../CustomComponents/Snackbar';
-import CustomDialog from '../CustomComponents/CustomDialog';
-import CustomLoadingIndicator from '../CustomComponents/CustomLoadingIndicator';
+import Snackbar from '../../CustomComponents/Snackbar';
+import CustomDialog from '../../CustomComponents/CustomDialog';
+import CustomActivityIndicator from '../../CustomComponents/CustomActinityIndicator';
 
 const SelectStartLocationScreen = () => {
   const route = useRoute();
@@ -16,7 +16,6 @@ const SelectStartLocationScreen = () => {
   const [showBackDialog, setShowBackDialog] = useState(false);
   const [selectedDestination, setSelectedDestination] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [isDetected, setIsDetected] = useState(false);  //tracks if start location has been detected or selected
 
   const handleSelectFromList = () => {
     setShowDestinations(true);
@@ -39,16 +38,13 @@ const SelectStartLocationScreen = () => {
       Alert.alert('Permission Denied', 'Please grant location permission to detect your current location.');
       return;
     }
-
     try {
-
       const location = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = location.coords;
       setLoading(false); // Show loading indicator
 
       setSnackbarMessage('Location detected!');
       setShowSnackbar(true);
-      setIsDetected(true);  //sets to true to show that location is detected
       const confirmedStarterLocation = {
         latitude,
         longitude, 
@@ -56,7 +52,7 @@ const SelectStartLocationScreen = () => {
 
       setTimeout(() => {
         setShowSnackbar(false);
-        navigation.navigate('StartGameScreen', {selectedPlaces, detected: isDetected, confirmedStarterLocation});
+        navigation.navigate('StartGameScreen', {selectedPlaces, detected: true, confirmedStarterLocation});
       }, 601); 
 
     } catch (error) {
@@ -85,12 +81,11 @@ const SelectStartLocationScreen = () => {
       
       // add selectedDestination to the beginning of the array
       updatedSelectedPlaces.unshift(selectedDestination);
-      setIsDetected(false); 
-      
+  
       // Navigate to StartGameScreen with updatedSelectedPlaces
       navigation.navigate('StartGameScreen', {
         selectedPlaces: updatedSelectedPlaces,
-        detected: isDetected,
+        detected: false,
         confirmedStarterLocation: {
           latitude: selectedDestination.latitude,
           longitude: selectedDestination.longitude,
@@ -158,7 +153,7 @@ const SelectStartLocationScreen = () => {
           action={{ label: 'Dismiss', onPress: () => setShowSnackbar(false) }}
         />
       )}
-      {loading && <CustomLoadingIndicator />}
+      {loading && <CustomActivityIndicator />}
       <CustomDialog
         visible={showBackDialog}
         title="Confirmation"

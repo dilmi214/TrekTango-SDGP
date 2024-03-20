@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Modal, Text, StyleSheet, Button, Image, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Modal, Text, StyleSheet, Button, Image, ScrollView, TouchableOpacity } from 'react-native';
 
 const PlaceDetailsModal = ({ visible, place, onClose, onAddToList}) => {
   const [currentReviewIndex, setCurrentReviewIndex] = useState(0);
