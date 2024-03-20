@@ -55,11 +55,11 @@ function hashPassword(password, salt) {
 
 // POST /register route
 app.post('/register', async (req, res) => {
-  const { username, email, password, name, dob } = req.body;
+  const { username, email, password, firstName, lastName, dob } = req.body;
 
   try {
     // Check if required fields are provided
-    if (!username || !email || !password || !name || !dob) {
+    if (!username || !email || !password || !firstName || lastName || !dob) {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
@@ -75,7 +75,8 @@ app.post('/register', async (req, res) => {
       email,
       password: hashedPassword,
       salt,
-      name,
+      firstName,
+      lastName,
       dob
     });
 

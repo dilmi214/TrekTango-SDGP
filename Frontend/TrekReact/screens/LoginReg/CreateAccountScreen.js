@@ -35,7 +35,8 @@ const CreateAccountScreen = () => {
           username,
           email,
           password,
-          name: `${firstName} ${lastName}`, // Combine first name and last name
+          firstName,
+          lastName,
           dob
         }),
       });
