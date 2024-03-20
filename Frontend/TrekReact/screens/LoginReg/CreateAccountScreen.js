@@ -1,109 +1,116 @@
+import { baseURL } from './getIPAddress';
 import React, { useState } from 'react';
-import { StyleSheet, TextInput, Text, View, TouchableOpacity, ScrollView, Modal, Button } from 'react-native';
-import DateTimePickerModal from '@react-native-community/datetimepicker';
+import { StyleSheet, TextInput, Text, View, TouchableOpacity, ScrollView } from 'react-native';
+import axios from 'axios'; // Import axios for making HTTP requests
+import { useNavigation } from '@react-navigation/native';
 
-export default function CreateAccountScreen({ navigation }) {
-  const [email, setEmail] = useState('');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+const CreateAccountScreen = () => {
+  // const navigation = useNavigation(); // Get navigation object
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [dateOfBirth, setDateOfBirth] = useState(null);
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [dob, setDob] = useState('');
 
-  const handleCreateAccount = () => {
-    // Implement rithiks account creation logic here
-    navigation.navigate('Main')
-  };
+  const navigation = useNavigation(); // Get navigation object
+  
 
-  const handleDateChange = (event, selectedDate) => {
-    if (selectedDate) {
-      setDateOfBirth(selectedDate);
+  const handleCreateAccount = async () => {
+    try {
+      // Check if password and confirm password match
+      if (password !== confirmPassword) {
+        console.error('Passwords do not match');
+        return;
+      }
+  
+      // Make a POST request to the backend endpoint
+      const response = await fetch(`${baseURL}/api/users/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          email,
+          password,
+          firstName,
+          lastName,
+          dob
+        }),
+      });
+      
+      // Check if the request was successful
+      if (response.status === 201) {
+        console.log('User registered successfully');
+        navigation.navigate('Main'); //Can also navigate to the login page (Will be prompted to rewrite username and password)
+        
+      } else {
+        console.error('Failed to register user');
+        // Handle error appropriately
+      }
+    } catch (error) {
+      console.error('Error registering user:', error);
+      // Handle error appropriately
     }
   };
-
-  const handleConfirmDate = () => {
-    setShowDatePicker(false);
-  };
+  
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.createAccountText}>Create an account</Text>
       <TextInput
         style={styles.input}
-        placeholderTextColor="#999"
-        placeholder="Email"
-        value={email}
-        onChangeText={(text) => setEmail(text)}
-      />
-      <TextInput
-        style={styles.input}
-        placeholderTextColor="#999"
-        placeholder="Username"
-        value={username}
-        onChangeText={(text) => setUsername(text)}
-      />
-      <TextInput
-        style={styles.input}
-        placeholderTextColor="#999"
-        placeholder="Password"
-        secureTextEntry={true}
-        value={password}
-        onChangeText={(text) => setPassword(text)}
-        textContentType="none" 
-      />
-      <TextInput
-        style={styles.input}
-        placeholderTextColor="#999"
-        placeholder="Confirm Password"
-        secureTextEntry={true}
-        value={confirmPassword}
-        onChangeText={(text) => setConfirmPassword(text)}
-        textContentType="none"
-      />
-      <TextInput
-        style={styles.input}
-        placeholderTextColor="#999"
+        placeholderTextColor="white"
         placeholder="First Name"
         value={firstName}
         onChangeText={(text) => setFirstName(text)}
       />
       <TextInput
         style={styles.input}
-        placeholderTextColor="#999"
+        placeholderTextColor="white"
         placeholder="Last Name"
         value={lastName}
         onChangeText={(text) => setLastName(text)}
       />
-      <View style={styles.datePickerContainer}>
-        <Text style={styles.datePickerLabel}>Date of Birth:</Text>
-        <TouchableOpacity style={styles.datePickerButton} onPress={() => setShowDatePicker(true)}>
-          <Text style={styles.datePickerButtonText}>
-            {dateOfBirth ? dateOfBirth.toDateString() : 'Select Date of Birth'}
-          </Text>
-        </TouchableOpacity>
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={showDatePicker}
-          onRequestClose={() => setShowDatePicker(false)}
-        >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <DateTimePickerModal
-                testID="dateTimePicker"
-                value={dateOfBirth || new Date()}
-                mode="date"
-                is24Hour={true}
-                display="spinner"
-                onChange={handleDateChange}
-              />
-              <Button title="Confirm" onPress={handleConfirmDate} />
-            </View>
-          </View>
-        </Modal>
-      </View>
+      <TextInput
+        style={styles.input}
+        placeholderTextColor="white"
+        placeholder="Enter email"
+        value={email}
+        onChangeText={(text) => setEmail(text)}
+      />
+      <TextInput
+        style={styles.input}
+        placeholderTextColor="white"
+        placeholder="Enter username"
+        value={username}
+        onChangeText={(text) => setUsername(text)}
+      />
+      <TextInput
+        style={styles.input}
+        placeholderTextColor="white"
+        placeholder="Enter password"
+        secureTextEntry={true}
+        value={password}
+        onChangeText={(text) => setPassword(text)}
+      />
+      <TextInput
+        style={styles.input}
+        placeholderTextColor="white"
+        placeholder="Confirm Password"
+        secureTextEntry={true}
+        value={confirmPassword}
+        onChangeText={(text) => setConfirmPassword(text)}
+      />
+      <TextInput
+        style={styles.input}
+        placeholderTextColor="white"
+        placeholder="Date of Birth (YYYY-MM-DD)"
+        value={dob}
+        onChangeText={(text) => setDob(text)}
+      />
       <TouchableOpacity style={styles.createAccountButton} onPress={handleCreateAccount}>
         <Text style={styles.createAccountButtonText}>Create Account</Text>
       </TouchableOpacity>
@@ -133,38 +140,6 @@ const styles = StyleSheet.create({
     color: 'white',
     borderRadius: 10,
   },
-  datePickerContainer: {
-    width: '100%',
-    marginBottom: 20,
-  },
-  datePickerLabel: {
-    color: 'white',
-    marginBottom: 8,
-  },
-  datePickerButton: {
-    backgroundColor: '#4CAF50', 
-    height: 40,
-    width: '60%',
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 30,
-  },
-  datePickerButtonText: {
-    color: 'white',
-    textAlign: 'center',
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    backgroundColor: '#181818',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 16,
-  },
   createAccountButton: {
     backgroundColor: '#0F4792',
     height: 40,
@@ -178,3 +153,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
+
+export default CreateAccountScreen;
