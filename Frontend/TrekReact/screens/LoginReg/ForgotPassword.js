@@ -1,9 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 
-const ForgotPasswordScreen = () => {
-  const navigation = useNavigation();
+const ForgotPasswordScreen = ({navigation}) => {
   const handleContinuePress = () => {
     navigation.navigate('LogIn')
   };

@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import * as Location from 'expo-location';
-import { useNavigation } from '@react-navigation/native';
 import CustomActivityIndicator from '../../CustomComponents/CustomActinityIndicator';
 
 /**
  * Component for selecting initial location for the game.
  * @returns {JSX.Element} LocationSelectionScreen component.
  */
-const LocationSelectionScreen = () => {
-  const navigation = useNavigation();
+const LocationSelectionScreen = ({navigation}) => {
   const [loading, setLoading] = useState(false);
 
   /**

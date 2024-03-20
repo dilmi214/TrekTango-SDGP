@@ -13,6 +13,10 @@ const LoginScreen = () => {
     navigation.navigate('CreateAccountScreen');
   };
 
+  const handleForgotPasswordPress = () => {
+    navigation.navigate('ForgotPassword');
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Image
@@ -45,6 +49,9 @@ const LoginScreen = () => {
       </View>
       <TouchableOpacity style={styles.createAccountButton} onPress={handleCreateAccountPress}>
         <Text style={styles.createAccountText}>Create an account</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.forgotPasswordButton} onPress={handleForgotPasswordPress}>
+        <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -119,6 +126,12 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   createAccountText: {
+    color: '#8CCDF1',
+  },
+  forgotPasswordButton: {
+    marginTop: 16,
+  },
+  forgotPasswordText: {
     color: '#8CCDF1',
   },
 });
