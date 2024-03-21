@@ -5,31 +5,31 @@ import * as Location from 'expo-location';
 import CustomActivityIndicator from '../../CustomComponents/CustomActinityIndicator'; 
 import Snackbar from '../../CustomComponents/Snackbar';
 
-
 const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) => {
   const [showFromDropdown, setShowFromDropdown] = useState(false);
   const [selectedFromLocation, setSelectedFromLocation] = useState(null);
   const [currentLocation, setCurrentLocation] = useState(null);
   const [directionsClicked, setDirectionsClicked] = useState(false);
-  const [loading, setLoading] = useState(false); // Changed initial loading state to false
+  const [loading, setLoading] = useState(false);
+  const [arrived, setArrived] = useState(false); 
 
   useEffect(() => {
     getLocationAsync();
   }, []);
 
   const getLocationAsync = async () => {
-    setLoading(true); // Set loading to true before fetching location
+    setLoading(true);
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
       console.log('Permission to access location was denied');
-      setLoading(false); // Stop loading indicator if permission is denied
+      setLoading(false);
       return;
     }
 
     let location = await Location.getCurrentPositionAsync({});
     setCurrentLocation(location.coords);
     setSelectedFromLocation({ name: 'Current Location', place_id: 'current_location', latitude: location.coords.latitude, longitude: location.coords.longitude });
-    setLoading(false); // Stop loading indicator once location is obtained
+    setLoading(false);
   };
 
   const handleConfirm = () => {
@@ -53,8 +53,13 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
   };
 
   const handleCameraOpen = async () => {
-    setLoading(true); // Show loading indicator when "Snap" button is clicked
-    // Your code to capture an image can go here
+    setLoading(true);
+    //new logic malith
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    setLoading(false);
+  };
+
+  const handleArrived = () => {
     if (currentLocation) {
       const modalLocation = clickedLocation;
       const R = 6371e3;
@@ -69,18 +74,15 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       const distance = R * c;
   
-      if (distance <= 1200) {
-        console.log("You are within 200 meters of the modal location. Action can be performed.");
+      if (distance <= 5000) {
+        setArrived(true);
       } else {
-        // If the user is not within 200 meters, show the Snackbar
-        console.log(" Action can be performed.");
+        setArrived(false);
+        alert('Not there yet.');
       }
     }
-    // Simulate a delay of 2 seconds for capturing the image (replace with actual camera logic)
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    setLoading(false); // Close loading indicator once image capture process is complete
   };
+  
 
   const filteredLocations = locations.filter(location => location.name !== clickedLocation.name);
 
@@ -94,17 +96,15 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
           <Text style={styles.title}>{clickedLocation?.name}</Text>
 
           {loading ? (
-            <CustomActivityIndicator /> // Render custom loading indicator while loading location
+            <CustomActivityIndicator />
           ) : (
             <>
-              {/* Directions button */}
               <TouchableOpacity style={styles.directionsButton} onPress={() => setDirectionsClicked(true)}>
                 <Text style={styles.directionsButtonText}>Get Directions</Text>
               </TouchableOpacity>
 
               {directionsClicked && (
                 <>
-                  {/* From dropdown */}
                   <View style={styles.dropdownContainer}>
                     <Text style={styles.label}>From: </Text>
                     <TouchableOpacity style={styles.dropdownButton} onPress={() => setShowFromDropdown(!showFromDropdown)}>
@@ -127,18 +127,22 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
                     </View>
                   )}
 
-                  {/* Confirm button */}
                   <TouchableOpacity style={styles.directionsButton} onPress={handleConfirm}>
                     <Text style={styles.directionsButtonText}>Confirm</Text>
                   </TouchableOpacity>
                 </>
               )}
 
-              {/* Button to open camera */}
-              <TouchableOpacity style={styles.cameraButton} onPress={handleCameraOpen}>
-                <MaterialCommunityIcons name="camera" size={24} color="#fff" />
-                <Text style={styles.snapText}>Snap</Text>
-              </TouchableOpacity>             
+              {arrived && ( // Conditionally render camera button if arrived
+                <TouchableOpacity style={styles.cameraButton} onPress={handleCameraOpen}>
+                  <MaterialCommunityIcons name="camera" size={24} color="#fff" />
+                  <Text style={styles.snapText}>Snap</Text>
+                </TouchableOpacity>
+              )}
+
+              <TouchableOpacity style={styles.arrivedButton} onPress={handleArrived}>
+                <Text style={styles.arrivedText}>I've arrived</Text>
+              </TouchableOpacity>
             </>
           )}
         </Animated.View>
@@ -239,6 +243,24 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginLeft: 5,
   },
+  arrivedButton: {
+    backgroundColor: 'rgba(1,1,1,0.3)',
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 25,
+    alignItems: 'center',
+    position: 'absolute',
+    bottom: 20,
+    left: '50%',
+    maxWidth:'auto',
+    transform: [{ translateX: -50 }],
+  },
+  arrivedText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
 });
+
 
 export default GameLocationModal;
