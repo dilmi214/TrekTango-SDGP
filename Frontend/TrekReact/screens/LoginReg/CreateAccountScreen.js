@@ -1,4 +1,4 @@
-import { baseURL } from './getIPAddress';
+import { baseURL } from '../getIPAddress';
 import React, { useState } from 'react';
 import { StyleSheet, TextInput, Text, View, TouchableOpacity, ScrollView } from 'react-native';
 import axios from 'axios'; // Import axios for making HTTP requests
