@@ -7,46 +7,46 @@ const destinationOrderCurrLoc = async(req, res) => {
     
         const originLat = req.body.originLat; // Latitude of the origin place
         const originLng = req.body.originLng; // Longitude of the origin place
-        var destinationPlaceIdList = req.body.destinationPlaceIdList; //List of Place IDs of destinations
-        const numberOfDestinations = destinationPlaceIdList.length;
-        var firstDestinationPlaceId = destinationPlaceIdList[0];
+        var destinationList = req.body.destinationList; //List of Place IDs of destinations
+        const numberOfDestinations = destinationList.length;
+        var firstDestination = destinationList[0];
     
         for(let i = 1; i < numberOfDestinations; i++ ){
             let distanceOriginToFirstDestination = await axios.get(`https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=
-                                                     ${originLat},${originLng}&destinations=place_id:${firstDestinationPlaceId}&key=${apiKey}`);
+                                                     ${originLat},${originLng}&destinations=place_id:${firstDestination.place_id}&key=${apiKey}`);
     
             let distanceOriginToOtherDestination = await axios.get(`https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=
-                                                     ${originLat},${originLng}&destinations=place_id:${destinationPlaceIdList[i]}&key=${apiKey}`);
+                                                     ${originLat},${originLng}&destinations=place_id:${destinationList[i].place_id}&key=${apiKey}`);
     
             if (distanceOriginToFirstDestination.data.rows[0].elements[0].distance.value > distanceOriginToOtherDestination.data.rows[0].elements[0].distance.value){
-              firstDestinationPlaceId = destinationPlaceIdList[i];
+              firstDestination = destinationList[i];
             }
             
         }
         
       
-        destinationPlaceIdList.splice((destinationPlaceIdList.indexOf(firstDestinationPlaceId)),1);
+        destinationList.splice((destinationList.indexOf(firstDestination)),1);
     
         
         
-        for(let j = 0; j < destinationPlaceIdList.length; j++){
-          for(let k = 1; k < destinationPlaceIdList.length; k++){
-            let distanceFirstToDestination1 = await axios.get(`https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=place_id:${firstDestinationPlaceId}&destinations=place_id:${destinationPlaceIdList[j]}&key=${apiKey}`);
+        for(let j = 0; j < destinationList.length; j++){
+          for(let k = 1; k < destinationList.length; k++){
+            let distanceFirstToDestination1 = await axios.get(`https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=place_id:${firstDestination.place_id}&destinations=place_id:${destinationList[j].place_id}&key=${apiKey}`);
             
-            let distanceFirstToDestination2 = await axios.get(`https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=place_id:${firstDestinationPlaceId}&destinations=place_id:${destinationPlaceIdList[k]}&key=${apiKey}`);  
+            let distanceFirstToDestination2 = await axios.get(`https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=place_id:${firstDestination.place_id}&destinations=place_id:${destinationList[k].place_id}&key=${apiKey}`);  
                                                         
             if (distanceFirstToDestination1.data.rows[0].elements[0].distance.value > distanceFirstToDestination2.data.rows[0].elements[0].distance.value){
-              let temp = destinationPlaceIdList[j];
-              destinationPlaceIdList[j] = destinationPlaceIdList[k];
-              destinationPlaceIdList[k] = temp;
+              let temp = destinationList[j];
+              destinationList[j] = destinationList[k];
+              destinationList[k] = temp;
             }
             
           }
                 
         }
-        destinationPlaceIdList.unshift(firstDestinationPlaceId);
+        destinationList.unshift(firstDestination);
         console.log("The places are ordered");
-        res.json(destinationPlaceIdList);
+        res.json(destinationList);
         
     
       } catch (error) {
@@ -58,30 +58,27 @@ const destinationOrderCurrLoc = async(req, res) => {
 //Calculate distance between places return ordered list if a place from the list is the starter point
 const destinationOrderListPlace = async(req, res) => {
     try {
+        var destinationList = req.body.destinationList; //List of Place IDs of destinations
+        var firstDestinationPlaceId = destinationList[0].place_id;
     
-        var destinationPlaceIdList = req.body.destinationPlaceIdList; //List of Place IDs of destinations
-        const numberOfDestinations = destinationPlaceIdList.length;
-        var firstDestinationPlaceId = destinationPlaceIdList[0];
-    
-      
-      
-        for(let j = 1; j < destinationPlaceIdList.length; j++){
-          for(let k = 2; k < destinationPlaceIdList.length; k++){
-            let distanceFirstToDestination1 = await axios.get(`https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=place_id:${firstDestinationPlaceId}&destinations=place_id:${destinationPlaceIdList[j]}&key=${apiKey}`);
             
-            let distanceFirstToDestination2 = await axios.get(`https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=place_id:${firstDestinationPlaceId}&destinations=place_id:${destinationPlaceIdList[k]}&key=${apiKey}`);  
+        for(let j = 1; j < destinationList.length; j++){
+          for(let k = 2; k < destinationList.length; k++){
+            let distanceFirstToDestination1 = await axios.get(`https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=place_id:${firstDestinationPlaceId}&destinations=place_id:${destinationList[j].place_id}&key=${apiKey}`);
+            
+            let distanceFirstToDestination2 = await axios.get(`https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=place_id:${firstDestinationPlaceId}&destinations=place_id:${destinationList[k].place_id}&key=${apiKey}`);  
                                                         
             if (distanceFirstToDestination1.data.rows[0].elements[0].distance.value > distanceFirstToDestination2.data.rows[0].elements[0].distance.value){
-              let temp = destinationPlaceIdList[j];
-              destinationPlaceIdList[j] = destinationPlaceIdList[k];
-              destinationPlaceIdList[k] = temp;
+              let temp = destinationList[j];
+              destinationList[j] = destinationList[k];
+              destinationList[k] = temp;
             }
             
           }
                 
         }
-        console.log("The places are ordered");
-        res.json(destinationPlaceIdList);
+        console.log("Places are ordered");
+        res.json(destinationList);
         
     
       } catch (error) {

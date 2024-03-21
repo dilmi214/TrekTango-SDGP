@@ -5,6 +5,7 @@ import * as Location from 'expo-location';
 import Snackbar from '../../CustomComponents/Snackbar';
 import CustomDialog from '../../CustomComponents/CustomDialog';
 import CustomActivityIndicator from '../../CustomComponents/CustomActinityIndicator';
+import  {baseURL}  from '../../LoginReg/getIPAddress';
 
 const SelectStartLocationScreen = () => {
   const route = useRoute();
@@ -50,9 +51,24 @@ const SelectStartLocationScreen = () => {
         longitude, 
       };
 
+      const response = await fetch('http://192.168.201.193:3000/api/destinationOrder/orderCurrLoc',{
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          originLat: latitude,
+          originLng: longitude,
+          destinationList: selectedPlaces}),
+      });
+      if (!response.ok) {
+        console.log(`HTTP error! Status: ${response.status}`);
+    }
+    orderedPlaces = await response.json();
+
       setTimeout(() => {
         setShowSnackbar(false);
-        navigation.navigate('StartGameScreen', {selectedPlaces, detected: true, confirmedStarterLocation});
+        navigation.navigate('StartGameScreen', {selectedPlaces: orderedPlaces, detected: true, confirmedStarterLocation});
       }, 601); 
 
     } catch (error) {
@@ -69,7 +85,7 @@ const SelectStartLocationScreen = () => {
     setShowBackDialog(false);
   };
 
-  const handleNext = () => {
+  const handleNext = async() => {
     if (selectedDestination) {
       let updatedSelectedPlaces = [...selectedPlaces]; // copy of selectedPlaces array
       
@@ -81,6 +97,19 @@ const SelectStartLocationScreen = () => {
       
       // add selectedDestination to the beginning of the array
       updatedSelectedPlaces.unshift(selectedDestination);
+      
+      const response = await fetch('http://192.168.201.193:3000/api/destinationOrder/orderListPlace',{
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ destinationList: updatedSelectedPlaces}),
+      });
+      if (!response.ok) {
+        console.log(`HTTP error! Status: ${response.status}`);
+    }
+      updatedSelectedPlaces = await response.json();
+
   
       // Navigate to StartGameScreen with updatedSelectedPlaces
       navigation.navigate('StartGameScreen', {
