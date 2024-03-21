@@ -1,12 +1,41 @@
-import React from 'react';
+// import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image, TextInput } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { baseURL } from '../getIPAddress';
+import { Alert } from 'react-native';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
+const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const handleSignInPress = () => {
-    navigation.navigate('Main');
+  const handleSignInPress = async () => {
+    try {
+      const response = await fetch(`${baseURL}/api/users/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          usernameOrEmail: email,
+          password: password
+        }),
+      });
+  
+      const responseData = await response.json();
+  
+      if (response.ok) {
+        // Login successful, navigate to the home screen
+        navigation.navigate('Main');
+      } else {
+        // Login failed, show error message
+        Alert.alert('Error', responseData.error);
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Failed to connect to server');
+    }
   };
 
   const handleCreateAccountPress = () => {
@@ -28,8 +57,10 @@ const LoginScreen = () => {
       <TextInput
         style={styles.input}
         placeholderTextColor="white"
-        placeholder="Email"
+        placeholder="Username Or Email"
         autoCapitalize="none"
+        value={email}
+        onChangeText={setEmail}
       />
       <TextInput
         style={styles.input}
@@ -37,6 +68,8 @@ const LoginScreen = () => {
         placeholder="Password"
         secureTextEntry={true}
         autoCapitalize="none"
+value={password}
+        onChangeText={setPassword}
       />
       <TouchableOpacity style={styles.signInButton} onPress={handleSignInPress}>
         <Text style={styles.signInButtonText}>Sign In</Text>
