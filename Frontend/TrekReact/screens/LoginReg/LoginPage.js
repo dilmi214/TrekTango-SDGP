@@ -2,13 +2,15 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image, TextInput } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import CustomDialog from '../CustomComponents/CustomDialog'; // Import your custom dialog component
 import { baseURL } from '../getIPAddress';
-import { Alert } from 'react-native';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
-const [email, setEmail] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showErrorDialog, setShowErrorDialog] = useState(false); // State to control error dialog visibility
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleSignInPress = async () => {
     try {
@@ -29,12 +31,15 @@ const [email, setEmail] = useState('');
         // Login successful, navigate to the home screen
         navigation.navigate('Main');
       } else {
-        // Login failed, show error message
-        Alert.alert('Error', responseData.error);
+         // Login failed, show error message using custom dialog
+         setErrorMessage(responseData.error);
+         setShowErrorDialog(true);
       }
     } catch (error) {
       console.error(error);
-      Alert.alert('Error', 'Failed to connect to server');
+      // Failed to connect to server, show error message using custom dialog
+      setErrorMessage('Failed to connect to server');
+      setShowErrorDialog(true);
     }
   };
 
@@ -45,6 +50,11 @@ const [email, setEmail] = useState('');
   const handleForgotPasswordPress = () => {
     navigation.navigate('ForgotPassword');
   };
+
+  const handleDialogOptionSelect = () => {
+    setShowErrorDialog(false); // Hide the error dialog
+  };
+
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -86,6 +96,14 @@ value={password}
       <TouchableOpacity style={styles.forgotPasswordButton} onPress={handleForgotPasswordPress}>
         <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
       </TouchableOpacity>
+      {/* Custom Error Dialog */}
+      <CustomDialog
+        visible={showErrorDialog}
+        title="Error"
+        message={errorMessage}
+        options={['OK']}
+        onSelect={handleDialogOptionSelect}
+      />
     </ScrollView>
   );
 }
