@@ -5,7 +5,7 @@ import * as Location from 'expo-location';
 import Snackbar from '../../CustomComponents/Snackbar';
 import CustomDialog from '../../CustomComponents/CustomDialog';
 import CustomActivityIndicator from '../../CustomComponents/CustomActinityIndicator';
-import  {baseURL}  from '../../LoginReg/getIPAddress';
+import  {baseURL}  from '../../getIPAddress';
 
 const SelectStartLocationScreen = () => {
   const route = useRoute();
@@ -51,7 +51,7 @@ const SelectStartLocationScreen = () => {
         longitude, 
       };
 
-      const response = await fetch('http://192.168.201.193:3000/api/destinationOrder/orderCurrLoc',{
+      const response = await fetch(`${baseURL}/api/destinationOrder/orderCurrLoc`,{
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -100,7 +100,7 @@ const SelectStartLocationScreen = () => {
       // add selectedDestination to the beginning of the array
       updatedSelectedPlaces.unshift(selectedDestination);
       
-      const response = await fetch('http://192.168.201.193:3000/api/destinationOrder/orderListPlace',{
+      const response = await fetch(`${baseURL}/api/destinationOrder/orderListPlace`,{
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
