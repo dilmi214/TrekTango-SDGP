@@ -1,15 +1,29 @@
-import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, TextInput, ScrollView, StyleSheet, Modal, Dimensions } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Image, TouchableOpacity, TextInput, ScrollView, StyleSheet, Dimensions } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 
-
+import postsData from './posts.json'; // Importing posts data from JSON file
 
 const ImageFeed = () => {
-  const [likes, setLikes] = useState(Array(5).fill(0));
-  const [liked, setLiked] = useState(Array(5).fill(false));
-  const [comments, setComments] = useState(Array(5).fill([]));
-  const [newCommentText, setNewCommentText] = useState(Array(5).fill(''));
-  const [commentSectionVisible, setCommentSectionVisible] = useState(Array(5).fill(false));
+  const [likes, setLikes] = useState([]);
+  const [liked, setLiked] = useState([]);
+  const [comments, setComments] = useState([]);
+  const [newCommentText, setNewCommentText] = useState([]);
+  const [commentSectionVisible, setCommentSectionVisible] = useState([]);
+
+  useEffect(() => {
+    // Fetch likes, comments, and other data when the component mounts
+    // You may need to fetch this data from an API or other source
+    // For simplicity, I'm just initializing with the data from postsData
+    const initialLikesState = postsData.map(post => post.likes.length);
+    setLikes(initialLikesState);
+    setLiked(Array(postsData.length).fill(false));
+    const initialCommentsState = postsData.map(post => post.comments.map(comment => comment.comment));
+    setComments(initialCommentsState);
+    setNewCommentText(Array(postsData.length).fill(''));
+    setCommentSectionVisible(Array(postsData.length).fill(false));
+  }, []);
+
   const handleLike = (index) => {
     const newLikes = [...likes];
     const newLiked = [...liked];
@@ -48,19 +62,16 @@ const ImageFeed = () => {
     setCommentSectionVisible(newCommentSectionVisible);
   };
 
-  
-
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Trek Tango</Text>
       <ScrollView contentContainerStyle={styles.feed}>
-        {[...Array(5)].map((_, index) => (
+        {postsData.map((post, index) => (
           <TouchableOpacity key={index} onPress={() => handleImageClick(index)}>
             <View style={styles.postContainer}>
               <Image
                 source={{
-                  uri: 'https://imgur.com/mfO5v21.jpg',
+                  uri: post.imageReferenceId,
                 }}
                 style={styles.image}
               />
@@ -75,12 +86,15 @@ const ImageFeed = () => {
               </View>
               {commentSectionVisible[index] && (
                 <View style={styles.commentSection}>
-                  {comments[index] && comments[index].map((comment, commentIndex) => (
-                    <View key={commentIndex} style={styles.comment}>
-                      <Text style={styles.commentText}>{comment}</Text>
-                    </View>
-                  ))}
-                </View>
+                {post.comments.map((comment, commentIndex) => (
+                  <View key={commentIndex} style={styles.comment}>
+                    <Text style={styles.commentText}>
+                      <Text style={styles.commentUsername}>{comment.username}: </Text>
+                      {comment.comment}
+                    </Text>
+                  </View>
+                ))}
+              </View>
               )}
               <View style={styles.commentInputContainer}>
                 <TextInput
@@ -94,6 +108,7 @@ const ImageFeed = () => {
                   <Text style={styles.postCommentButtonText}>Post</Text>
                 </TouchableOpacity>
               </View>
+              
             </View>
           </TouchableOpacity>
         ))}
