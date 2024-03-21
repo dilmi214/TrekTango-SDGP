@@ -42,7 +42,7 @@ const SelectStartLocationScreen = () => {
     try {
       const location = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = location.coords;
-      setLoading(false); // Show loading indicator
+      
 
       setSnackbarMessage('Location detected!');
       setShowSnackbar(true);
@@ -67,6 +67,7 @@ const SelectStartLocationScreen = () => {
     orderedPlaces = await response.json();
 
       setTimeout(() => {
+        setLoading(false); // Show loading indicator
         setShowSnackbar(false);
         navigation.navigate('StartGameScreen', {selectedPlaces: orderedPlaces, detected: true, confirmedStarterLocation});
       }, 601); 
@@ -87,6 +88,7 @@ const SelectStartLocationScreen = () => {
 
   const handleNext = async() => {
     if (selectedDestination) {
+      setLoading(true); // Show loading indicator
       let updatedSelectedPlaces = [...selectedPlaces]; // copy of selectedPlaces array
       
       // find index of selectedDestination in selectedPlaces
@@ -109,6 +111,7 @@ const SelectStartLocationScreen = () => {
         console.log(`HTTP error! Status: ${response.status}`);
     }
       updatedSelectedPlaces = await response.json();
+      setLoading(false); // Show loading indicator
 
   
       // Navigate to StartGameScreen with updatedSelectedPlaces
