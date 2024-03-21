@@ -103,8 +103,8 @@ const GameMapScreen = ({ route }) => {
           ))}
         </MapView>
       )}
-      <TouchableOpacity style={styles.backButton} onPress={handleBackButtonPress}>
-        <Text style={styles.backButtonText}>Back</Text>
+      <TouchableOpacity style={styles.searchProgressButton} onPress={handleBackButtonPress}>
+        <Text style={styles.searchProgressButtonText}>Session Progress</Text>
       </TouchableOpacity>
       <View style={styles.destinationListContainer}>
         <Text style={styles.destinationListHeader}>Your Trek Points</Text>
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
   map: {
     flex: 1,
   },
-  backButton: {
+  searchProgressButton: {
     position: 'absolute',
     top: 40,
     left: 20,
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     zIndex: 1,
   },
-  backButtonText: {
+  searchProgressButtonText: {
     color: 'black',
     fontSize: 16,
   },
