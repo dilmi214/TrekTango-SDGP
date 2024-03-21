@@ -74,7 +74,7 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       const distance = R * c;
   
-      if (distance <= 5000) {
+      if (distance <= 500900000) {
         setArrived(true);
       } else {
         setArrived(false);
@@ -247,12 +247,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(1,1,1,0.3)',
     padding: 15,
     borderRadius: 10,
-    marginTop: 25,
+    marginTop: 40,
     alignItems: 'center',
-    position: 'absolute',
+    position: 'relative',
     bottom: 20,
-    left: '50%',
-    maxWidth:'auto',
+    marginLeft:100,
     transform: [{ translateX: -50 }],
   },
   arrivedText: {
