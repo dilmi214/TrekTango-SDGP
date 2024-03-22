@@ -1,16 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const {newPost, getRefreshedData, publishPost, getPostById, getUserPost, getPublicPostOfUser, likePost, deleteComment, addComment, getPostByUserID} = require('../controllers/socialMediaController');
+const {registerUser, loginUser, sendVerificationCode, forgotPassword} = require('../controllers/userController');
 
-router.route('/newPost').post(newPost);
-router.route('/getRefreshedData').post(getRefreshedData);
-router.route('/publishPost').post(publishPost);
-router.route('/getPostById').put(getPostById);
-router.route('/getUserPost').put(getUserPost);
-router.route('/getPublicPostofUser').post(getPublicPostOfUser);
-router.route('/likePost').post(likePost);
-router.route('/deleteComment').put(deleteComment);
-router.route('/addComment').put(addComment);
-router.route('/getPostByUserID').put(getPostByUserID);
+router.route('/register').post(registerUser);
+router.route('/login').post(loginUser);
+router.route('/sendVerificationCode').put(sendVerificationCode);
+router.route('/forgotPassword').put(forgotPassword);
 
 module.exports = router;
