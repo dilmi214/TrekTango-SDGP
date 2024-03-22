@@ -10,18 +10,23 @@ const ImageFeed = () => {
   const [comments, setComments] = useState([]);
   const [newCommentText, setNewCommentText] = useState([]);
   const [commentSectionVisible, setCommentSectionVisible] = useState([]);
+  const likedUserId = "90b816ccc0014621ae1ad499d431229dh";
 
   useEffect(() => {
-    // Fetch likes, comments, and other data when the component mounts
-    // You may need to fetch this data from an API or other source
-    // For simplicity, I'm just initializing with the data from postsData
+    // Initialize likes, liked, comments, newCommentText, and commentSectionVisible arrays based on postsData
     const initialLikesState = postsData.map(post => post.likes.length);
     setLikes(initialLikesState);
-    setLiked(Array(postsData.length).fill(false));
+
+    const initialLikedState = postsData.map(post => {
+      const isLikedByUser = post.likes.includes(likedUserId); // Check if liked by the specific user
+      return isLikedByUser;
+    });
+    setLiked(initialLikedState);
+
     const initialCommentsState = postsData.map(post => post.comments.map(comment => comment.comment));
     setComments(initialCommentsState);
-    setNewCommentText(Array(postsData.length).fill(''));
-    setCommentSectionVisible(Array(postsData.length).fill(false));
+    setNewCommentText(postsData.map(() => '')); // Empty comment text for each post
+    setCommentSectionVisible(postsData.map(() => false));  // Comment sections initially hidden
   }, []);
 
   const handleLike = (index) => {
@@ -30,6 +35,8 @@ const ImageFeed = () => {
     if (!newLiked[index]) {
       newLikes[index]++;
       newLiked[index] = true;
+      const postId = postsData[index].postId; // Access postId from postsData
+      console.log('User liked post:', postId);
     } else {
       newLikes[index]--;
       newLiked[index] = false;
@@ -53,6 +60,8 @@ const ImageFeed = () => {
       const newCommentTexts = [...newCommentText];
       newCommentTexts[index] = '';
       setNewCommentText(newCommentTexts);
+      const postId = postsData[index].postId; // Access postId from postsData
+      console.log('User commented on post:', postId);
     }
   };
 
@@ -70,9 +79,7 @@ const ImageFeed = () => {
           <TouchableOpacity key={index} onPress={() => handleImageClick(index)}>
             <View style={styles.postContainer}>
               <Image
-                source={{
-                  uri: post.imageReferenceId,
-                }}
+                source={{ uri: post.imageReferenceId }}
                 style={styles.image}
               />
               <View style={styles.interactionBar}>
@@ -86,15 +93,15 @@ const ImageFeed = () => {
               </View>
               {commentSectionVisible[index] && (
                 <View style={styles.commentSection}>
-                {post.comments.map((comment, commentIndex) => (
-                  <View key={commentIndex} style={styles.comment}>
-                    <Text style={styles.commentText}>
-                      <Text style={styles.commentUsername}>{comment.username}: </Text>
-                      {comment.comment}
-                    </Text>
-                  </View>
-                ))}
-              </View>
+                  {post.comments.map((comment, commentIndex) => (
+                    <View key={commentIndex} style={styles.comment}>
+                      <Text style={styles.commentText}>
+                        <Text style={styles.commentUsername}>{comment.username}: </Text>
+                        {comment.comment}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
               )}
               <View style={styles.commentInputContainer}>
                 <TextInput
@@ -108,7 +115,6 @@ const ImageFeed = () => {
                   <Text style={styles.postCommentButtonText}>Post</Text>
                 </TouchableOpacity>
               </View>
-              
             </View>
           </TouchableOpacity>
         ))}
