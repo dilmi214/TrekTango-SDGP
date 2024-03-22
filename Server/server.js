@@ -16,6 +16,7 @@ const connectDB = require('./Database/connect');
 const userRouter = require('./routes/userRoutes');
 const destinationListRouter = require('./routes/destinationListRoute');
 const socialMediaRouter = require('./routes/socialMediaRoutes');
+const sessionRouter = require('./routes/sessionRoute');
 
 //middleware
 
@@ -26,6 +27,7 @@ app.use(cors());
 app.use('/api/users', userRouter);
 app.use('/api/destinationOrder', destinationListRouter);
 app.use('/api/socialMedia', socialMediaRouter);
+app.use('/api/session', sessionRouter);
 
 const port = process.env.PORT || 3000;
 const start = async () => {

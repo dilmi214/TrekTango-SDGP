@@ -28,7 +28,10 @@ const LoginScreen = () => {
       const responseData = await response.json();
   
       if (response.ok) {
-        // Login successful, navigate to the home screen
+        // Login successful, save username and userid to AsyncStorage
+        await AsyncStorage.setItem('username', responseData.username);
+        await AsyncStorage.setItem('userid', responseData.userid); // Assuming userid is a number
+        // Navigate to the home screen
         navigation.navigate('Main');
       } else {
          // Login failed, show error message using custom dialog
