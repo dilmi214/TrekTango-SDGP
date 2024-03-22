@@ -39,9 +39,8 @@ export default class CameraScreen extends Component {
   };
 
   confirmPhoto = () => {
-    // Handle photo confirmation logic
     console.log('Photo confirmed:', this.state.photo);
-    // Reset state or navigate to next screen
+    this.props.onClose(); // Close the camera screen
   };
 
   renderCamera = () => {
@@ -94,7 +93,7 @@ export default class CameraScreen extends Component {
     return (
       <View style={styles.container}>
         {this.renderCamera()}
-        <TouchableOpacity style={styles.backButton} onPress={() => this.props.navigation.goBack()}>
+        <TouchableOpacity style={styles.backButton} onPress={this.props.onClose}>
           <Ionicons name="chevron-back" size={32} color="white" />
         </TouchableOpacity>
       </View>
@@ -120,16 +119,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   flipButton: {
-    position: 'absolute',
-    bottom: 20,
-    left: 20,
+    position: 'relative',
+    bottom: 40,
+    right: 180,
     zIndex: 10,
-  } 
-  ,
+  },
   captureButton: {
     position: 'absolute',
     bottom: 20,
     alignItems: 'center',
+    borderColor: '#fff',
+    borderWidth: '2%',
+    borderRadius: 100,
   },
   captureButtonInner: {
     width: 70,
