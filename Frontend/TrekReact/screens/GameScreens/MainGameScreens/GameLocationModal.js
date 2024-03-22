@@ -4,16 +4,12 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; // Import
 import * as Location from 'expo-location';
 import CustomActivityIndicator from '../../CustomComponents/CustomActinityIndicator'; 
 import Snackbar from '../../CustomComponents/Snackbar';
-import { Camera } from 'expo-camera';
-import CameraScreen  from './OpenCamera';
 
 const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) => {
   const [showFromDropdown, setShowFromDropdown] = useState(false);
   const [selectedFromLocation, setSelectedFromLocation] = useState(null);
   const [currentLocation, setCurrentLocation] = useState(null);
   const [directionsClicked, setDirectionsClicked] = useState(false);
-  const [showCameraScreen, setShowCameraScreen] = useState(false);
-
   const [loading, setLoading] = useState(false);
   const [arrived, setArrived] = useState(false); 
 
@@ -58,14 +54,9 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
 
   const handleCameraOpen = async () => {
     setLoading(true);
-    // Set a state to control whether the camera screen should be shown
-    setShowCameraScreen(true);
+    //new logic malith
+    await new Promise(resolve => setTimeout(resolve, 2000));
     setLoading(false);
-  };
-
-  const handleCapture = (photoUri) => {
-    // Handle the captured photo (e.g., display, save)
-    console.log('Captured photo:', photoUri);
   };
 
   const handleArrived = () => {
@@ -143,10 +134,10 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
               )}
 
               {arrived && ( // Conditionally render camera button if arrived
-                      <TouchableOpacity style={styles.cameraButton} onPress={handleCameraOpen}>
-                        <MaterialCommunityIcons name="camera" size={24} color="#fff" />
-                        <Text style={styles.snapText}>Snap</Text>
-                      </TouchableOpacity>
+                <TouchableOpacity style={styles.cameraButton} onPress={handleCameraOpen}>
+                  <MaterialCommunityIcons name="camera" size={24} color="#fff" />
+                  <Text style={styles.snapText}>Snap</Text>
+                </TouchableOpacity>
               )}
 
               <TouchableOpacity style={styles.arrivedButton} onPress={handleArrived}>
@@ -154,10 +145,7 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
               </TouchableOpacity>
             </>
           )}
-          {showCameraScreen && (
-            <CameraScreen onCapture={handleCapture} onClose={() => setShowCameraScreen(false)} />
-          )}
-          </Animated.View>
+        </Animated.View>
       </View>
     </Modal>
   );
