@@ -15,7 +15,7 @@ const connectDB = require('./Database/connect');
 //routers
 const userRouter = require('./routes/userRoutes');
 const destinationListRouter = require('./routes/destinationListRoute');
-const { collection } = require('./models/userSchema');
+const socialMediaRouter = require('./routes/socialMediaRoutes');
 
 //middleware
 
@@ -25,6 +25,7 @@ app.use(cors());
 
 app.use('/api/users', userRouter);
 app.use('/api/destinationOrder', destinationListRouter);
+app.use('/api/socialMedia', socialMediaRouter);
 
 const port = process.env.PORT || 3000;
 const start = async () => {
