@@ -15,7 +15,7 @@ const connectDB = require('./Database/connect');
 //routers
 const userRouter = require('./routes/userRoutes');
 const destinationListRouter = require('./routes/destinationListRoute');
-
+const { collection } = require('./models/userSchema');
 
 //middleware
 
