@@ -1,3 +1,31 @@
+const SocialMediaPost = require('../models/socialMediaPostSchema');
+const { v4: uuidv4 } = require('uuid');
+
+const newPost = async (req, res) =>{
+   
+    const {username, userID, placeId, imageReferenceId, uploadToMedia, caption, comments, likes } = req.body;
+    try{
+    const newPost = new SocialMediaPost({
+        username,
+        userID,
+        placeId,
+        imageReferenceId,
+        uploadToMedia,
+        caption,
+        comments: comments || [],
+        likes: likes || [],
+       
+    });
+
+    await newPost.save();
+    console.log('New Post Created');
+    res.status(201).json(newPost);
+} catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+}
+}
+
 const getRefreshedData = async (req, res) => {
     try {
       // Get the lastRefreshedAt value from the request body
@@ -37,6 +65,7 @@ const getRefreshedData = async (req, res) => {
   
     //Create a set of code here to update the last refresh date to now
   }
+
 
 const publishPost = async (req, res) => {
     const userID = req.params.userID;
@@ -228,4 +257,4 @@ const getPostByUserID = async (req, res) => {
   } 
  
 
-  module.exports = {getRefreshedData, publishPost, getPostById, getUserPost, getPublicPostOfUser, likePost, deleteComment, addComment, getPostByUserID };
+  module.exports = {newPost, getRefreshedData, publishPost, getPostById, getUserPost, getPublicPostOfUser, likePost, deleteComment, addComment, getPostByUserID };
