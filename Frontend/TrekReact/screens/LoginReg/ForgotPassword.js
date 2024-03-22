@@ -1,74 +1,106 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, TextInput } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 const ForgotPasswordScreen = () => {
   const navigation = useNavigation();
+  const [email, setEmail] = useState('');
+  const [isValidEmail, setIsValidEmail] = useState(true);
 
   const handleContinuePress = () => {
-    navigation.navigate('LogIn');
+    if (isValidEmailFormat(email)) {
+      navigation.navigate('LogIn');
+    } else {
+      setIsValidEmail(false);
+    }
+  };
+
+  const isValidEmailFormat = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   };
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        {/* Customize back button icon here (optional) */}
-        <Text style={styles.backButtonText}>Back</Text>
-      </TouchableOpacity>
-      <View style={styles.content}>
-        <Text style={styles.text}>Forgot Password?</Text>
-        <Text style={styles.description}>
-          Enter your email address below and we'll send you a link to reset your password.
-        </Text>
-      </View>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.signInText}>Forgot Password?</Text>
+      <Text style={styles.description}>
+        Enter your email address below and we'll send you a OTP to reset your password. Check your email.
+      </Text>
+      <TextInput
+        style={[styles.input, !isValidEmail && styles.inputError]}
+        placeholder="Email"
+        placeholderTextColor="white"
+        value={email}
+        onChangeText={(text) => {
+          setEmail(text);
+          setIsValidEmail(true);
+        }}
+        autoCapitalize="none"
+      />
+      {!isValidEmail && <Text style={styles.errorText}>Please enter a valid email address</Text>}
       <TouchableOpacity style={styles.continueButton} onPress={handleContinuePress}>
         <Text style={styles.continueButtonText}>Continue</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
+    flexGrow: 1,
+    backgroundColor: 'black',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    justifyContent: 'flex-start',
+    padding: 16,
+    paddingTop: 300,
   },
-  content: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 30,
-  },
-  text: {
+  signInText: {
+    color: 'white',
+    marginBottom: 16,
     fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    alignSelf: 'flex-start',
+    marginLeft: 5,
   },
   description: {
-    fontSize: 16,
-    textAlign: 'center',
+    color: 'white',
     marginBottom: 20,
+    fontSize: 16,
+    alignSelf: 'flex-start',
+    marginLeft: 5,
+    textAlign: 'center',
+  },
+  input: {
+    height: 40,
+    width: '100%',
+    backgroundColor: '#181818',
+    marginBottom: 20,
+    paddingLeft: 8,
+    color: 'white',
+    borderRadius: 10,
+  },
+  inputError: {
+    borderColor: 'red',
+    borderWidth: 1,
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 10,
+    alignSelf: 'flex-start',
+    marginLeft: 5,
   },
   continueButton: {
-    backgroundColor: 'blue',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 5,
+    backgroundColor: '#0F4792',
+    height: 40,
+    width: '100%',
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center',
+    marginTop: 10,
   },
   continueButtonText: {
     color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  backButton: {
-    position: 'absolute',
-    top: 40,
-    left: 10,
-    padding: 10,
-  },
-  backButtonText: {
-    color: 'black', // Adjust color based on your preference
+    textAlign: 'center',
   },
 });
 
