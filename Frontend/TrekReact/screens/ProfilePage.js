@@ -1,28 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-
-
+import postsData from './posts.json'; // Importing the JSON data
 
 const ProfilePage = () => {
-  const [likes, setLikes] = useState(Array(3).fill(0));
-  const [liked, setLiked] = useState(Array(3).fill(false));
-  const [comments, setComments] = useState(Array(3).fill([]));
-  const [newCommentText, setNewCommentText] = useState('');
-  const [tokens, setTokens] = useState([
-    { image: 'https://imgur.com/mfO5v21.jpg', description: 'token 1' },
-    { image: 'https://imgur.com/mfO5v21.jpg', description: 'token 2' },
-    { image: 'https://imgur.com/mfO5v21.jpg', description: 'token 3' },
-  ]);
-  const [showComments, setShowComments] = useState(Array(3).fill(false));
-  const [tripsCompleted, setTripsCompleted] = useState(5); 
+  // State declarations
+  const [likes, setLikes] = useState([]);
+  const [liked, setLiked] = useState([]);
+  const [comments, setComments] = useState([]);
+  const [showComments, setShowComments] = useState([]);
+  const [tripsCompleted, setTripsCompleted] = useState(5);
 
+  // Fetching posts data from the JSON file
+  useEffect(() => {
+    // Initialize state variables based on postsData
+    const initialLikes = postsData.map(post => post.likes.length);
+    const initialLiked = postsData.map(post => post.likes.includes('df04e15c0300495abb30b8f96aae35d2'));
+    const initialComments = postsData.map(post => post.comments.map(comment => comment.comment));
+    const initialShowComments = postsData.map(() => false);
+
+    setLikes(initialLikes);
+    setLiked(initialLiked);
+    setComments(initialComments);
+    setShowComments(initialShowComments);
+  }, []);
+
+  // Event handlers
   const handleLike = (index) => {
     const newLikes = [...likes];
     const newLiked = [...liked];
     if (!newLiked[index]) {
       newLikes[index]++;
       newLiked[index] = true;
+      const postId = postsData[index].postId; // Access postId from postsData
+      console.log('User liked post:', postId);
     } else {
       newLikes[index]--;
       newLiked[index] = false;
@@ -39,20 +50,6 @@ const ProfilePage = () => {
     });
   };
 
-  const handlePostComment = (index) => {
-    if (newCommentText.trim() !== '') {
-      const newComments = [...comments];
-      newComments[index] = [...newComments[index], newCommentText];
-      setComments(newComments);
-      setNewCommentText('');
-    }
-  };
-
-  const posts = Array(3).fill({
-    image: 'https://imgur.com/mfO5v21.jpg',
-    caption: 'Post eka!',
-  });
-
   return (
     <View style={styles.container}>
       <View style={styles.profileHeader}>
@@ -68,9 +65,9 @@ const ProfilePage = () => {
       <ScrollView style={styles.scroll}>
         <View style={styles.posts}>
           <Text style={styles.sectionTitle}>Posts</Text>
-          {posts.map((post, index) => (
+          {postsData.map((post, index) => (
             <View key={index} style={styles.postContainer}>
-              <Image source={{ uri: post.image }} style={styles.postImage} />
+              <Image source={{ uri: post.imageReferenceId }} style={styles.postImage} />
               <Text style={styles.caption}>{post.caption}</Text>
               <View style={styles.interactionBar}>
                 <TouchableOpacity onPress={() => handleLike(index)} style={styles.iconButton}>
@@ -86,27 +83,6 @@ const ProfilePage = () => {
                   <Text style={styles.commentText}>{comment}</Text>
                 </View>
               ))}
-              <View style={styles.commentInputContainer}>
-                <TextInput
-                  placeholder="Add a comment..."
-                  placeholderTextColor="#ccc"
-                  style={styles.commentInput}
-                  onChangeText={(text) => setNewCommentText(text)}
-                  value={newCommentText}
-                />
-                <TouchableOpacity onPress={() => handlePostComment(index)} style={styles.postCommentButton}>
-                  <Text style={styles.postCommentButtonText}>Post</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          ))}
-        </View>
-        <View style={styles.tokens}>
-          <Text style={styles.sectionTitle}>Tokens</Text>
-          {tokens.map((token, index) => (
-            <View key={index} style={styles.tokenContainer}>
-              <Image source={{ uri: token.image }} style={styles.tokenImage} />
-              <Text style={styles.tokenDescription}>{token.description}</Text>
             </View>
           ))}
         </View>
@@ -187,36 +163,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#fff',
   },
-  commentInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-    marginTop: -5,
-    marginBottom: 10,
-  },
-  commentInput: {
-    flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 15,
-    fontSize: 16,
-    color: '#fff',
-    backgroundColor: '#010C33',
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#6C7A95',
-    marginRight: 10,
-  },
-  postCommentButton: {
-    backgroundColor: '#0047AB',
-    borderRadius: 20,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-  },
-  postCommentButtonText: {
-    fontSize: 16,
-    color: '#fff',
-    fontWeight: 'bold',
-  },
   comment: {
     paddingVertical: 10,
     paddingHorizontal: 15,
@@ -228,32 +174,8 @@ const styles = StyleSheet.create({
   iconButton: {
     padding: 5,
   },
-  tokens: {
-    padding: 20,
-  },
-  tokenContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  tokenImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 10,
-    marginRight: 10,
-  },
-  tokenDescription: {
-    fontSize: 16,
-    color: '#fff',
-  },
   scroll: {
     backgroundColor: '#010C33',
-  },
-  navBarContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
   },
 });
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, FlatList, StyleSheet, TouchableOpacity, Image, ScrollView, Button, Alert, Platform } from 'react-native';
+import { Text, View, FlatList, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import PlaceDetailsModal from './PlaceDetailsModal';
 import ConfirmedDestinationListModal from './ConfirmedDestinationListModal'; 
 import {  useRoute } from '@react-navigation/native';
@@ -21,6 +21,11 @@ const categories = [
   { label: "Museums", value: "museum" }
 ];
 
+/**
+ * Component for displaying nearby destinations and managing selected places.
+ * @param {object} navigation - The navigation object used for navigating between screens.
+ * @returns {JSX.Element} - JSX element representing the NearbyDestinationsScreen component.
+ */
 const NearbyDestinationsScreen = ({navigation}) => {
 
   const [destinations, setDestinations] = useState([]);
@@ -46,21 +51,24 @@ const NearbyDestinationsScreen = ({navigation}) => {
     fetchNearbyDestinations();
   }, [selectedType]);
 
-  // Fetch nearby destinations based on selected category
+  /**
+   * Fetches nearby destinations based on the selected category.
+   * @param {string} pageToken - Token for pagination.
+   */
   const fetchNearbyDestinations = async (pageToken = '') => {
     // Construct the URL for Google Places API
-    let url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&key=${GOOGLE_PLACES_API_KEY}`;
-  
-    if (selectedType) {
-      url += `&type=${selectedType}`;
-    }
-  
-    if (pageToken) {
-      url += `&pagetoken=${pageToken}`;
-    }
+    try {
+      let url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&key=${GOOGLE_PLACES_API_KEY}`;
+    
+      if (selectedType) {
+        url += `&type=${selectedType}`;
+      }
+    
+      if (pageToken) {
+        url += `&pagetoken=${pageToken}`;
+      }
   
     // Fetch data from the URL
-    try {
       setShowLoadingIndicator(true);
       const response = await fetch(url);
       const data = await response.json();
@@ -85,25 +93,47 @@ const NearbyDestinationsScreen = ({navigation}) => {
         setShowLoadingIndicator(false);
       }, 300);
     } catch (error) {
-      console.error('Error fetching nearby destinations: ', error);
+      //console.error('Error fetching nearby destinations: ', error);
       setShowLoadingIndicator(false);
+      setSnackbarMessage('Error fetching nearby destinations');
+      setShowSnackbar(true);
+      setTimeout(() => {
+        setShowSnackbar(false);
+      }, 1201);
     }
   };
 
-  // Load more data when user reaches the end of the list
+  /**
+   * Loads more data when the user reaches the end of the list.
+   */
   const loadMoreData = () => {
     if (nextPageToken) {
       fetchNearbyDestinations(nextPageToken);
     }
   };
 
-  // Open modal to view details of a place
+  /**
+   * Opens a modal to view details of a place.
+   * @param {object} place - The place object containing details.
+   */
   const openPlaceDetailsModal = (place) => {
-    setSelectedPlace(place);
-    setPlaceDetailsModalVisible(true);
+    try{
+      setSelectedPlace(place);
+      setPlaceDetailsModalVisible(true);
+    } catch (error) {
+      //console.error('Error opening place details modal: ', error);
+      setSnackbarMessage('Failed to open place details. Please try again later.');
+      setShowSnackbar(true);
+      setTimeout(() => {
+        setShowSnackbar(false);
+      }, 5000); // Adjust duration as needed
+    }
   };
 
-  // Add a place to the list of selected destinations
+  /**
+   * Adds a place to the list of selected destinations.
+   * @param {object} placeData - The place data to be added.
+   */
   const handleAddToList = (placeData) => {
     // Check if place is already added
     const isPlaceAlreadyAdded = selectedPlaces.some(item => item.place_id === placeData.place_id);
@@ -117,7 +147,7 @@ const NearbyDestinationsScreen = ({navigation}) => {
       }, 1201);
     } else if (selectedPlaces.length >= 8) {
       setPlaceDetailsModalVisible(false);
-      setSnackbarMessage('Max destination limit reached!');
+      setSnackbarMessage('Maximum destination limit reached!');
       setShowSnackbar(true);
       setTimeout(() => {
         setShowSnackbar(false);
@@ -133,9 +163,11 @@ const NearbyDestinationsScreen = ({navigation}) => {
     }
   };
 
-  // Check if minimum selected places count is met before navigating to next screen
+  /**
+   * Checks if the minimum selected places count is met before navigating to the next screen.
+   */
   const checkSelectedPlacesCount = () => {
-    if (selectedPlaces.length > 3) {
+    if (selectedPlaces.length > 2) {
       // Navigate to next screen
       navigation.navigate('SelectStartLocationScreen', { selectedPlaces });
     } else {
@@ -148,16 +180,25 @@ const NearbyDestinationsScreen = ({navigation}) => {
     }
   };
 
-  // Toggle visibility of confirmed destination list modal
+  /**
+   * Toggles the visibility of the confirmed destination list modal.
+   */
   const toggleConfirmedDestinationListModal = () => {
     setIsConfirmedDestinationListModalVisible(!isConfirmedDestinationListModalVisible);
   };
 
-  // Remove a destination from the selected list
+  /**
+   * Removes a destination from the selected list.
+   * @param {string} placeId - The ID of the place to be removed.
+   */
   const handleRemoveDestination = (placeId) => {
     setSelectedPlaces(prevSelectedPlaces => prevSelectedPlaces.filter(item => item.place_id !== placeId));
   };
 
+  /**
+   * Handles the response from the back dialog.
+   * @param {string} option - The selected option ('Yes' or 'No').
+   */
   const handleBackDialogResponse = (option) => {
     if (option === 'Yes') {
       navigation.goBack();
