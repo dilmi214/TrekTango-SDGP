@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     bottom: 20,
     alignItems: 'center',
     borderColor: '#fff',
-    borderWidth: '2%',
+    // borderWidth: '2%',
     borderRadius: 100,
   },
   captureButtonInner: {
