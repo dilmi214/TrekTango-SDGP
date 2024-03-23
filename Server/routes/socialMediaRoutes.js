@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const {newPost, getRefreshedData, publishPost, getPostById, getUserPost, getPublicPostOfUser, likePost, deleteComment, addComment, getPostByUserID} = require('../controllers/socialMediaController');
+const {newPost, initiateFeed, getRefreshedData, publishPost, getPostById, getUserPost, getPublicPostOfUser, likePost, deleteComment, addComment, getPostByUserID} = require('../controllers/socialMediaController');
 
 router.route('/newPost').post(newPost);
+router.route('/getFeed').get(initiateFeed);
 router.route('/getRefreshedData').post(getRefreshedData);
 router.route('/publishPost').post(publishPost);
 router.route('/getPostById').put(getPostById);

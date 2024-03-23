@@ -7,7 +7,6 @@ const sessionSchema = new mongoose.Schema({
   userId: { type: String, required: true },
   listOfPlaces: [{
     places: { type: Object, required: true },
-    complete: { type: Boolean, default: false },
     listOfImageReferenceIds: { type: String, default: null }
   }],
   sessionComplete: { type: Boolean, default: false },

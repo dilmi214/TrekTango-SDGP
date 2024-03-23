@@ -27,7 +27,22 @@ const newPost = async (req, res) =>{
 }
 
 const initiateFeed = async (req, res) => {
-  
+  try{
+    const post = await SocialMediaPost.find({uploadToMedia: true});
+
+    const shuffleArray = (array) => {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+     return array;
+    }
+    const shuffledFeed = await shuffleArray(post);      
+    res.status(200).json(shuffledFeed);
+  }catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error Occurred in Fetching Data" });
+  }
 }
  
 const getRefreshedData = async (req, res) => {
@@ -261,4 +276,4 @@ const getPostByUserID = async (req, res) => {
   } 
  
 
-  module.exports = {newPost, getRefreshedData, publishPost, getPostById, getUserPost, getPublicPostOfUser, likePost, deleteComment, addComment, getPostByUserID };
+  module.exports = {newPost, initiateFeed, getRefreshedData, publishPost, getPostById, getUserPost, getPublicPostOfUser, likePost, deleteComment, addComment, getPostByUserID };

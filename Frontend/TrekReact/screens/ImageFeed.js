@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, TextInput, ScrollView, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, Image, TouchableOpacity, TextInput, ScrollView, StyleSheet, Dimensions, RefreshControl } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import { baseURL } from './getIPAddress';
 
-import postsData from './posts.json'; // Importing posts data from JSON file
+
 
 const ImageFeed = () => {
   const [likes, setLikes] = useState([]);
@@ -10,24 +11,44 @@ const ImageFeed = () => {
   const [comments, setComments] = useState([]);
   const [newCommentText, setNewCommentText] = useState([]);
   const [commentSectionVisible, setCommentSectionVisible] = useState([]);
+  const [postsData, setPostsData] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
   const likedUserId = "90b816ccc0014621ae1ad499d431229dh";
 
   useEffect(() => {
-    // Initialize likes, liked, comments, newCommentText, and commentSectionVisible arrays based on postsData
-    const initialLikesState = postsData.map(post => post.likes.length);
-    setLikes(initialLikesState);
-
-    const initialLikedState = postsData.map(post => {
-      const isLikedByUser = post.likes.includes(likedUserId); // Check if liked by the specific user
-      return isLikedByUser;
-    });
-    setLiked(initialLikedState);
-
-    const initialCommentsState = postsData.map(post => post.comments.map(comment => comment.comment));
-    setComments(initialCommentsState);
-    setNewCommentText(postsData.map(() => '')); // Empty comment text for each post
-    setCommentSectionVisible(postsData.map(() => false));  // Comment sections initially hidden
+    fetchData(); // Fetch data from backend on component mount
   }, []);
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch(`${baseURL}/api/socialMedia/getFeed`); // Replace with your backend endpoint
+      const postsData = await response.json();
+      setPostsData(postsData);
+      
+      // Initialize state based on fetched data
+      const initialLikesState = postsData.map(post => post.likes.length);
+      setLikes(initialLikesState);
+
+      const initialLikedState = postsData.map(post => {
+        const isLikedByUser = post.likes.includes(likedUserId); // Check if liked by the specific user
+        return isLikedByUser;
+      });
+      setLiked(initialLikedState);
+
+      const initialCommentsState = postsData.map(post => post.comments.map(comment => comment.comment));
+      setComments(initialCommentsState);
+      setNewCommentText(postsData.map(() => '')); // Empty comment text for each post
+      setCommentSectionVisible(postsData.map(() => false));  // Comment sections initially hidden
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  const onRefresh = () => {
+    setRefreshing(true); // Set refreshing state to true
+    fetchData(); // Fetch data again
+    setRefreshing(false); // Set refreshing state back to false after data is fetched
+  };
 
   const handleLike = (index) => {
     const newLikes = [...likes];
@@ -74,7 +95,15 @@ const ImageFeed = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Trek Tango</Text>
-      <ScrollView contentContainerStyle={styles.feed}>
+      <ScrollView
+        contentContainerStyle={styles.feed}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        }
+      >
         {postsData.map((post, index) => (
           <TouchableOpacity key={index} onPress={() => handleImageClick(index)}>
             <View style={styles.postContainer}>

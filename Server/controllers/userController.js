@@ -20,7 +20,7 @@ function generateVerificationCode() {
 const registerUser = async(req, res) => {
     const { username, email, password, firstName, lastName, dob } = req.body;
     try {
-        // Check if required fields are provided
+        // Check if required fields are provided.
         if (!username || !email || !password || !firstName || !lastName ||!dob) {
             return res.status(400).json({ error: 'All fields are required' });
         }
