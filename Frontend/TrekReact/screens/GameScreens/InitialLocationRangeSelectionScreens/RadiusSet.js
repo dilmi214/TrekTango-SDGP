@@ -5,16 +5,24 @@ import Constants from 'expo-constants';
 import CustomDialog from '../../CustomComponents/CustomDialog';
 import CustomActivityIndicator from '../../CustomComponents/CustomActinityIndicator';
 
+/**
+ * Screen component for setting the radius around the selected location.
+ * Users can adjust the radius by selecting a value from the dropdown.
+ * Provides options for navigation and displays feedback messages.
+ * @param {object} route - The route object containing parameters passed from the previous screen.
+ * @param {object} navigation - The navigation object provided by React Navigation.
+ * @returns {JSX.Element} RadiusSetScreen component.
+ */
 const RadiusSetScreen = ({ route, navigation }) => {
   const { longitude, latitude } = route.params;
   const mapRef = useRef(null);
-  const [showDialog, setShowDialog] = useState(false);
-  const [radius, setRadius] = useState(1000); 
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const radiusValues = [1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000];
-  const [selectedRadiusValue, setSelectedRadiusValue] = useState(radiusValues[0]);
-  const [loading, setLoading] = useState(false);
-  const [mapLoaded, setMapLoaded] = useState(false); 
+  const [showDialog, setShowDialog] = useState(false); // Visibility of confirmation dialog
+  const [radius, setRadius] = useState(1000); // Radius value set by user
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Visibility of radius selection dropdown
+  const radiusValues = [1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000]; // Available radius values
+  const [selectedRadiusValue, setSelectedRadiusValue] = useState(radiusValues[0]); // Currently selected radius
+  const [loading, setLoading] = useState(false); // Visibility of loading indicator
+  const [mapLoaded, setMapLoaded] = useState(false); // Whether the map has finished loading
 
   useEffect(() => {
     setLoading(true); 
@@ -31,15 +39,31 @@ const RadiusSetScreen = ({ route, navigation }) => {
     }
   }, [mapLoaded]);
 
-
+  /**
+   * Handles the map ready event.
+   * Sets the mapLoaded state to true once the map is ready.
+   */
   const handleMapReady = () => {
     setMapLoaded(true);
   };
 
+  /**
+   * Handles the user's press on the "Back" button.
+   * Displays a confirmation dialog and navigates back to the previous screen if confirmed.
+   */
   const handleBackPress = () => {
-    setShowDialog(true);
+    try {
+      setShowDialog(true);
+    } catch (error) {
+      //console.error('Error handling back press:', error);
+    }
   };
 
+  /**
+   * Handles the user's selection in the confirmation dialog.
+   * Navigates back to the previous screen if the user confirms.
+   * @param {string} option - The option selected by the user ('Yes' or 'No').
+   */
   const handleDialogSelect = (option) => {
     setShowDialog(false);
     if (option === 'Yes') {
@@ -47,33 +71,52 @@ const RadiusSetScreen = ({ route, navigation }) => {
     }
   };
 
+  /**
+   * Handles the user's press on the "Next" button.
+   * Navigates to the next screen if a radius value has been selected.
+   */
   const handleNextPress = () => {
-    navigation.navigate('NearbyDestinations', {longitude, latitude, radius});
+    try {
+      navigation.navigate('NearbyDestinations', { longitude, latitude, radius });
+    } catch (error) {
+      //console.error('Error navigating to nearby destinations:', error);
+    }
   };
 
+  /**
+   * Toggles the visibility of the radius selection dropdown.
+   */
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
+  /**
+   * Handles the selection of a radius value from the dropdown.
+   * Updates the selected radius value and adjusts the map's region accordingly.
+   * @param {number} value - The selected radius value.
+   */
   const onRadiusChange = (value) => {
-    setSelectedRadiusValue(value);
-    setRadius(value);
-    toggleDropdown();
+    try{    
+      setSelectedRadiusValue(value);
+      setRadius(value);
+      toggleDropdown();
+      
+      // new latitudeDelta and longitudeDelta based on the radius
+      const delta = value / 112300; // 1 degree = 111.3 kilometers
+      const latitudeDelta = value / 22000; // Adjust the division factor as needed for zoom level
+      const longitudeDelta = delta;
     
-    // new latitudeDelta and longitudeDelta based on the radius
-    const delta = value / 112300; // 1 degree = 111.3 kilometers
-    const latitudeDelta = value / 22000; // Adjust the division factor as needed for zoom level
-    const longitudeDelta = delta;
-  
-    // Update the map's region to fit the circle
-    if (mapRef.current) {
-      mapRef.current.animateToRegion({
-        latitude,
-        longitude,
-        latitudeDelta,
-        longitudeDelta,
-      });
-    }
+      // Update the map's region to fit the circle
+      if (mapRef.current) {
+        mapRef.current.animateToRegion({
+          latitude,
+          longitude,
+          latitudeDelta,
+          longitudeDelta,
+        });
+      }
+    }catch{error}
+      //console.error('Error handling radius change:', error);
   };
 
   return (
@@ -92,8 +135,8 @@ const RadiusSetScreen = ({ route, navigation }) => {
       >
         <Marker
           coordinate={{ latitude, longitude }}
-          title="Current Location"
-          description="You are here"
+          title="Location selected"
+          pinColor="blue"
         />
         <Circle
           center={{ latitude, longitude }}
@@ -140,6 +183,7 @@ const RadiusSetScreen = ({ route, navigation }) => {
           />
         </View>
       </View>
+      {loading && <CustomActivityIndicator />}
     </View>
   );
 };
@@ -190,7 +234,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 5,
-    position: 'relative', // Ensure relative positioning for the dropdownContainer
+    position: 'relative', 
   },
   selectedRadiusText: {
     fontSize: 16,
@@ -198,7 +242,7 @@ const styles = StyleSheet.create({
   },
   dropdownContainer: {
     position: 'absolute',
-    top: '165%', // Position below the radius button
+    top: '165%', 
     left: 0,
     backgroundColor: '#fff',
     borderColor: '#ccc',

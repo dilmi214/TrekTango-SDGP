@@ -13,7 +13,7 @@ const GameMapScreen = ({ route }) => {
   const [directions, setDirections] = useState([]);
 
   useEffect(() => {
-    console.log(detected, confirmedStarterLocation, 'ahhhh')
+    console.log(detected, confirmedStarterLocation)
     const fetchDirections = async () => {
       const apiKey = 'AIzaSyCCHxfnoWl-DNhLhKcjhCTiHYNY917ltL8';
       const waypoints = finalDestinationList.map(place => `place_id:${place.place_id}`).join('|');

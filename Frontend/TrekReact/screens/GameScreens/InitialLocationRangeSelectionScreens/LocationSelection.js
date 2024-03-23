@@ -18,23 +18,17 @@ const LocationSelectionScreen = ({navigation}) => {
   const handleCurrentLocationPress = async () => {
     try {
       setLoading(true);
-      const { status } = await Location.requestForegroundPermissionsAsync(); // request permission
-      if (status !== 'granted') { // if permission denied
-        console.log('Location permission not granted');
-        setLoading(false);
-        return;
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        throw new Error('Location permission not granted');
       }
-      const location = await Location.getCurrentPositionAsync({}); // get the user's current location
-      // get latitude and longitude
-      const latitude = location.coords.latitude;
-      const longitude = location.coords.longitude;
-      console.log('Current Location:', { latitude, longitude });
-      navigation.navigate('RadiusSetScreen', { latitude, longitude });
-    } catch (error) {
-      console.error('Error getting current location:', error);
-      throw new Error('Failed to get current location');
-    } finally {
+      const location = await Location.getCurrentPositionAsync({});
+      const { latitude, longitude } = location.coords;
       setLoading(false);
+      navigation.navigate('RadiusSetScreen', { latitude, longitude });      
+    } catch (error) {
+      setLoading(false);
+      handleError(error);
     }
   };
 
@@ -43,8 +37,19 @@ const LocationSelectionScreen = ({navigation}) => {
    * Navigates to SearchLocation screen.
    */
   const handleSearchLocationPress = () => {
+    setLoading(false);
     navigation.navigate('SearchLocation');
   };
+
+  const handleError = (error) => {
+    Alert.alert(
+      'Error',
+      error.message,
+      [{ text: 'OK', onPress: () => console.log('OK Pressed') }],
+      { cancelable: false }
+    );
+  };
+
 
   return (
     <View style={styles.container}>
