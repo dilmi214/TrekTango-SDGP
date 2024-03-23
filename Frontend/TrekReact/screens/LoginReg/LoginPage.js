@@ -45,8 +45,8 @@ const LoginScreen = () => {
           console.log('Stored username:', value);
         });
   
-        AsyncStorage.getItem('userID').then((value1) => {
-          console.log('Stored userID:', value1);
+        AsyncStorage.getItem('userID').then((value) => {
+          console.log('Stored userID:', value);
         });
   
         // Navigate to the home screen

@@ -3,6 +3,7 @@ import { View, StyleSheet, Text, TouchableOpacity, Alert} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import CustomDialog from '../../CustomComponents/CustomDialog';
+import { baseURL } from '../../getIPAddress';
 
 const StartGameScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -19,35 +20,49 @@ const StartGameScreen = ({ route }) => {
       const finalDestinationList = selectedPlaces.map(place => ({
         ...place,
         completed: false,
-      
       }));
-      
-      navigation.navigate('GameMapScreen', {              
+  
+      navigation.navigate('GameMapScreen', {
         finalDestinationList,
         detected,
-        confirmedStarterLocation,            
+        confirmedStarterLocation,
       });
-
+  
+      let username = ''; // Initialize username variable
+      await AsyncStorage.getItem('username').then((value) => {
+        username = value;
+      });
+  
+      let userid = ''; // Initialize userid variable
+      await AsyncStorage.getItem('userID').then((value) => {
+        userid = value;
+      });
+  
+      console.log('Username:', username);
+      console.log('UserID:', userid);
+      console.log('Final Destination List:', finalDestinationList);
+  
       const response = await fetch(`${baseURL}/api/session/createSession`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId: await AsyncStorage.getItem('userid'),
-          username: await AsyncStorage.getItem('username'),
-          listOfPlaces: selectedPlaces
+          userId: userid,
+          username: username,
+          listOfPlaces: finalDestinationList,
         }),
       });
-
-      if(response.status === 201){
+  
+      console.log('Response Status:', response.status);
+      if (response.status == 201) {
         console.log('Session Created Successfully');
-      }else{
-        console.error("Failed to create session");
+      } else {
+        console.error('Failed to create session');
       }
     }
   };
-
+  
   const handleBack = () => {
     navigation.goBack();
   };

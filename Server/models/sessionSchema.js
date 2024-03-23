@@ -5,11 +5,7 @@ const sessionSchema = new mongoose.Schema({
   sessionId: {type: String, default: uuidv4(), required: true, unique: true },
   username: { type: String, required: true },
   userId: { type: String, required: true },
-  listOfPlaces: [{
-    places: { type: Object, required: true },
-    complete: { type: Boolean, default: false },
-    listOfImageReferenceIds: { type: String, default: null }
-  }],
+  listOfPlaces: [{ type: Object, required: true }],
   sessionComplete: { type: Boolean, default: false },
  createdAt: { type: Date, default: Date.now }
 });
