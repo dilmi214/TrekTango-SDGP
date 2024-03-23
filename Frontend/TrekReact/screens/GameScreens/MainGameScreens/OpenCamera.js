@@ -44,6 +44,7 @@ export default class CameraScreen extends Component {
     console.log('Photo confirmed:', this.state.photo);
     console.log('Caption:', this.state.caption);
     console.log('Public:', this.state.isPublic);
+    this.props.onCapture(this.state.photo); // Pass the photo data to the callback function
     this.props.onClose(); // Close the camera screen
   };
 
