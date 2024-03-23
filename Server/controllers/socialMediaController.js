@@ -26,6 +26,10 @@ const newPost = async (req, res) =>{
 }
 }
 
+const initiateFeed = async (req, res) => {
+  
+}
+ 
 const getRefreshedData = async (req, res) => {
     try {
       // Get the lastRefreshedAt value from the request body

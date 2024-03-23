@@ -6,6 +6,15 @@ import CustomActivityIndicator from '../../CustomComponents/CustomActinityIndica
 import Snackbar from '../../CustomComponents/Snackbar';
 import { Camera } from 'expo-camera';
 import CameraScreen  from './OpenCamera';
+import { upload } from 'cloudinary-react-native'; // Import upload function from Cloudinary
+import { Cloudinary } from '@cloudinary/url-gen'; // Import Cloudinary class
+
+// Create an instance of Cloudinary with your configuration parameters
+const cld = new Cloudinary({
+  cloud: {
+    cloudName: "drxygqing",
+  },
+});
 
 const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) => {
   const [showFromDropdown, setShowFromDropdown] = useState(false);
@@ -88,10 +97,30 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
     }
   };
 
-  const handleCapture = (photoUri) => {
-    console.log('Captured photo:', photoUri);
+  const handleCapture = async (photoData) => {
+    console.log('Photo captured:', photoData);
+    
+    try {
+      // Upload the captured image to Cloudinary
+      const options = {
+        upload_preset: 'ro9px38k', // upload preset name
+        unsigned: true,
+      }
+  
+      await upload(cld, {file: photoData.uri, options: options, callback: (error, response) => {
+        if (!error) {
+          //successful upload
+          console.log('Upload success:', response);
+        } else {
+          // upload error
+          console.error('Upload error:', error);
+        }
+      }});
+    } catch (error) {
+      console.error('Error uploading photo to Cloudinary:', error.message);
+    }
   };
-
+  
   const filteredLocations = locations.filter(location => location.name !== clickedLocation.name);
 
   return (

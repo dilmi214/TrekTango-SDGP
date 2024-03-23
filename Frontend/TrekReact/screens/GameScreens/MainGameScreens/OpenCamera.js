@@ -40,6 +40,7 @@ export default class CameraScreen extends Component {
 
   confirmPhoto = () => {
     console.log('Photo confirmed:', this.state.photo);
+    this.props.onCapture(this.state.photo); // Pass the photo data to the callback function
     this.props.onClose(); // Close the camera screen
   };
 
