@@ -217,8 +217,32 @@ const resetPassword = async (username, newPassword) => {
         return { success: false, error: 'Internal Server Error' };
     }
   };
+
+  const getIdByUsernameOrEmail = async (req, res) => {
+    try {
+      const { usernameOrEmail } = req.params; // Assuming username is passed in the query parameters
+  
+      // Check if username is provided
+      const user = await User.findOne({ $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }]});
+  
+      // Call the method to find userid by username
+      const userID = await user.userID;
+  
+      if (userID) {
+        // If userid found, send it in the response
+        res.status(200).json({ userID: userID });
+      } else {
+        // If userid not found, send appropriate error response
+        res.status(404).json({ error: 'User not found' });
+      }
+    } catch (error) {
+      // Handle any errors
+      console.error('Error fetching userid by username:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  };
       
 
 
-module.exports = {registerUser, loginUser, sendVerificationCode, forgotPassword};
+module.exports = {registerUser, loginUser, sendVerificationCode, forgotPassword, getIdByUsernameOrEmail};
     
