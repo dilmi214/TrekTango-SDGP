@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, TouchableOpacity, StyleSheet, Text, Image } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Text, Image, TextInput } from 'react-native';
 import { Camera } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -10,6 +10,8 @@ export default class CameraScreen extends Component {
       hasPermission: null,
       cameraType: Camera.Constants.Type.back,
       photo: null,
+      caption: '',
+      isPublic: true,
     };
   }
 
@@ -40,7 +42,8 @@ export default class CameraScreen extends Component {
 
   confirmPhoto = () => {
     console.log('Photo confirmed:', this.state.photo);
-    this.props.onCapture(this.state.photo); // Pass the photo data to the callback function
+    console.log('Caption:', this.state.caption);
+    console.log('Public:', this.state.isPublic);
     this.props.onClose(); // Close the camera screen
   };
 
@@ -66,33 +69,54 @@ export default class CameraScreen extends Component {
               <Text style={styles.buttonText}>Confirm</Text>
             </TouchableOpacity>
           </View>
+          <View style={styles.captionContainer}>
+            <TextInput
+              style={styles.captionInput}
+              placeholder="Enter caption here"
+              placeholderTextColor="#ffffff"
+              onChangeText={(text) => this.setState({ caption: text })}
+              value={this.state.caption}
+              autoCapitalize="none"
+            />
+            <TouchableOpacity
+              style={styles.privacyButton}
+              onPress={() => this.setState({ isPublic: !this.state.isPublic })}
+            >
+              <Text style={styles.privacyButtonText}>
+                {this.state.isPublic ? 'Public' : 'Private'}
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       );
     }
 
     return (
-      <Camera
-        style={styles.camera}
-        type={this.state.cameraType}
-        ref={(ref) => {
-          this.camera = ref;
-        }}
-      >
-        <View style={styles.cameraContainer}>
-          <TouchableOpacity style={styles.flipButton} onPress={this.flipCamera}>
-            <Ionicons name="camera-reverse-outline" size={32} color="white" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.captureButton} onPress={this.takePicture}>
-            <View style={styles.captureButtonInner} />
-          </TouchableOpacity>
-        </View>
-      </Camera>
+      <View style={styles.cameraContainer}>
+        <Camera
+          style={styles.camera}
+          type={this.state.cameraType}
+          ref={(ref) => {
+            this.camera = ref;
+          }}
+        >
+          <View style={styles.cameraButtonsContainer}>
+            <TouchableOpacity style={styles.flipButton} onPress={this.flipCamera}>
+              <Ionicons name="camera-reverse-outline" size={32} color="white" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.captureButton} onPress={this.takePicture}>
+              <View style={styles.captureButtonInner} />
+            </TouchableOpacity>
+          </View>
+        </Camera>
+      </View>
     );
   };
 
   render() {
     return (
       <View style={styles.container}>
+        <View style={styles.topPlaceholder} />
         {this.renderCamera()}
         <TouchableOpacity style={styles.backButton} onPress={this.props.onClose}>
           <Ionicons name="chevron-back" size={32} color="white" />
@@ -108,21 +132,24 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     backgroundColor: 'black',
   },
+  cameraContainer: {
+    flex: 1,
+  },
   camera: {
     flex: 1,
     justifyContent: 'flex-end',
     alignItems: 'center',
   },
-  cameraContainer: {
+  cameraButtonsContainer: {
     flexDirection: 'row',
     marginBottom: 20,
     justifyContent: 'center',
     alignItems: 'center',
   },
   flipButton: {
-    position: 'relative',
+    position: 'absolute',
     bottom: 40,
-    right: 180,
+    right: 140,
     zIndex: 10,
   },
   captureButton: {
@@ -130,7 +157,6 @@ const styles = StyleSheet.create({
     bottom: 20,
     alignItems: 'center',
     borderColor: '#fff',
-    // borderWidth: '2%',
     borderRadius: 100,
   },
   captureButtonInner: {
@@ -141,8 +167,8 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: 'absolute',
-    top: 20,
-    left: 20,
+    top: 4,
+    left: 10,
     zIndex: 10,
   },
   preview: {
@@ -159,7 +185,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     position: 'absolute',
-    bottom: 20,
+    bottom: 80,
   },
   button: {
     marginHorizontal: 20,
@@ -172,5 +198,37 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  captionContainer: {
+    position: 'absolute',
+    bottom: 50,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+  },
+  captionInput: {
+    backgroundColor: 'rgba(255,255,255,0.6)',
+    width: '60%',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    color: '#ffffff',
+    bottom:-15,
+  },
+  privacyButton: {
+    marginLeft: 20,
+    padding: 10,
+    backgroundColor: '#010C33',
+    borderRadius: 10,
+    bottom:-15,
+  },
+  privacyButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  topPlaceholder: {
+    height: 150,
   },
 });
