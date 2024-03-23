@@ -1,276 +1,193 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, Linking, Animated, ScrollView } from 'react-native';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; // Import MaterialCommunityIcons for the camera icon
-import * as Location from 'expo-location';
-import CustomActivityIndicator from '../../CustomComponents/CustomActinityIndicator'; 
-import Snackbar from '../../CustomComponents/Snackbar';
-import { Camera } from 'expo-camera';
-import CameraScreen  from './OpenCamera';
+import React, { useState } from 'react';
+import { View, Modal, Text, StyleSheet, Button, Image, ScrollView, TouchableOpacity } from 'react-native';
 
-const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) => {
-  const [showFromDropdown, setShowFromDropdown] = useState(false);
-  const [selectedFromLocation, setSelectedFromLocation] = useState(null);
-  const [currentLocation, setCurrentLocation] = useState(null);
-  const [directionsClicked, setDirectionsClicked] = useState(false);
-  const [showFullScreenCamera, setShowFullScreenCamera] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [arrived, setArrived] = useState(false); 
+const PlaceDetailsModal = ({ visible, place, onClose, onAddToList}) => {
+  const [currentReviewIndex, setCurrentReviewIndex] = useState(0);
 
-  useEffect(() => {
-    getLocationAsync();
-  }, []);
+  const GOOGLE_API_KEY = "AIzaSyCCHxfnoWl-DNhLhKcjhCTiHYNY917ltL8";
+  console.log('Place ID:', place.place_id);
+  console.log('Longitude:', place.geometry.location.lat);
+  console.log('Latitude:', place.geometry.location.lng);
 
-  const getLocationAsync = async () => {
-    setLoading(true);
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
-      console.log('Permission to access location was denied');
-      setLoading(false);
-      return;
-    }
+  const handleAddToList = () => {
+    if (!place) return;
 
-    let location = await Location.getCurrentPositionAsync({});
-    setCurrentLocation(location.coords);
-    setSelectedFromLocation({ name: 'Current Location', place_id: 'current_location', latitude: location.coords.latitude, longitude: location.coords.longitude });
-    setLoading(false);
+    const placeData = {
+      place_id: place.place_id,
+      name: place.name,
+      latitude: place.geometry.location.lat,
+      longitude: place.geometry.location.lng
+      //can get photos, address all that from here
+    };
+
+    onAddToList(placeData);
   };
 
-  const handleConfirm = () => {
-    if (selectedFromLocation) {
-      let startLocation;
-      if (selectedFromLocation.name === 'Current Location') {
-        startLocation = `${currentLocation.latitude},${currentLocation.longitude}`;
-      } else {
-        startLocation = `${selectedFromLocation.latitude},${selectedFromLocation.longitude}`;
-      }
-      const destinationLocationName = encodeURIComponent(clickedLocation.name);
-      const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${startLocation}&destination=${destinationLocationName}`;
-      setDirectionsClicked(false);
-      Linking.openURL(googleMapsUrl);
-    }
+  const handleNextReview = () => {
+    setCurrentReviewIndex(currentReviewIndex === place.reviews.length - 1 ? 0 : currentReviewIndex + 1);
   };
 
-  const handleFromLocationSelect = (selected) => {
-    setSelectedFromLocation(selected);
-    setShowFromDropdown(false);
+  const handlePreviousReview = () => {
+    setCurrentReviewIndex(currentReviewIndex === 0 ? place.reviews.length - 1 : currentReviewIndex - 1);
   };
 
-  const handleSnapButtonPress = () => {
-    setShowFullScreenCamera(true);
-  };
-
-  const handleDirectionsButtonPress = () => {
-    setDirectionsClicked(prevState => !prevState); 
-  };
-  
-
-  const handleArrived = () => {
-    if (currentLocation) {
-      const modalLocation = clickedLocation;
-      const R = 6371e3;
-      const φ1 = currentLocation.latitude * Math.PI / 180;
-      const φ2 = modalLocation.latitude * Math.PI / 180;
-      const Δφ = (modalLocation.latitude - currentLocation.latitude) * Math.PI / 180;
-      const Δλ = (modalLocation.longitude - currentLocation.longitude) * Math.PI / 180;
-  
-      const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-                Math.cos(φ1) * Math.cos(φ2) *
-                Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      const distance = R * c;
-  
-      if (distance <= 5000) {
-        setArrived(true);
-      } else {
-        setArrived(false);
-        alert('Not there yet.');
-      }
-    }
-  };
-
-  const handleCapture = (photoUri) => {
-    console.log('Captured photo:', photoUri);
-  };
-
-  const filteredLocations = locations.filter(location => location.name !== clickedLocation.name);
+  if (!place) {
+    return null;
+  }
 
   return (
-    <Modal visible={isVisible} transparent animationType="slide" onRequestClose={onClose}>
+    <Modal visible={visible} onRequestClose={onClose} transparent={true}>
       <View style={styles.modalContainer}>
-        <Animated.View style={[styles.modalContent, { transform: [{ scale: new Animated.Value(1) }] }]}>
+        <View style={styles.modalContent}>
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <Ionicons name="close" size={24} color="#fff" />
+            <Text style={styles.closeButtonText}>X</Text>
           </TouchableOpacity>
-          <Text style={styles.title}>{clickedLocation?.name}</Text>
-
-          {loading ? (
-            <CustomActivityIndicator />
-          ) : (
-            <>
-            <TouchableOpacity style={styles.directionsButton} onPress={handleDirectionsButtonPress}>
-              <Text style={styles.directionsButtonText}>Get Directions</Text>
-            </TouchableOpacity>
-              {directionsClicked && (
-                <>
-                  <View style={styles.dropdownContainer}>
-                    <Text style={styles.label}>From: </Text>
-                    <TouchableOpacity style={styles.dropdownButton} onPress={() => setShowFromDropdown(!showFromDropdown)}>
-                      <Text style={styles.dropdownText}>{selectedFromLocation ? selectedFromLocation.name : 'Select Location'}</Text>
-                    </TouchableOpacity>
-                  </View>
-
-                  {showFromDropdown && (
-                    <View style={styles.dropdown}>
-                      <ScrollView>
-                        <TouchableOpacity onPress={() => handleFromLocationSelect({ name: 'Current Location', place_id: 'current_location', latitude: currentLocation.latitude, longitude: currentLocation.longitude })}>
-                          <Text style={styles.dropdownItem}>Current Location</Text>
-                        </TouchableOpacity>
-                        {filteredLocations.map(location => (
-                          <TouchableOpacity key={location.place_id} onPress={() => handleFromLocationSelect(location)}>
-                            <Text style={styles.dropdownItem}>{location.name}</Text>
-                          </TouchableOpacity>
-                        ))}
-                      </ScrollView>
+          <ScrollView style={styles.scrollView}>
+            <Text style={styles.placeName}>{place.name}</Text>
+            <Text style={styles.placeAddress}>{place.vicinity}</Text>
+            {place.photos && place.photos.length > 0 && (
+              <View style={styles.imageContainer}>
+                  <ScrollView horizontal={true}>
+                    <View style={styles.imageRow}>
+                      {place.photos && place.photos.map((photo, index) => (
+                        <Image
+                          key={index}
+                          source={{ uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photo.photo_reference}&key=${GOOGLE_API_KEY}` }}
+                          style={styles.placeImage}
+                        />
+                      ))}
                     </View>
-                  )}
-
-                  <TouchableOpacity style={styles.directionsButton} onPress={handleConfirm}>
-                    <Text style={styles.directionsButtonText}>Confirm</Text>
-                  </TouchableOpacity>
-                </>
-              )}
-
-              {arrived && !directionsClicked && (
-                <TouchableOpacity style={styles.cameraButton} onPress={handleSnapButtonPress}>
-                  <MaterialCommunityIcons name="camera" size={24} color="#fff" />
-                  <Text style={styles.snapText}>Snap</Text>
-                </TouchableOpacity>
-              )}
-
-              <TouchableOpacity style={styles.arrivedButton} onPress={handleArrived}>
-                <Text style={styles.arrivedText}>I've arrived</Text>
-              </TouchableOpacity>
-            </>
-          )}
-          </Animated.View>
+                  </ScrollView>
+              </View>
+            )}
+            {(!place.photos || place.photos.length == 0) && (
+              <Image
+              source={require('../../CustomComponents/ImgUnavailable.png')}
+              style={{ width: 200, height: 150 }} 
+              />
+            )}
+            <Text style={styles.detailsText}>Rating: {place.rating ? place.rating : "Not available"}</Text>
+            <Text style={styles.detailsText}>Opening Hours: {place.opening_hours ? (
+              place.opening_hours.open_now ? 'Open Now' : 'Closed'
+            ) : (
+              'Not available'
+            )}</Text>
+            <Text style={styles.detailsText}>Price Level: {place.price_level ?'$'.repeat(place.price_level) : "Currently unavailable"}</Text>
+            <Text style={styles.detailsText}>Types: {place.types ? place.types.join(", ") : "Currently unavailable"}</Text>
+            <Text style={styles.detailsText}>Website: {place.website ? place.website : "Currently unavailable"}</Text>
+            <Text style={styles.detailsText}>Phone Number: {place.formatted_phone_number ? place.formatted_phone_number : "Currently unavailable"}</Text>
+            {place.reviews && place.reviews.length > 0 ? (
+              <View style={styles.reviewsContainer}>
+                <View style={styles.reviewNavigation}>
+                  <Button title="<" onPress={handlePreviousReview} />
+                  <Text style={styles.reviewsTitle}>Review {currentReviewIndex + 1} of {place.reviews.length}:</Text>
+                  <Button title=">" onPress={handleNextReview} />
+                </View>
+                {place.reviews[currentReviewIndex] && (
+                  <Text style={styles.reviewText}>{place.reviews[currentReviewIndex].text}</Text>
+                )}
+              </View>
+            ) : (
+              <Text style={styles.noReviewsText}>No reviews available</Text>
+            )}
+          </ScrollView>
+          <View style={styles.buttonContainer}>
+            <Button title="Add to List" onPress={handleAddToList} />
+          </View>
+        </View>
       </View>
-      {showFullScreenCamera && (
-        <CameraScreen onCapture={handleCapture} onClose={() => setShowFullScreenCamera(false)} />
-      )}
     </Modal>
   );
 };
+
+
 
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(1, 12, 51, 0.8)',
   },
   modalContent: {
-    backgroundColor: '#1E2A78',
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    width: '90%',
+    maxHeight: '80%',
+    borderRadius: 20,
+    alignItems: 'center',
     padding: 20,
-    borderRadius:20,
-    width: '80%',
-    minHeight: 300,
+    justifyContent: 'space-between',
+  },
+  scrollView: {
+    maxHeight: '100%',
+  },
+  placeName: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  placeAddress: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 10,
+  },
+  imageContainer: {
+    marginBottom: 20,
+  },
+  imageRow: {
+    flexDirection: 'row',
+  },
+  placeImage: {
+    width: 340,
+    height: 150,
+    marginRight: 10,
+    marginBottom: 10,
+    borderRadius: 10,
+  },
+  infoContainer: {
+    marginBottom: 20,
+  },
+  detailsText: {
+    fontSize: 16,
+    marginBottom: 5,
+  },
+  buttonContainer: {
+    width: '100%',
+    alignItems: 'center',
+  },
+  addButton: {
     position: 'absolute',
-    top: '20%',
-    alignSelf: 'center',
-    zIndex: 1,
-    borderWidth: 2,
-    borderColor: '#fff',
+    bottom: 20,
+    backgroundColor: '#007bff',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  addButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
   closeButton: {
     position: 'absolute',
     top: 10,
     right: 10,
   },
-  title: {
-    fontSize: 24,
+  closeButtonText: {
+    fontSize: 20,
     fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-    color: '#fff',
+    color: 'black',
   },
-  dropdownContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  label: {
-    fontWeight: 'bold',
-    color: '#fff',
-    width: 60, 
-  },
-  dropdownButton: {
-    backgroundColor: '#4A69BB',
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 5,
-    flex: 1, 
-    alignItems: 'center',
-  },
-  dropdown: {
-    maxHeight: 150,
-    backgroundColor: '#fff',
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: '#ccc',
-  },
-  dropdownText: {
-    color: '#fff',
-  },
-  dropdownItem: {
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    color: '#010C33', 
-  },
-  directionsButton: {
-    backgroundColor: 'rgba(0, 0, 0, 0.3)', 
-    padding: 15,
-    borderRadius: 10,
-    marginTop: 20,
-    alignItems: 'center',
-  },
-  directionsButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  cameraButton: {
+  reviewNavigation: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#4A69BB',
-    padding: 15,
-    borderRadius: 5,
-    marginTop: 10,
   },
-  snapText: {
-    color: '#fff',
-    marginLeft: 5,
-  },
-  arrivedButton: {
-    backgroundColor: 'rgba(1,1,1,0.3)',
-    padding: 15,
-    borderRadius: 10,
-    marginTop: 25,
-    alignItems: 'center',
-    position: 'relative',
-    bottom: 20,
-    marginLeft: 110,
-    maxWidth:'auto',
-    transform: [{ translateX: -50 }],
-  },
-  arrivedText: {
-    color: '#fff',
+  reviewsTitle: {
+    fontSize: 18,
     fontWeight: 'bold',
-    fontSize: 16,
+    marginHorizontal: 10,
   },
 });
 
-
-export default GameLocationModal;
+export default PlaceDetailsModal;
