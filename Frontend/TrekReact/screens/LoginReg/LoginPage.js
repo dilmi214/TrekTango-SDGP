@@ -1,6 +1,7 @@
 // import React from 'react';
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image, TextInput } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image, TextInput} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import CustomDialog from '../CustomComponents/CustomDialog'; // Import your custom dialog component
 import { baseURL } from '../getIPAddress';
@@ -28,15 +29,32 @@ const LoginScreen = () => {
       const responseData = await response.json();
   
       if (response.ok) {
-        // Login successful, save username and userid to AsyncStorage
-        await AsyncStorage.setItem('username', responseData.username);
-        await AsyncStorage.setItem('userid', responseData.userid); // Assuming userid is a number
+        // Login successful, save username to AsyncStorage
+        await AsyncStorage.setItem('username', email);
+  
+        // Fetch user ID by username or email
+        const response1 = await fetch(`${baseURL}/api/users/getId/${email}`);
+        const userData = await response1.json();
+        const userID = userData.userID;
+  
+        // Save userID as a string to AsyncStorage
+        await AsyncStorage.setItem('userID', userID);
+  
+        // Retrieve and log stored values for testing
+        AsyncStorage.getItem('username').then((value) => {
+          console.log('Stored username:', value);
+        });
+  
+        AsyncStorage.getItem('userID').then((value1) => {
+          console.log('Stored userID:', value1);
+        });
+  
         // Navigate to the home screen
         navigation.navigate('Main');
       } else {
-         // Login failed, show error message using custom dialog
-         setErrorMessage(responseData.error);
-         setShowErrorDialog(true);
+        // Login failed, show error message using custom dialog
+        setErrorMessage(responseData.error);
+        setShowErrorDialog(true);
       }
     } catch (error) {
       console.error(error);
@@ -45,6 +63,7 @@ const LoginScreen = () => {
       setShowErrorDialog(true);
     }
   };
+  
 
   const handleCreateAccountPress = () => {
     navigation.navigate('CreateAccountScreen');

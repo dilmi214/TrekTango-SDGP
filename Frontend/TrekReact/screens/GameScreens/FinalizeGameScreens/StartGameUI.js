@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Alert } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Alert} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import CustomDialog from '../../CustomComponents/CustomDialog';
 
@@ -12,12 +13,13 @@ const StartGameScreen = ({ route }) => {
     setShowDialog(true); // Show the custom dialog
   };
 
-  const handleDialogOptionSelect = (option) => {
+  const handleDialogOptionSelect = async (option) => {
     setShowDialog(false); // Hide the dialog
     if (option === 'Yes') {
       const finalDestinationList = selectedPlaces.map(place => ({
         ...place,
         completed: false,
+      
       }));
       
       navigation.navigate('GameMapScreen', {              
@@ -25,6 +27,24 @@ const StartGameScreen = ({ route }) => {
         detected,
         confirmedStarterLocation,            
       });
+
+      const response = await fetch(`${baseURL}/api/session/createSession`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: await AsyncStorage.getItem('userid'),
+          username: await AsyncStorage.getItem('username'),
+          listOfPlaces: selectedPlaces
+        }),
+      });
+
+      if(response.status === 201){
+        console.log('Session Created Successfully');
+      }else{
+        console.error("Failed to create session");
+      }
     }
   };
 

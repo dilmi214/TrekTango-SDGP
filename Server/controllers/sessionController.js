@@ -16,10 +16,10 @@ const createSession = async (req, res) => {
       await session.save();
   
       // Respond with success message
-      res.status(201).json({ message: 'Session saved successfully', sessionId: session.sessionId });
+      res.status(201).send();
     } catch (error) {
       // Respond with error if any
-      res.status(500).json({ error: 'Failed to save session', details: error.message });
+      res.status(500).send();
     }
   };
 

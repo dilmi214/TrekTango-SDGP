@@ -12,8 +12,7 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
   const [selectedFromLocation, setSelectedFromLocation] = useState(null);
   const [currentLocation, setCurrentLocation] = useState(null);
   const [directionsClicked, setDirectionsClicked] = useState(false);
-  const [showCameraScreen, setShowCameraScreen] = useState(false);
-
+  const [showFullScreenCamera, setShowFullScreenCamera] = useState(false);
   const [loading, setLoading] = useState(false);
   const [arrived, setArrived] = useState(false); 
 
@@ -56,17 +55,14 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
     setShowFromDropdown(false);
   };
 
-  const handleCameraOpen = async () => {
-    setLoading(true);
-    // Set a state to control whether the camera screen should be shown
-    setShowCameraScreen(true);
-    setLoading(false);
+  const handleSnapButtonPress = () => {
+    setShowFullScreenCamera(true);
   };
 
-  const handleCapture = (photoUri) => {
-    // Handle the captured photo (e.g., display, save)
-    console.log('Captured photo:', photoUri);
+  const handleDirectionsButtonPress = () => {
+    setDirectionsClicked(prevState => !prevState); 
   };
+  
 
   const handleArrived = () => {
     if (currentLocation) {
@@ -91,7 +87,10 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
       }
     }
   };
-  
+
+  const handleCapture = (photoUri) => {
+    console.log('Captured photo:', photoUri);
+  };
 
   const filteredLocations = locations.filter(location => location.name !== clickedLocation.name);
 
@@ -108,10 +107,9 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
             <CustomActivityIndicator />
           ) : (
             <>
-              <TouchableOpacity style={styles.directionsButton} onPress={() => setDirectionsClicked(true)}>
-                <Text style={styles.directionsButtonText}>Get Directions</Text>
-              </TouchableOpacity>
-
+            <TouchableOpacity style={styles.directionsButton} onPress={handleDirectionsButtonPress}>
+              <Text style={styles.directionsButtonText}>Get Directions</Text>
+            </TouchableOpacity>
               {directionsClicked && (
                 <>
                   <View style={styles.dropdownContainer}>
@@ -142,11 +140,11 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
                 </>
               )}
 
-              {arrived && ( // Conditionally render camera button if arrived
-                      <TouchableOpacity style={styles.cameraButton} onPress={handleCameraOpen}>
-                        <MaterialCommunityIcons name="camera" size={24} color="#fff" />
-                        <Text style={styles.snapText}>Snap</Text>
-                      </TouchableOpacity>
+              {arrived && !directionsClicked && (
+                <TouchableOpacity style={styles.cameraButton} onPress={handleSnapButtonPress}>
+                  <MaterialCommunityIcons name="camera" size={24} color="#fff" />
+                  <Text style={styles.snapText}>Snap</Text>
+                </TouchableOpacity>
               )}
 
               <TouchableOpacity style={styles.arrivedButton} onPress={handleArrived}>
@@ -154,11 +152,11 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
               </TouchableOpacity>
             </>
           )}
-          {showCameraScreen && (
-            <CameraScreen onCapture={handleCapture} onClose={() => setShowCameraScreen(false)} />
-          )}
           </Animated.View>
       </View>
+      {showFullScreenCamera && (
+        <CameraScreen onCapture={handleCapture} onClose={() => setShowFullScreenCamera(false)} />
+      )}
     </Modal>
   );
 };
@@ -173,7 +171,7 @@ const styles = StyleSheet.create({
   modalContent: {
     backgroundColor: '#1E2A78',
     padding: 20,
-    borderRadius: 20,
+    borderRadius:20,
     width: '80%',
     minHeight: 300,
     position: 'absolute',
@@ -261,9 +259,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 25,
     alignItems: 'center',
-    position: 'absolute',
+    position: 'relative',
     bottom: 20,
-    left: '50%',
+    marginLeft: 110,
     maxWidth:'auto',
     transform: [{ translateX: -50 }],
   },
