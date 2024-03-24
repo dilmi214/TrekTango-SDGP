@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Image, Text, TouchableOpacity, Dimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useNavigation, CommonActions } from '@react-navigation/native';
 
 const API_KEY = 'c00e472f4fc54c0693b80206240602';
 const CITY_NAME = 'Colombo';
@@ -26,6 +27,40 @@ const HomeScreen = () => {
     fetchWeather();
   }, []);
 
+  const navigation = useNavigation();
+
+  const onPressOngoingTrips = () => {
+    const routeParams = {
+      finalDestinationList: [
+        {"completed": false, "latitude": 6.895755299999999, "longitude": 79.8553637, "name": "Pearl City Hotel", "place_id": "ChIJrwWG_t5b4joRUVsf8YotgAA"},
+        {"completed": false, "latitude": 6.897764999999999, "longitude": 79.856454, "name": "Colombo Court Hotel & Spa", "place_id": "ChIJu5QWQ99b4joRqOrSgneXwyM"},
+        {"completed": false, "latitude": 6.908742699999999, "longitude": 79.8503411, "name": "Renuka City Hotel", "place_id": "ChIJK-LINl1Z4joRcY2QA2GZcbU"}
+      ],
+      detected: false,
+      confirmedStarterLocation: {"latitude": 6.895755299999999, "longitude": 79.8553637}
+    };
+    
+    navigation.navigate('GameMapScreen', routeParams);
+  };
+
+  const onPressPlanTrip = () => {
+    navigation.navigate('LocationSelection');
+    
+    // Set the active tab to "Game"
+    navigation.dispatch(
+      CommonActions.navigate({
+        name: 'Main',
+        params: {
+          screen: 'Game',
+        },
+      })
+    );
+  };
+
+  const navigateToScreen = (screenName) => {
+    navigation.navigate(screenName);
+  };
+
   return (
     <View style={styles.container}>
       <Image source={{ uri: 'https://imgur.com/uJQUEuh.jpg' }} style={styles.logo} />
@@ -47,18 +82,18 @@ const HomeScreen = () => {
         )}
       </View>
       <View style={styles.buttonContainer}>
-        <HomePageButton text="Ongoing Trips" imageUrl="https://imgur.com/LhqUR6O.jpg" />
+        <HomePageButton text="Ongoing Trips" imageUrl="https://imgur.com/LhqUR6O.jpg" onPress={onPressOngoingTrips} />
         <HomePageButton text="Logbook" imageUrl="https://imgur.com/mGMqTHl.jpg" />
-        <HomePageButton text="Plan the Trip" imageUrl="https://imgur.com/X2qhdKU.png" />
+        <HomePageButton text="Plan the Trip" imageUrl="https://imgur.com/X2qhdKU.png" onPress={onPressPlanTrip} />
       </View>
       <StatusBar style="auto" />
     </View>
   );
 };
 
-const HomePageButton = ({ text, imageUrl }) => {
+const HomePageButton = ({ text, imageUrl, onPress }) => {
   return (
-    <TouchableOpacity style={styles.button}>
+    <TouchableOpacity style={styles.button} onPress={onPress}>
       <Text style={styles.buttonText}>{text}</Text>
       <Image source={{ uri: imageUrl }} style={styles.buttonImage} />
     </TouchableOpacity>
@@ -140,7 +175,6 @@ const styles = {
     paddingHorizontal: 20,
     marginBottom: 20,
     width: width * 0.9,
-
   },
   buttonText: {
     color: '#ffffff',

@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesome5 } from '@expo/vector-icons';
 
 // Import screens 
-import HomeScreen from './HomeScreen';
+import HomeNavigation from './HomeNavigation';
 import ImageFeed from './ImageFeed';
 import ProfilePage from './ProfilePage';
 import GameNavigation from './GameScreens/GameNavigator'; // Import using destructuring
@@ -45,7 +45,7 @@ function MainContainer() {
         })}
           
       >
-        <Tab.Screen name={homeName} component={HomeScreen} />
+        <Tab.Screen name={homeName} component={HomeNavigation} />
         <Tab.Screen name={gameName} component={GameNavigation} />
         <Tab.Screen name={feedName} component={ImageFeed} />
         <Tab.Screen name={profileName} component={ProfilePage} />
