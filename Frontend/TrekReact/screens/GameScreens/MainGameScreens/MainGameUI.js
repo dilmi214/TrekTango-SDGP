@@ -11,18 +11,24 @@ const GameMapScreen = ({ route }) => {
   const { finalDestinationList, detected, confirmedStarterLocation } = route.params;
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [directions, setDirections] = useState([]);
+  // const [capturedLocationID, setCapturedLocationID] = useState(null);
+  const [capturedLocationIDs, setCapturedLocationIDs] = useState([]);
 
   useEffect(() => {
-    console.log(detected, confirmedStarterLocation)
     const fetchDirections = async () => {
-      const apiKey = 'AIzaSyCCHxfnoWl-DNhLhKcjhCTiHYNY917ltL8';
-      const waypoints = finalDestinationList.map(place => `place_id:${place.place_id}`).join('|');
+      const apiKey = 'AIzaSyCCHxfnoWl-DNhLhKcjhCTiHYNY917ltL8'; 
+      const filteredDestinations = finalDestinationList.filter(destination => !capturedLocationIDs.includes(destination.place_id));
+      if (filteredDestinations.length < 2) {
+        setDirections([]);
+        return;
+      }
+      const waypoints = filteredDestinations.map(place => `place_id:${place.place_id}`).join('|');
       const origin = `${confirmedStarterLocation.latitude},${confirmedStarterLocation.longitude}`;
-      const destination = `${finalDestinationList[finalDestinationList.length - 1].latitude},${finalDestinationList[finalDestinationList.length - 1].longitude}`;
-
+      const destination = `${filteredDestinations[filteredDestinations.length - 1].latitude},${filteredDestinations[filteredDestinations.length - 1].longitude}`;
+  
       const response = await fetch(`https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&waypoints=${waypoints}&key=${apiKey}`);
       const data = await response.json();
-
+  
       if (data.status === 'OK') {
         const polylinePoints = data.routes[0].overview_polyline.points;
         setDirections(polylinePoints);
@@ -30,20 +36,21 @@ const GameMapScreen = ({ route }) => {
         console.error('Error fetching directions:', data.status);
       }
     };
-
+  
     fetchDirections();
-  }, [finalDestinationList, confirmedStarterLocation]);
+  }, [finalDestinationList, confirmedStarterLocation, capturedLocationIDs]);
+  
 
   const handleBackButtonPress = () => {
     navigation.goBack();
   };
 
   const renderDestinationItem = ({ item }) => (
-    <View style={styles.destinationItem}>
-      <Text style={styles.destinationText}>{item.name}</Text>
-    </View>
-  );
-
+    <TouchableOpacity style={styles.destinationItem}>
+      <Text style={capturedLocationIDs.includes(item.place_id) ? styles.crossedText : styles.destinationText}>{item.name}</Text>
+    </TouchableOpacity>
+  );  
+  
   const handleRedMarkerPress = (location) => {
     setSelectedLocation(location);
   };
@@ -53,6 +60,12 @@ const GameMapScreen = ({ route }) => {
       setSelectedLocation(location);
     }
   };
+
+  const handleLocationCapture = (locationID) => {
+    setCapturedLocationIDs(prevIDs => [...prevIDs, locationID]);
+    setSelectedLocation(null); 
+  };
+  
 
   return (
     <View style={styles.container}>
@@ -83,11 +96,12 @@ const GameMapScreen = ({ route }) => {
             }}
             title="Start Location"
             pinColor="blue"
-            onPress={() => handleBlueMarkerPress(finalDestinationList[0])} // Handle marker press
+            onPress={() => handleBlueMarkerPress(finalDestinationList[0])} 
           />
 
-          {finalDestinationList.map((destination, index) => (
-            // Check if detected is false and if it's the first item, skip rendering
+        {finalDestinationList
+          .filter(destination => !capturedLocationIDs.includes(destination.place_id))
+          .map((destination, index) => (
             !detected && index === 0 ? null : (
               <Marker
                 key={destination.place_id}
@@ -97,7 +111,7 @@ const GameMapScreen = ({ route }) => {
                 }}
                 title={destination.name}
                 pinColor="red"
-                onPress={() => handleRedMarkerPress(destination)} // Handle marker press
+                onPress={() => handleRedMarkerPress(destination)} 
               />
             )
           ))}
@@ -119,13 +133,19 @@ const GameMapScreen = ({ route }) => {
       {/* Render the GameLocationModal when selectedLocation is not null */}
       {selectedLocation && (
         <GameLocationModal
-          isVisible={true}  // Ensure the modal is visible
-          locations={finalDestinationList}  // Pass the selectedPlaces array
-          clickedLocation={selectedLocation}  // Pass the selected location
+          isVisible={true}
+          locations={finalDestinationList}
+          clickedLocation={selectedLocation}
           onClose={() => setSelectedLocation(null)}
+          onLocationCapture={handleLocationCapture} 
         />
-      )}
-    </View>
+        )}
+        {/*{capturedLocationID === selectedLocation?.place_id && (
+          <View>
+            {console.log('Location ID:', capturedLocationID)}
+          </View>
+        )} */}
+  </View>
   );
 };
 
@@ -159,18 +179,29 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   destinationListHeader: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 5,
+    left:20,
+    bottom: 5,
   },
   destinationList: {
     maxHeight: 200,
   },
   destinationItem: {
-    paddingVertical: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
   },
   destinationText: {
-    fontSize: 14,
+    fontSize: 16,
+    color: '#333',
+  },
+  crossedText: {
+    fontSize: 16,
+    color: '#999',
+    textDecorationLine: 'line-through',
   },
 });
 
@@ -185,7 +216,7 @@ function decodePolyline(encoded) {
     let b, shift = 0, result = 0;
 
     do {
-      b = encoded.charCodeAt(index++) - 63; // finds ascii and substract it by 63
+      b = encoded.charCodeAt(index++) - 63; // ascii
       result |= (b & 0x1f) << shift;
       shift += 5;
     } while (b >= 0x20);
