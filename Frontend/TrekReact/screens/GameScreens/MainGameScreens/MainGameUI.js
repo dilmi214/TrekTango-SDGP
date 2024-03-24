@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, FlatList } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, FlatList, Alert} from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from 'react-native-maps';
 import { useNavigation } from '@react-navigation/native';
 import * as Location from 'expo-location';
@@ -42,9 +42,21 @@ const GameMapScreen = ({ route }) => {
   
 
   const handleBackButtonPress = () => {
-    navigation.goBack();
+    Alert.alert(
+      'Confirmation',
+      'Are you sure you want to exit? This will end the trip.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Exit', onPress: () => { // goes back to first game opage
+            for (let i = 0; i < 5; i++) {
+              navigation.goBack();
+            }
+          }
+        }
+      ]
+    );
   };
-
+  
   const renderDestinationItem = ({ item }) => (
     <TouchableOpacity style={styles.destinationItem}>
       <Text style={capturedLocationIDs.includes(item.place_id) ? styles.crossedText : styles.destinationText}>{item.name}</Text>
@@ -118,7 +130,7 @@ const GameMapScreen = ({ route }) => {
         </MapView>
       )}
       <TouchableOpacity style={styles.searchProgressButton} onPress={handleBackButtonPress}>
-        <Text style={styles.searchProgressButtonText}>Session Progress</Text>
+        <Text style={styles.searchProgressButtonText}>End Trip</Text>
       </TouchableOpacity>
       <View style={styles.destinationListContainer}>
         <Text style={styles.destinationListHeader}>Your Trek Points</Text>
