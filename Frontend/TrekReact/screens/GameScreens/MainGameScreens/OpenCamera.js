@@ -2,8 +2,7 @@ import React, { Component } from 'react';
 import { View, TouchableOpacity, StyleSheet, Text, Image, TextInput } from 'react-native';
 import { Camera } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { baseURL } from '../../getIPAddress';
+
 
 export default class CameraScreen extends Component {
   constructor(props) {
@@ -46,41 +45,11 @@ export default class CameraScreen extends Component {
     console.log('Photo confirmed:', this.state.photo.uri);
     console.log('Caption:', this.state.caption);
     console.log('Public:', this.state.isPublic);
-    this.props.onCapture(this.state.photo);
+    this.props.onCapture(this.state.photo, this.state.caption, this.state.isPublic);
     this.props.onClose(); // Close the camera screen
 
-    await AsyncStorage.getItem('username').then((value) => {
-      userName = value;
-    });
-
-    await AsyncStorage.getItem('userID').then((value) => {
-      userID = value;
-    });
-try{
-    const response = await fetch(`${baseURL}/api/socialMedia/newPost`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username: userName, 
-        userID, 
-        imageReferenceId: this.state.photo.uri , 
-        uploadToMedia: this.state.isPublic, 
-        caption: this.state.caption
-      }),
-    });
     
-    // Check if the request was successful
-    if (response.status === 201) {
-      console.log('Post created sucessfully');
-              
-    } else {
-      console.error('Failed to Create a Post');
-      // Handle error appropriately
-    }} catch (error){
-      console.error(error);
-    }
+
   };
 
   renderCamera = () => {

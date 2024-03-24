@@ -8,6 +8,8 @@ import { Camera } from 'expo-camera';
 import CameraScreen  from './OpenCamera';
 import { upload } from 'cloudinary-react-native'; // Import upload function from Cloudinary
 import { Cloudinary } from '@cloudinary/url-gen'; // Import Cloudinary class
+import { baseURL } from '../../getIPAddress';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Create an instance of Cloudinary with your configuration parameters
 const cld = new Cloudinary({
@@ -97,8 +99,10 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
     }
   };
 
-  const handleCapture = async (photoData) => {
+  const handleCapture = async (photoData, caption, isPublic) => {
     console.log('Photo captured:', photoData);
+    console.log('Photo captured:', caption);
+    console.log(isPublic);
     
     try {
       // Upload the captured image to Cloudinary
@@ -107,10 +111,49 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
         unsigned: true,
       }
   
-      await upload(cld, {file: photoData.uri, options: options, callback: (error, response) => {
+      upload(cld, {file: photoData.uri, options: options, callback: async (error, response) => {
         if (!error) {
           //successful upload
           console.log('Upload success:', response);
+          const secureUrl = response.secure_url;
+          console.log(secureUrl);
+
+          let userName, userID;
+
+          await AsyncStorage.getItem('username').then((value) => {
+            userName = value;
+          });
+      
+          await AsyncStorage.getItem('userID').then((value) => {
+            userID = value;
+          });
+
+          try{
+            const response = await fetch(`${baseURL}/api/socialMedia/newPost`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                username: userName, 
+                userID, 
+                imageReferenceId: secureUrl , 
+                uploadToMedia: isPublic, 
+                caption
+              }),
+            });
+            
+            // Check if the request was successful
+            if (response.status === 201) {
+              console.log('Post created sucessfully');
+                      
+            } else {
+              console.error('Failed to Create a Post');
+              // Handle error appropriately
+            }} catch (error){
+              console.error(error);
+            }
+
         } else {
           // upload error
           console.error('Upload error:', error);
@@ -119,7 +162,8 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
     } catch (error) {
       console.error('Error uploading photo to Cloudinary:', error.message);
     }
-  };
+};
+
   
   const filteredLocations = locations.filter(location => location.name !== clickedLocation.name);
 
