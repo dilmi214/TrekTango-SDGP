@@ -1,14 +1,24 @@
 import React, { useState } from 'react';
 import { View, Modal, Text, StyleSheet, Button, Image, ScrollView, TouchableOpacity } from 'react-native';
 
+/**
+ * Modal component for displaying details of a selected place.
+ * @param {object} props - Component props.
+ * @param {boolean} props.visible - Controls the visibility of the modal.
+ * @param {object} props.place - Data of the selected place.
+ * @param {Function} props.onClose - Callback function to close the modal.
+ * @param {Function} props.onAddToList - Callback function to add the place to a list.
+ * @param {Array} props.selectedPlaces - Array of currently selected places.
+ * @returns {JSX.Element} - PlaceDetailsModal component.
+ */
 const PlaceDetailsModal = ({ visible, place, onClose, onAddToList}) => {
   const [currentReviewIndex, setCurrentReviewIndex] = useState(0);
 
   const GOOGLE_API_KEY = "AIzaSyCCHxfnoWl-DNhLhKcjhCTiHYNY917ltL8";
-  console.log('Place ID:', place.place_id);
-  console.log('Longitude:', place.geometry.location.lat);
-  console.log('Latitude:', place.geometry.location.lng);
 
+  /**
+   * Handles adding the place to the list.
+   */
   const handleAddToList = () => {
     if (!place) return;
 
@@ -17,16 +27,21 @@ const PlaceDetailsModal = ({ visible, place, onClose, onAddToList}) => {
       name: place.name,
       latitude: place.geometry.location.lat,
       longitude: place.geometry.location.lng
-      //can get photos, address all that from here
     };
 
     onAddToList(placeData);
   };
 
+  /**
+   * Handles displaying the next review.
+   */
   const handleNextReview = () => {
     setCurrentReviewIndex(currentReviewIndex === place.reviews.length - 1 ? 0 : currentReviewIndex + 1);
   };
 
+  /**
+   * Handles displaying the previous review.
+   */
   const handlePreviousReview = () => {
     setCurrentReviewIndex(currentReviewIndex === 0 ? place.reviews.length - 1 : currentReviewIndex - 1);
   };

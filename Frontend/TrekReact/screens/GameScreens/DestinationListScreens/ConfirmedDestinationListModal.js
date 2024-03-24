@@ -1,8 +1,21 @@
 import React from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity} from 'react-native';
 
+/**
+ * Modal component for displaying a list of confirmed destinations.
+ * @param {object} props - Component props.
+ * @param {boolean} props.visible - Controls the visibility of the modal.
+ * @param {Function} props.onClose - Callback function to close the modal.
+ * @param {Array} props.selectedPlaces - Array of selected places to be displayed.
+ * @param {Function} props.onRemoveDestination - Callback function to remove a destination from the list.
+ * @returns {JSX.Element} - ConfirmedDestinationListModal component.
+ */
 const ConfirmedDestinationListModal = ({ visible, onClose, selectedPlaces, onRemoveDestination }) => {
   
+  /**
+   * Handles the removal of a destination from the list.
+   * @param {string} placeId - The ID of the destination to be removed.
+   */
   const handleRemoveDestination = (placeId) => {
     onRemoveDestination(placeId);
   };

@@ -24,6 +24,9 @@ const categories = [
 /**
  * Component for displaying nearby destinations and managing selected places.
  * @param {object} navigation - The navigation object used for navigating between screens.
+ * @param {number} latitude - The latitude coordinate of the user's location.
+ * @param {number} longitude - The longitude coordinate of the user's location.
+ * @param {number} radius - The radius in meters for fetching nearby destinations.
  * @returns {JSX.Element} - JSX element representing the NearbyDestinationsScreen component.
  */
 const NearbyDestinationsScreen = ({navigation}) => {
@@ -43,7 +46,6 @@ const NearbyDestinationsScreen = ({navigation}) => {
 
   const route = useRoute();
   const { longitude, latitude, radius } = route.params;
-  console.log(radius)
 
   useEffect(() => {
     setDestinations([]);
