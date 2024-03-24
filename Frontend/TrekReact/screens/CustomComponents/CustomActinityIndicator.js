@@ -2,6 +2,10 @@ import React from 'react';
 import { View, Image, StyleSheet } from 'react-native';
 import Spinner from '../CustomComponents/spinner.gif';
 
+/**
+ * CustomActivityIndicator component displays a loading indicator with a spinner GIF.
+ * @returns {JSX.Element} CustomActivityIndicator component
+ */
 const CustomActivityIndicator = () => {
   return (
     <View style={styles.overlay}>
