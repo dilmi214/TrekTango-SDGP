@@ -3,19 +3,18 @@ const { v4: uuidv4 } = require('uuid');
 
 const newPost = async (req, res) =>{
    
-    const {username, userID, placeId, imageReferenceId, uploadToMedia, caption, comments, likes } = req.body;
+    const {username, userID, imageReferenceId, uploadToMedia, caption} = req.body;
     try{
     const newPost = new SocialMediaPost({
         username,
         userID,
-        placeId,
+        postId: uuidv4(),
         imageReferenceId,
         uploadToMedia,
         caption,
-        comments: comments || [],
-        likes: likes || [],
-       
-    });
+        comments: [{commentID: uuidv4()}],
+        likes: [],
+      });
 
     await newPost.save();
     console.log('New Post Created');

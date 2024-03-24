@@ -2,6 +2,7 @@
 const User = require('../models/userSchema');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const { v4: uuidv4 } = require('uuid');
 const emailAddress = process.env.emailAddress;
 const emailPassword = process.env.emailPassword;
 
@@ -39,6 +40,7 @@ const registerUser = async(req, res) => {
 
         // Create a new user instance
         const newUser = new User({
+            userID: uuidv4(),
             username,
             email,
             password: hashedPassword,

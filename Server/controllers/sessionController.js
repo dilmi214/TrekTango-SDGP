@@ -1,4 +1,5 @@
-const Session = require('../models/sessionSchema')
+const Session = require('../models/sessionSchema');
+const { v4: uuidv4 } = require('uuid');
 
 const createSession = async (req, res) => {
     try {
@@ -7,6 +8,7 @@ const createSession = async (req, res) => {
   
       // Create a new location document
       const session = new Session({
+        sessionId: uuidv4(),
         userId,
         username,
         listOfPlaces
