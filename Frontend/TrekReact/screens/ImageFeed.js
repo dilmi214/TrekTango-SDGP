@@ -4,8 +4,6 @@ import { FontAwesome } from '@expo/vector-icons';
 import { baseURL } from './getIPAddress';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
-
 const ImageFeed = () => {
   const [likes, setLikes] = useState([]);
   const [liked, setLiked] = useState([]);
@@ -20,26 +18,23 @@ const ImageFeed = () => {
   useEffect(() => {
     fetchData(); // Fetch data from backend on component mount
   }, []);
-
   const fetchData = async () => {
     try {
       await AsyncStorage.getItem('username').then((value) => {
         setUserName(value);
       });
-
+  
       // Retrieve userID
       const userID = await AsyncStorage.getItem('userID');
-
+  
       // Now that userID is available, proceed with setting liked state
       await AsyncStorage.getItem('userID').then((value) => {
         setUserID(value);
-
+  
         // Fetch postsData after userID is retrieved
         fetch(`${baseURL}/api/socialMedia/getFeed`)
           .then(response => response.json())
           .then(postsData => {
-            setPostsData(postsData);
-            
             // Initialize state based on fetched data
             const initialLikesState = postsData.map(post => post.likes.length);
             setLikes(initialLikesState);
@@ -55,6 +50,14 @@ const ImageFeed = () => {
             setComments(initialCommentsState);
             setNewCommentText(postsData.map(() => '')); // Empty comment text for each post
             setCommentSectionVisible(postsData.map(() => false));  // Comment sections initially hidden
+  
+            // Update postsData to include username and caption
+            const updatedPostsData = postsData.map(post => ({
+              ...post,
+              username: post.username, // Assuming username field is present in postsData
+              caption: post.caption // Assuming caption field is present in postsData
+            }));
+            setPostsData(updatedPostsData);
           })
           .catch(error => {
             console.error('Error fetching data:', error);
@@ -63,7 +66,55 @@ const ImageFeed = () => {
     } catch (error) {
       console.error('Error fetching data:', error);
     }
-};
+  };
+
+  {postsData.map((post, index) => (
+    <TouchableOpacity key={index}>
+      <View style={styles.postContainer}>
+        <View style={styles.postHeader}>
+          <Text style={styles.username}>{post.username}</Text>
+          <Text style={styles.caption}>{post.caption}</Text>
+        </View>
+        <Image
+          source={{ uri: post.imageReferenceId }}
+          style={styles.image}
+        />
+        <View style={styles.interactionBar}>
+          <TouchableOpacity onPress={() => handleLike(index)} style={styles.iconButton}>
+            <FontAwesome name={liked[index] ? "heart" : "heart-o"} size={24} color={liked[index] ? "#ff9999" : "#ccc"} />
+          </TouchableOpacity>
+          <Text style={styles.likeText}>{likes[index]} Likes</Text>
+          <TouchableOpacity onPress={() => toggleCommentSection(index)} style={styles.iconButton}>
+            <FontAwesome name="comment" size={24} color="#ccc" />
+          </TouchableOpacity>
+        </View>
+        {commentSectionVisible[index] && (
+          <View style={styles.commentSection}>
+            {post.comments.map((comment, commentIndex) => (
+              <View key={commentIndex} style={styles.comment}>
+                <Text style={styles.commentText}>
+                  <Text style={styles.commentUsername}>{comment.username}: </Text>
+                  {comment.comment}
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
+        <View style={styles.commentInputContainer}>
+          <TextInput
+            placeholder="Add a comment..."
+            placeholderTextColor="#ccc"
+            style={styles.commentInput}
+            value={newCommentText[index]}
+            onChangeText={(text) => handleCommentChange(index, text)}
+          />
+          <TouchableOpacity onPress={() => handlePostComment(index)} style={styles.postCommentButton}>
+            <Text style={styles.postCommentButtonText}>Post</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </TouchableOpacity>
+  ))}
 
   const onRefresh = () => {
     setRefreshing(true); // Set refreshing state to true
@@ -195,6 +246,10 @@ const ImageFeed = () => {
         {postsData.map((post, index) => (
           <TouchableOpacity key={index}>
             <View style={styles.postContainer}>
+            <View style={styles.postHeader}>
+              <Text style={styles.username}>{post.username}</Text>
+              <Text style={styles.caption}>{post.caption}</Text>
+            </View>
               <Image
                 source={{ uri: post.imageReferenceId }}
                 style={styles.image}
@@ -328,6 +383,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.8)',
+  },
+  username: {
+    fontSize: 16,
+    color: 'white', 
+    fontWeight: 'bold', 
+    marginBottom: 5, 
+  },
+  caption: {
+    fontSize: 14,
+    color: 'white', 
+    marginBottom: 10, 
   },
 });
 

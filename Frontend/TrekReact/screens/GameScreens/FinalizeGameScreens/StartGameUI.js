@@ -1,19 +1,31 @@
 import React, {useState} from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Alert} from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import CustomDialog from '../../CustomComponents/CustomDialog';
 import { baseURL } from '../../getIPAddress';
 
+/**
+ * Screen component for starting the adventure game.
+ * @param {object} route - The route object containing parameters passed to this screen.
+ * @returns {JSX.Element} - JSX element representing the StartGameScreen component.
+ */
 const StartGameScreen = ({ route }) => {
   const navigation = useNavigation();
   const { selectedPlaces, detected, confirmedStarterLocation } = route.params;
   const [showDialog, setShowDialog] = useState(false); // State to control dialog visibility
 
+  /**
+   * Handles the start of the adventure game.
+   */
   const handleStartAdventure = () => {
     setShowDialog(true); // Show the custom dialog
   };
 
+  /**
+   * Handles the selection of an option in the custom dialog.
+   * @param {string} option - The selected option ('Cancel' or 'Yes').
+   */
   const handleDialogOptionSelect = async (option) => {
     setShowDialog(false); // Hide the dialog
     if (option === 'Yes') {
@@ -39,10 +51,6 @@ const StartGameScreen = ({ route }) => {
         userid = value;
       });
   
-      console.log('Username:', username);
-      console.log('UserID:', userid);
-      console.log('Final Destination List:', finalDestinationList);
-  
       const response = await fetch(`${baseURL}/api/session/createSession`, {
         method: 'POST',
         headers: {
@@ -64,6 +72,9 @@ const StartGameScreen = ({ route }) => {
     }
   };
   
+  /**
+   * Navigates back to the previous screen.
+   */
   const handleBack = () => {
     navigation.goBack();
   };

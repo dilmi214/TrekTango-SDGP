@@ -1,6 +1,6 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import NearbyDestinationsScreen from './DestinationListScreens/DestinationList'; // Import your second code component
+import NearbyDestinationsScreen from './DestinationListScreens/DestinationList'; 
 import SelectStartLocationScreen from './FinalizeGameScreens/StartLocationSetting';
 import StartGameScreen from './FinalizeGameScreens/StartGameUI';
 import GameMapScreen from './MainGameScreens/MainGameUI';
@@ -9,6 +9,10 @@ import RadiusSetScreen from './InitialLocationRangeSelectionScreens/RadiusSet';
 import SearchInitialLocationScreen from './InitialLocationRangeSelectionScreens/SearchInitialLocation';
 const Stack = createStackNavigator();
 
+/**
+ * Component defining the navigation stack for the game screens.
+ * @returns {JSX.Element} - JSX element representing the GameNavigation component.
+ */
 function GameNavigation() {
   return (
     <Stack.Navigator>

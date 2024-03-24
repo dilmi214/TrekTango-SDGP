@@ -7,6 +7,10 @@ import CustomDialog from '../../CustomComponents/CustomDialog';
 import CustomActivityIndicator from '../../CustomComponents/CustomActinityIndicator';
 import  {baseURL}  from '../../getIPAddress';
 
+/**
+ * Screen component for selecting the starting location for the adventure game.
+ * @returns {JSX.Element} - JSX element representing the SelectStartLocationScreen component.
+ */
 const SelectStartLocationScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
@@ -18,10 +22,16 @@ const SelectStartLocationScreen = () => {
   const [selectedDestination, setSelectedDestination] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  /**
+   * Handles the selection of destinations from the list.
+   */
   const handleSelectFromList = () => {
     setShowDestinations(true);
   };
 
+  /**
+   * Handles the detection of the current location.
+   */
   const handleDetectCurrentLocation = async () => {
     setLoading(true); // Show loading indicator
     let { status } = await Location.getForegroundPermissionsAsync();
@@ -41,9 +51,7 @@ const SelectStartLocationScreen = () => {
     }
     try {
       const location = await Location.getCurrentPositionAsync({});
-      const { latitude, longitude } = location.coords;
-      
-
+      const { latitude, longitude } = location.coords;     
       setSnackbarMessage('Location detected!');
       setShowSnackbar(true);
       const confirmedStarterLocation = {
@@ -63,8 +71,8 @@ const SelectStartLocationScreen = () => {
       });
       if (!response.ok) {
         console.log(`HTTP error! Status: ${response.status}`);
-    }
-    orderedPlaces = await response.json();
+      }
+      orderedPlaces = await response.json();
 
       setTimeout(() => {
         setLoading(false); // Show loading indicator
@@ -78,7 +86,10 @@ const SelectStartLocationScreen = () => {
     }
   };
 
-
+  /**
+   * Handles the navigation back to the previous screen.
+   * @param {string} option - The selected option ('Yes' or 'No') from the back dialog.
+   */
   const handleBack = (option) => {
     if (option === 'Yes') {
       navigation.goBack();
@@ -86,6 +97,9 @@ const SelectStartLocationScreen = () => {
     setShowBackDialog(false);
   };
 
+  /**
+   * Handles the selection of the next destination.
+   */
   const handleNext = async() => {
     if (selectedDestination) {
       setLoading(true); // Show loading indicator
@@ -123,8 +137,6 @@ const SelectStartLocationScreen = () => {
           longitude: selectedDestination.longitude,
         }
       });
-      
-      console.log("worked", selectedDestination.place_id, selectedDestination.name); //debug statement
     } else {
       // If no destination is selected, show a message
       setShowSnackbar(true);
@@ -135,6 +147,10 @@ const SelectStartLocationScreen = () => {
     }
   };
 
+  /**
+   * Handles the selection of a destination.
+   * @param {object} destination - The selected destination object.
+   */
   const handleSelectDestination = (destination) => {
     setSelectedDestination(destination);
   };
