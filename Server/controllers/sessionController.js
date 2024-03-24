@@ -19,7 +19,8 @@ const createSession = async (req, res) => {
       res.status(201).json({ message: 'Session created successfully' });
     } catch (error) {
       // Respond with error if any
-      res.status(500).json({ message: 'Failed to create Session ' });
+      console.error(error);
+      res.status(500).json({ error:error });
     }
   };
 

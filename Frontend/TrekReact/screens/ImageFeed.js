@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, TextInput, ScrollView, StyleSheet, Dimensions, RefreshControl } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { baseURL } from './getIPAddress';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
@@ -13,7 +14,8 @@ const ImageFeed = () => {
   const [commentSectionVisible, setCommentSectionVisible] = useState([]);
   const [postsData, setPostsData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
-  const likedUserId = "90b816ccc0014621ae1ad499d431229dh";
+  const [userName, setUserName] = useState("");
+  const [userID, setUserID] = useState("");
 
   useEffect(() => {
     fetchData(); // Fetch data from backend on component mount
@@ -21,28 +23,47 @@ const ImageFeed = () => {
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`${baseURL}/api/socialMedia/getFeed`); // Replace with your backend endpoint
-      const postsData = await response.json();
-      setPostsData(postsData);
-      
-      // Initialize state based on fetched data
-      const initialLikesState = postsData.map(post => post.likes.length);
-      setLikes(initialLikesState);
-
-      const initialLikedState = postsData.map(post => {
-        const isLikedByUser = post.likes.includes(likedUserId); // Check if liked by the specific user
-        return isLikedByUser;
+      await AsyncStorage.getItem('username').then((value) => {
+        setUserName(value);
       });
-      setLiked(initialLikedState);
 
-      const initialCommentsState = postsData.map(post => post.comments.map(comment => comment.comment));
-      setComments(initialCommentsState);
-      setNewCommentText(postsData.map(() => '')); // Empty comment text for each post
-      setCommentSectionVisible(postsData.map(() => false));  // Comment sections initially hidden
+      // Retrieve userID
+      const userID = await AsyncStorage.getItem('userID');
+
+      // Now that userID is available, proceed with setting liked state
+      await AsyncStorage.getItem('userID').then((value) => {
+        setUserID(value);
+
+        // Fetch postsData after userID is retrieved
+        fetch(`${baseURL}/api/socialMedia/getFeed`)
+          .then(response => response.json())
+          .then(postsData => {
+            setPostsData(postsData);
+            
+            // Initialize state based on fetched data
+            const initialLikesState = postsData.map(post => post.likes.length);
+            setLikes(initialLikesState);
+            
+            // Now, map over postsData to set liked state
+            const initialLikedState = postsData.map(post => {
+              const isLikedByUser = post.likes.includes(userID); // Check if liked by the specific user
+              return isLikedByUser;
+            });
+            setLiked(initialLikedState);
+            
+            const initialCommentsState = postsData.map(post => post.comments.map(comment => comment.comment));
+            setComments(initialCommentsState);
+            setNewCommentText(postsData.map(() => '')); // Empty comment text for each post
+            setCommentSectionVisible(postsData.map(() => false));  // Comment sections initially hidden
+          })
+          .catch(error => {
+            console.error('Error fetching data:', error);
+          });
+      });
     } catch (error) {
       console.error('Error fetching data:', error);
     }
-  };
+};
 
   const onRefresh = () => {
     setRefreshing(true); // Set refreshing state to true
@@ -50,17 +71,59 @@ const ImageFeed = () => {
     setRefreshing(false); // Set refreshing state back to false after data is fetched
   };
 
-  const handleLike = (index) => {
+  const handleLike = async(index) => {
     const newLikes = [...likes];
     const newLiked = [...liked];
     if (!newLiked[index]) {
       newLikes[index]++;
       newLiked[index] = true;
       const postId = postsData[index].postId; // Access postId from postsData
-      console.log('User liked post:', postId);
+
+      console.log('User liked post:', postId, userID);
+
+      const response = await fetch(`${baseURL}/api/socialMedia/likePost`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: userID, 
+          postId
+        }),
+      });
+      
+      // Check if the request was successful
+      if (response.status === 200) {
+        console.log('User Liked successfully');
+                
+      } else {
+        console.error('Failed to Like');
+        // Handle error appropriately
+      }
     } else {
       newLikes[index]--;
       newLiked[index] = false;
+      const postId = postsData[index].postId;
+
+      const response = await fetch(`${baseURL}/api/socialMedia/unLikePost`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: userID,
+          postId
+        }),
+      });
+      
+      // Check if the request was successful
+      if (response.status === 200) {
+        console.log('User UnLiked successfully');
+                
+      } else {
+        console.error('Failed to DisLike');
+        // Handle error appropriately
+      }
     }
     setLikes(newLikes);
     setLiked(newLiked);
@@ -72,17 +135,42 @@ const ImageFeed = () => {
     setNewCommentText(newCommentTexts);
   };
 
-  const handlePostComment = (index) => {
+  const handlePostComment = async (index) => {
     if (newCommentText[index].trim() !== '') {
-      const newComments = [...comments];
-      const newComment = newCommentText[index];
-      newComments[index] = [...newComments[index], newComment];
-      setComments(newComments);
-      const newCommentTexts = [...newCommentText];
-      newCommentTexts[index] = '';
-      setNewCommentText(newCommentTexts);
-      const postId = postsData[index].postId; // Access postId from postsData
-      console.log('User commented on post:', postId);
+      try {
+        const postId = postsData[index].postId;
+        const response = await fetch(`${baseURL}/api/socialMedia/addComment`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: userName,
+            comment: newCommentText[index],
+            postId
+          }),
+        });
+  
+        if (response.status === 200) {
+          console.log('User commented successfully');
+          // Update local state with the new comment
+          const updatedPostsData = [...postsData];
+          updatedPostsData[index].comments.push({
+            username: userName,
+            comment: newCommentText[index]
+          });
+          setPostsData(updatedPostsData);
+          // Clear the new comment text
+          const newCommentTexts = [...newCommentText];
+          newCommentTexts[index] = '';
+          setNewCommentText(newCommentTexts);
+        } else {
+          console.error('Failed to comment');
+          // Handle error appropriately
+        }
+      } catch (error) {
+        console.error('Error posting comment:', error);
+      }
     }
   };
 
