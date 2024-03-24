@@ -38,24 +38,29 @@ const GameMapScreen = ({ route }) => {
     };
   
     fetchDirections();
-  }, [finalDestinationList, confirmedStarterLocation, capturedLocationIDs]);
+  }, [finalDestinationList, confirmedStarterLocation, capturedLocationIDs, userPoints]);
   
+  const [userPoints, setUserPoints] = useState(0);
+
 
   const handleBackButtonPress = () => {
-    Alert.alert(
-      'Confirmation',
-      'Are you sure you want to exit? This will end the trip.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Exit', onPress: () => { // goes back to first game opage
-            for (let i = 0; i < 5; i++) {
-              navigation.goBack();
-            }
-          }
-        }
-      ]
-    );
+    if (capturedLocationIDs.length === finalDestinationList.length) {
+      setUserPoints(prevPoints => prevPoints + 30); // Increment user points by 30
+      Alert.alert('Congratulations', `You completed your trek with ${userPoints + 30} points.`, [
+        { text: 'OK', onPress: () => { for (let i = 0; i < 5; i++) navigation.goBack(); } }
+      ]);
+    } else {
+      Alert.alert(
+        'Confirmation',
+        'Are you sure you want to exit? This will end the trip.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Exit', onPress: () => { for (let i = 0; i < 5; i++) navigation.goBack(); } }
+        ]
+      );
+    }
   };
+  
   
   const renderDestinationItem = ({ item }) => (
     <TouchableOpacity style={styles.destinationItem}>
@@ -75,9 +80,9 @@ const GameMapScreen = ({ route }) => {
 
   const handleLocationCapture = (locationID) => {
     setCapturedLocationIDs(prevIDs => [...prevIDs, locationID]);
-    setSelectedLocation(null); 
+    setUserPoints(prevPoints => prevPoints + 10); 
+    setSelectedLocation(null);
   };
-  
 
   return (
     <View style={styles.container}>
@@ -133,6 +138,7 @@ const GameMapScreen = ({ route }) => {
         <Text style={styles.searchProgressButtonText}>End Trip</Text>
       </TouchableOpacity>
       <View style={styles.destinationListContainer}>
+        <Text style={styles.userPoints}>Points: {userPoints}</Text>
         <Text style={styles.destinationListHeader}>Your Trek Points</Text>
         <FlatList
           data={finalDestinationList}
@@ -179,8 +185,13 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   searchProgressButtonText: {
-    color: 'black',
+    top:29,
+    right:150,
+    color: '#fff',
     fontSize: 16,
+    backgroundColor:'rgba(0,0,0,0.7)',
+    padding: 10,
+    paddingLeft:200,
   },
   destinationListContainer: {
     position: 'absolute',
@@ -214,6 +225,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#999',
     textDecorationLine: 'line-through',
+  },
+  userPoints: {
+    left:290,
+    top:15,
+    backgroundColor:'rgba(180,180,180,0.9)',
+    padding:7,
   },
 });
 
