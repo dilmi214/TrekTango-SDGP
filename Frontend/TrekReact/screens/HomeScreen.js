@@ -82,8 +82,8 @@ const HomeScreen = () => {
         )}
       </View>
       <View style={styles.buttonContainer}>
-        <HomePageButton text="Ongoing Trips" imageUrl="https://imgur.com/LhqUR6O.jpg" onPress={onPressOngoingTrips} />
-        <HomePageButton text="Logbook" imageUrl="https://imgur.com/mGMqTHl.jpg" />
+        <HomePageButton text="Ongoing Trips" imageUrl="https://imgur.com/dzyCjzl.jpg" onPress={onPressOngoingTrips} />
+        <HomePageButton text="Logbook" imageUrl="https://imgur.com/PQob2UE.jpg" />
         <HomePageButton text="Plan the Trip" imageUrl="https://imgur.com/X2qhdKU.png" onPress={onPressPlanTrip} />
       </View>
       <StatusBar style="auto" />
@@ -108,6 +108,7 @@ const styles = {
     justifyContent: 'center',
   },
   logo: {
+    top:30,
     width: 200,
     height: 200,
     resizeMode: 'contain',
@@ -179,6 +180,8 @@ const styles = {
   buttonText: {
     color: '#ffffff',
     fontSize: 18,
+    top:50,
+    left:70,
     fontWeight: 'bold',
     textAlign: 'center',
   },
