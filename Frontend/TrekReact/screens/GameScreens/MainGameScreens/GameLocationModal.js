@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Linking, Animated, ScrollView } from 'react-native';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; // Import MaterialCommunityIcons for the camera icon
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; // Import MaterialCommunityIcons for icon use
 import * as Location from 'expo-location';
 import CustomActivityIndicator from '../../CustomComponents/CustomActinityIndicator'; 
 import Snackbar from '../../CustomComponents/Snackbar';
@@ -18,7 +18,7 @@ const cld = new Cloudinary({
   },
 });
 
-const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) => {
+  const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation, onLocationCapture }) => {
   const [showFromDropdown, setShowFromDropdown] = useState(false);
   const [selectedFromLocation, setSelectedFromLocation] = useState(null);
   const [currentLocation, setCurrentLocation] = useState(null);
@@ -102,8 +102,7 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
   const handleCapture = async (photoData, caption, isPublic) => {
     console.log('Photo captured:', photoData);
     console.log('Photo captured:', caption);
-    console.log(isPublic);
-    
+    console.log(isPublic);    
     try {
       // Upload the captured image to Cloudinary
       const options = {
@@ -117,6 +116,7 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
           console.log('Upload success:', response);
           const secureUrl = response.secure_url;
           console.log(secureUrl);
+          console.log('This is the placeid:',clickedLocation.place_id )
 
           let userName, userID;
 
@@ -139,13 +139,13 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
                 userID, 
                 imageReferenceId: secureUrl , 
                 uploadToMedia: isPublic, 
-                caption
+                caption,
               }),
             });
             
             // Check if the request was successful
             if (response.status === 201) {
-              console.log('Post created sucessfully');
+              console.log('Post created successfully');
                       
             } else {
               console.error('Failed to Create a Post');
@@ -159,10 +159,12 @@ const GameLocationModal = ({ isVisible, locations, onClose, clickedLocation }) =
           console.error('Upload error:', error);
         }
       }});
+      onLocationCapture(clickedLocation.place_id);
     } catch (error) {
       console.error('Error uploading photo to Cloudinary:', error.message);
     }
 };
+
 
   
   const filteredLocations = locations.filter(location => location.name !== clickedLocation.name);
