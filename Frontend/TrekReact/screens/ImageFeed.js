@@ -193,7 +193,7 @@ const ImageFeed = () => {
         }
       >
         {postsData.map((post, index) => (
-          <TouchableOpacity key={index} onPress={() => handleImageClick(index)}>
+          <TouchableOpacity key={index}>
             <View style={styles.postContainer}>
               <Image
                 source={{ uri: post.imageReferenceId }}
