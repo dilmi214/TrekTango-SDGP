@@ -46,6 +46,7 @@ export default class CameraScreen extends Component {
     console.log('Photo confirmed:', this.state.photo.uri);
     console.log('Caption:', this.state.caption);
     console.log('Public:', this.state.isPublic);
+    this.props.onCapture(this.state.photo);
     this.props.onClose(); // Close the camera screen
 
     await AsyncStorage.getItem('username').then((value) => {
