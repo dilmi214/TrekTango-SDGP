@@ -243,8 +243,42 @@ const resetPassword = async (username, newPassword) => {
       res.status(500).json({ error: 'Internal Server Error' });
     }
   };
-      
+
+  const addPoints = async (req, res) => {
+    const { username, points } = req.body;
+
+    try {
+        // Find the user by userId
+        const user = await User.findOne({username});
+
+        // Increment the points field
+        user.points += points; // Assuming points is a positive integer
+        
+        // Save the updated user
+        await user.save();
+
+        res.status(200).json({ message: "Points updated successfully", user });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+const getPoints = async (req, res) => {
+    try {
+        const { username } = req.params;
+
+        const user = await User.findOne(username);
+
+        const points = user.points;
+
+        res.json(points);
+    } catch (error) {
+        res.status(500);
+    }
+}
 
 
-module.exports = {registerUser, loginUser, sendVerificationCode, forgotPassword, getIdByUsernameOrEmail};
+
+module.exports = {registerUser, loginUser, sendVerificationCode, forgotPassword, getIdByUsernameOrEmail, addPoints, getPoints};
     

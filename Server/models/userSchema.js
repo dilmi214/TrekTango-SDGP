@@ -13,7 +13,8 @@ const userSchema = new mongoose.Schema({
       lastName: { type: String }
     },
     dob: { type: Date },
-    verificationCode: { type: String, default: null, minlength: 6, maxlength: 6 }
+    verificationCode: { type: String, default: null, minlength: 6, maxlength: 6 },
+    points: {type: Number, default: 0}
   });
 
 module.exports  = mongoose.model('User' , userSchema);

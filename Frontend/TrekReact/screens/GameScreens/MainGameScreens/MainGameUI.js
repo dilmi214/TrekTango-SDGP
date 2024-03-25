@@ -43,6 +43,15 @@ const GameMapScreen = ({ route }) => {
 
 
   const handleBackButtonPress = async() => {
+
+    await AsyncStorage.getItem('sessionId').then((value) => {
+      sessionId = value;
+    });
+
+    await AsyncStorage.getItem('username').then((value) => {
+      username = value;
+    });
+
     if (capturedLocationIDs.length === finalDestinationList.length) {
       setUserPoints(prevPoints => prevPoints + 30); // Increment user points by 30
       Alert.alert('Congratulations', `You completed your trek with ${userPoints + 30} points.`, [
@@ -58,9 +67,7 @@ const GameMapScreen = ({ route }) => {
         ]
       );
     }
-    await AsyncStorage.getItem('sessionId').then((value) => {
-      sessionId = value;
-    });
+    
 
     const response = await fetch(`${baseURL}/api/session/complete`, {
       method: 'PUT',
@@ -73,6 +80,23 @@ const GameMapScreen = ({ route }) => {
     });
     if(response.status === 200){
       console.log("Session Updated")
+    }else{
+      console.error("Cannot update");
+    }
+
+   
+    const response1 = await fetch(`${baseURL}/api/users/addPoints`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username,
+        points: userPoints
+      }),
+    });
+    if(response1.status === 200){
+      console.log("Points added")
     }else{
       console.error("Cannot update");
     }

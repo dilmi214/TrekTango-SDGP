@@ -31,14 +31,17 @@ const createSession = async (req, res) => {
 
   const latestIncompleteSession = async (req, res) => {
     try {
-      // Find the latest location document with sessionComplete set to false
-      const session = await Session.findOne({ sessionComplete: false }).sort({ createdAt: -1 }).limit(1);
+      // Assuming req.user.username contains the username for which you want to find incomplete sessions
+      const { username } = req.params;
+  
+      // Find the latest session document with sessionComplete set to false for the given username
+      const session = await Session.findOne({ username, sessionComplete: false }).sort({ createdAt: -1 }).limit(1);
   
       if (!session) {
-        return res.status(404).json({ message: 'No incomplete sessions found' });
+        return res.status(404).json({ message: 'No incomplete sessions found for the user' });
       }
   
-      // Respond with the location document
+      // Respond with the session document
       res.json(session);
     } catch (error) {
       // Respond with error if any
@@ -50,11 +53,11 @@ const createSession = async (req, res) => {
     try {
         const { sessionId, placeId } = req.body;
 
-        console.log(placeId, sessionId);
+        
 
         // Find the session by sessionId
         let session = await Session.findOne({ sessionId });
-        console.log("Original Session:", session);
+      
 
         if (!session) {
             return res.status(404).json({ message: "Session not found" });
@@ -72,7 +75,7 @@ const createSession = async (req, res) => {
 
         // Save the updated session to a variable
         session = await session.save();
-        console.log("Updated Session:", session);
+        
 
         // Remove all the listOfPlaces in the database that belong to this session
         await Session.updateOne({ sessionId }, { $set: { listOfPlaces: [] } });
@@ -91,7 +94,7 @@ const createSession = async (req, res) => {
 const sessionComplete = async (req, res) => {
   try {
       const { sessionId } = req.body;
-
+console.log(sessionId, "hi");
       // Find the session by sessionId
       const session = await Session.findOne({ sessionId });
 
