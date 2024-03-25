@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Image, Text, TouchableOpacity, Dimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useNavigation, CommonActions } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { baseURL } from './getIPAddress';
 
 const API_KEY = 'c00e472f4fc54c0693b80206240602';
 const CITY_NAME = 'Colombo';
@@ -29,23 +31,41 @@ const HomeScreen = () => {
 
   const navigation = useNavigation();
 
-  const onPressOngoingTrips = () => {
+ 
+
+  const onPressOngoingTrips = async () => {
+    await AsyncStorage.getItem('username').then((value) => {
+      username = value;
+    });
+  
+    const response = await fetch(`${baseURL}/api/session/saveSession/${username}`);
+  
+    if (!response.ok) {
+      // If response status is not 200, display message on screen
+      alert('No Saved Session Available');
+      return; // Exit the function
+    }
+  
+    const placeData = await response.json();
+    const sessionId = placeData.sessionId;
+    const finalDestinationList = placeData.listOfPlaces;
+    const detected = placeData.detected;
+    const confirmedStarterLocation = placeData.confirmedStarterLocation;
+  
+    await AsyncStorage.setItem('sessionId', sessionId);
+  
     const routeParams = {
-      finalDestinationList: [
-        {"completed": false, "latitude": 6.895755299999999, "longitude": 79.8553637, "name": "Pearl City Hotel", "place_id": "ChIJrwWG_t5b4joRUVsf8YotgAA"},
-        {"completed": true, "latitude": 6.897764999999999, "longitude": 79.856454, "name": "Colombo Court Hotel & Spa", "place_id": "ChIJu5QWQ99b4joRqOrSgneXwyM"},
-        {"completed": false, "latitude": 6.908742699999999, "longitude": 79.8503411, "name": "Renuka City Hotel", "place_id": "ChIJK-LINl1Z4joRcY2QA2GZcbU"}
-      ],
-      detected: false,
-      confirmedStarterLocation: {"latitude": 6.895755299999999, "longitude": 79.8553637}
+      finalDestinationList,
+      detected,
+      confirmedStarterLocation
     };
-    
+  
     navigation.navigate('GameMapScreen', routeParams);
   };
-
+  
   const onPressPlanTrip = () => {
     navigation.navigate('LocationSelection');
-    
+  
     // Set the active tab to "Game"
     navigation.dispatch(
       CommonActions.navigate({
@@ -56,10 +76,11 @@ const HomeScreen = () => {
       })
     );
   };
-
+  
   const navigateToScreen = (screenName) => {
     navigation.navigate(screenName);
   };
+  
 
   return (
     <View style={styles.container}>
@@ -84,7 +105,7 @@ const HomeScreen = () => {
       <View style={styles.buttonContainer}>
         <HomePageButton text="Plan Trip" imageUrl="https://imgur.com/dzyCjzl.jpg" onPress={onPressPlanTrip} />
         <HomePageButton text="Logbook" imageUrl="https://imgur.com/PQob2UE.jpg" />
-        <HomePageButton text="Saved Trip" imageUrl="https://imgur.com/PQob2UE.jpg" />
+        <HomePageButton text="Saved Trip" imageUrl="https://imgur.com/PQob2UE.jpg" onPress={onPressOngoingTrips} />
       </View>
       <StatusBar style="auto" />
     </View>

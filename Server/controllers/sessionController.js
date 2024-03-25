@@ -42,7 +42,7 @@ const createSession = async (req, res) => {
       }
   
       // Respond with the session document
-      res.json(session);
+      res.status(200).json(session);
     } catch (error) {
       // Respond with error if any
       res.status(500).json({ error: 'Failed to retrieve incomplete sessions', details: error.message });
