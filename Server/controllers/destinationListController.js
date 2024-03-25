@@ -1,13 +1,13 @@
 const axios = require('axios');
 const apiKey = process.env.apiKey;
 
-//Calculate distance between places return ordered list if the currentlocation is the starter point
+
 const destinationOrderCurrLoc = async(req, res) => {
     try {
     
-        const originLat = req.body.originLat; // Latitude of the origin place
-        const originLng = req.body.originLng; // Longitude of the origin place
-        var destinationList = req.body.destinationList; //List of Place IDs of destinations
+        const originLat = req.body.originLat; 
+        const originLng = req.body.originLng; 
+        var destinationList = req.body.destinationList; 
         const numberOfDestinations = destinationList.length;
         var firstDestination = destinationList[0];
     
@@ -55,7 +55,7 @@ const destinationOrderCurrLoc = async(req, res) => {
       }
 }
 
-//Calculate distance between places return ordered list if a place from the list is the starter point
+
 const destinationOrderListPlace = async(req, res) => {
     try {
         var destinationList = req.body.destinationList; //List of Place IDs of destinations
