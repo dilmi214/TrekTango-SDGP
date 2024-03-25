@@ -3,7 +3,6 @@ import { View, TouchableOpacity, StyleSheet, Text, Image, TextInput } from 'reac
 import { Camera } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
 
-
 export default class CameraScreen extends Component {
   constructor(props) {
     super(props);
@@ -41,15 +40,12 @@ export default class CameraScreen extends Component {
     this.setState({ photo: null });
   };
 
-  confirmPhoto = async() => {
+  confirmPhoto = async () => {
     console.log('Photo confirmed:', this.state.photo.uri);
     console.log('Caption:', this.state.caption);
     console.log('Public:', this.state.isPublic);
     this.props.onCapture(this.state.photo, this.state.caption, this.state.isPublic);
-    this.props.onClose(); // Close the camera screen
-
-    
-
+    this.props.onClose(); 
   };
 
   renderCamera = () => {
@@ -61,7 +57,7 @@ export default class CameraScreen extends Component {
     if (hasPermission === false) {
       return <Text>No access to camera</Text>;
     }
-    
+
     if (photo) {
       return (
         <View style={styles.preview}>
@@ -97,31 +93,22 @@ export default class CameraScreen extends Component {
     }
 
     return (
-      <View style={styles.cameraContainer}>
-        <Camera
-          style={styles.camera}
-          type={this.state.cameraType}
-          ref={(ref) => {
-            this.camera = ref;
-          }}
-        >
-          <View style={styles.cameraButtonsContainer}>
-            <TouchableOpacity style={styles.flipButton} onPress={this.flipCamera}>
-              <Ionicons name="camera-reverse-outline" size={32} color="white" />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.captureButton} onPress={this.takePicture}>
-              <View style={styles.captureButtonInner} />
-            </TouchableOpacity>
-          </View>
-        </Camera>
-      </View>
+      <Camera style={styles.camera} type={this.state.cameraType} ref={(ref) => { this.camera = ref; }}>
+        <View style={styles.cameraButtonsContainer}>
+          <TouchableOpacity style={styles.flipButton} onPress={this.flipCamera}>
+            <Ionicons name="camera-reverse-outline" size={32} color="white" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.captureButton} onPress={this.takePicture}>
+            <View style={styles.captureButtonInner} />
+          </TouchableOpacity>
+        </View>
+      </Camera>
     );
   };
 
   render() {
     return (
       <View style={styles.container}>
-        <View style={styles.topPlaceholder} />
         {this.renderCamera()}
         <TouchableOpacity style={styles.backButton} onPress={this.props.onClose}>
           <Ionicons name="chevron-back" size={32} color="white" />
@@ -134,11 +121,7 @@ export default class CameraScreen extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'column',
     backgroundColor: 'black',
-  },
-  cameraContainer: {
-    flex: 1,
   },
   camera: {
     flex: 1,
@@ -219,21 +202,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 5,
     color: '#ffffff',
-    bottom:-15,
   },
   privacyButton: {
     marginLeft: 20,
     padding: 10,
     backgroundColor: '#010C33',
     borderRadius: 10,
-    bottom:-15,
   },
   privacyButtonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  topPlaceholder: {
-    height: 150,
   },
 });
