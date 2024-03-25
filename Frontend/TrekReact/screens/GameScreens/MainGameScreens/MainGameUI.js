@@ -2,16 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, FlatList, Alert} from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from 'react-native-maps';
 import { useNavigation } from '@react-navigation/native';
-import * as Location from 'expo-location';
 import GameLocationModal from './GameLocationModal';
-import CustomActivityIndicator from '../../CustomComponents/CustomActinityIndicator';
 
 const GameMapScreen = ({ route }) => {
   const navigation = useNavigation();
   const { finalDestinationList, detected, confirmedStarterLocation } = route.params;
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [directions, setDirections] = useState([]);
-  // const [capturedLocationID, setCapturedLocationID] = useState(null);
   const [capturedLocationIDs, setCapturedLocationIDs] = useState([]);
 
   useEffect(() => {
@@ -60,6 +57,25 @@ const GameMapScreen = ({ route }) => {
       );
     }
   };
+
+  const handleSaveButtonPress = () => {
+    if (capturedLocationIDs.length === finalDestinationList.length) {
+      setUserPoints(prevPoints => prevPoints + 30); // Increment user points by 30
+      Alert.alert('Congratulations', `You completed your trek with ${userPoints + 30} points.`, [
+        { text: 'OK', onPress: () => { for (let i = 0; i < 5; i++) navigation.goBack(); } }
+      ]);
+    } else {
+      Alert.alert(
+        'Confirmation',
+        'Are you sure you want to save your progress and exit trip?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Yes', onPress: () => { for (let i = 0; i < 5; i++) navigation.goBack(); } }
+        ]
+      );
+    }
+  };
+  
   
   
   const renderDestinationItem = ({ item }) => (
@@ -134,8 +150,11 @@ const GameMapScreen = ({ route }) => {
           ))}
         </MapView>
       )}
-      <TouchableOpacity style={styles.searchProgressButton} onPress={handleBackButtonPress}>
+      <TouchableOpacity style={styles.endTripButton} onPress={handleBackButtonPress}>
         <Text style={styles.searchProgressButtonText}>End Trip</Text>
+      </TouchableOpacity>      
+      <TouchableOpacity style={styles.searchProgressButton} onPress={handleSaveButtonPress}>
+        <Text style={styles.searchProgressButtonText}>Save Trip</Text>
       </TouchableOpacity>
       <View style={styles.destinationListContainer}>
         <Text style={styles.userPoints}>Points: {userPoints}</Text>
@@ -176,7 +195,7 @@ const styles = StyleSheet.create({
   },
   searchProgressButton: {
     position: 'absolute',
-    top: 40,
+    top: 70,
     left: 20,
     backgroundColor: 'transparent',
     paddingVertical: 10,
@@ -192,6 +211,16 @@ const styles = StyleSheet.create({
     backgroundColor:'rgba(0,0,0,0.7)',
     padding: 10,
     paddingLeft:200,
+  },
+  endTripButton: {
+    position: 'absolute',
+    top: 20,
+    left: 20,
+    backgroundColor: 'transparent',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    zIndex: 1,
   },
   destinationListContainer: {
     position: 'absolute',

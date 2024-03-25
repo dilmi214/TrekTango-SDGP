@@ -82,7 +82,7 @@ const HomeScreen = () => {
         )}
       </View>
       <View style={styles.buttonContainer}>
-        <HomePageButton text="Ongoing Trips" imageUrl="https://imgur.com/dzyCjzl.jpg" onPress={onPressOngoingTrips} />
+        <HomePageButton text="Plan Trip" imageUrl="https://imgur.com/dzyCjzl.jpg" onPress={onPressPlanTrip} />
         <HomePageButton text="Logbook" imageUrl="https://imgur.com/PQob2UE.jpg" />
       </View>
       <StatusBar style="auto" />
