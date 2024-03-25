@@ -33,7 +33,7 @@ const HomeScreen = () => {
     const routeParams = {
       finalDestinationList: [
         {"completed": false, "latitude": 6.895755299999999, "longitude": 79.8553637, "name": "Pearl City Hotel", "place_id": "ChIJrwWG_t5b4joRUVsf8YotgAA"},
-        {"completed": false, "latitude": 6.897764999999999, "longitude": 79.856454, "name": "Colombo Court Hotel & Spa", "place_id": "ChIJu5QWQ99b4joRqOrSgneXwyM"},
+        {"completed": true, "latitude": 6.897764999999999, "longitude": 79.856454, "name": "Colombo Court Hotel & Spa", "place_id": "ChIJu5QWQ99b4joRqOrSgneXwyM"},
         {"completed": false, "latitude": 6.908742699999999, "longitude": 79.8503411, "name": "Renuka City Hotel", "place_id": "ChIJK-LINl1Z4joRcY2QA2GZcbU"}
       ],
       detected: false,

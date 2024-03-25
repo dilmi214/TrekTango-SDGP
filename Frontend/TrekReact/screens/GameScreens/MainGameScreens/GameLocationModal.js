@@ -90,7 +90,7 @@ const cld = new Cloudinary({
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       const distance = R * c;
   
-      if (distance <= 5000) {
+      if (distance <= 50000) {
         setArrived(true);
       } else {
         setArrived(false);
@@ -116,7 +116,11 @@ const cld = new Cloudinary({
           console.log('Upload success:', response);
           const secureUrl = response.secure_url;
           console.log(secureUrl);
-          console.log('This is the placeid:',clickedLocation.place_id )
+          console.log('This is the placeid:',clickedLocation.place_id );
+
+          await AsyncStorage.getItem('sessionId').then((value) => {
+            console.log(value);
+          });
 
           let userName, userID;
 
@@ -139,13 +143,31 @@ const cld = new Cloudinary({
                 userID, 
                 imageReferenceId: secureUrl , 
                 uploadToMedia: isPublic, 
-                caption,
+                caption
               }),
             });
             
             // Check if the request was successful
             if (response.status === 201) {
               console.log('Post created successfully');
+
+          
+          const response = await fetch(`${baseURL}/api/session/isCompleted`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              sessionId,
+              placeId : clickedLocation.place_id
+            }),
+          });
+          if(response.status === 200){
+            console.log("Database Updated")
+          }else{
+            console.error("Cannot update");
+          }
+
                       
             } else {
               console.error('Failed to Create a Post');

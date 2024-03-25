@@ -60,12 +60,16 @@ const StartGameScreen = ({ route }) => {
           userId: userid,
           username: username,
           listOfPlaces: finalDestinationList,
+          detected,
+          confirmedStarterLocation
         }),
       });
   
       console.log('Response Status:', response.status);
       if (response.status == 201) {
-        console.log('Session Created Successfully');
+        sessionId = await response.json(); 
+        await AsyncStorage.setItem('sessionId', sessionId);
+        console.log('Session Created Successfully', sessionId);
       } else {
         console.error('Failed to create session');
       }
