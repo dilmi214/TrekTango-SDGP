@@ -17,29 +17,41 @@ const ProfilePage = () => {
 
   // Fetching posts data from the JSON file
   useEffect(() => {
-    const fetchData = async() => {
+    const fetchData = async () => {
       // Initialize state variables based on postsData
       const initialComments = postsData.map(post => post.comments.map(comment => comment.comment));
       const initialShowComments = postsData.map(() => false);
   
-      await AsyncStorage.getItem('username').then((value) => {
-        setUsername(value);
-      });
+      try {
+        const storedUsername = await AsyncStorage.getItem('username');
+        setUsername(storedUsername);
   
-      const response = await fetch(`${baseURL}/api/users/getPoints/${username}`);
-      const pointResponse = await response.json();
+        if (storedUsername) {
+          const pointResponse = await fetch(`${baseURL}/api/users/getPoints/${storedUsername}`);
+          const postResponse = await fetch(`${baseURL}/api/socialMedia/getUserPost/${storedUsername}`);
   
-      const response1 = await fetch(`${baseURL}/api/socialMedia/getUserPost/${username}`);
-      const postResponse = await response1.json();
+          if (pointResponse.ok && postResponse.ok) {
+            const pointsData = await pointResponse.json();
+            const postData = await postResponse.json();
   
-      setPostsData(postResponse);
-      setPoints(pointResponse);
-      setComments(initialComments);
-      setShowComments(initialShowComments);
-    }
-
+            setPoints(pointsData);
+            setPostsData(postData);
+            setComments(initialComments);
+            setShowComments(initialShowComments);
+          } else {
+            console.error("Failed to fetch points or posts data");
+          }
+        } else {
+          console.error("No username found in AsyncStorage");
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+  
     fetchData();
   }, []);
+  
 
   // Event handler
   const handleComment = (index) => {
