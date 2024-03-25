@@ -7,6 +7,6 @@ router.route('/getFeed').get(initiateFeed);
 router.route('/likePost').put(likePost);
 router.route('/unLikePost').put(unLikePost);
 router.route('/addComment').put(postComment);
-router.route('/getUserPost').put(getUserPost);
+router.route('/getUserPost/:username').get(getUserPost);
 
 module.exports = router;

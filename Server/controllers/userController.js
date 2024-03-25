@@ -268,7 +268,7 @@ const getPoints = async (req, res) => {
     try {
         const { username } = req.params;
 
-        const user = await User.findOne(username);
+        const user = await User.findOne({username});
 
         const points = user.points;
 

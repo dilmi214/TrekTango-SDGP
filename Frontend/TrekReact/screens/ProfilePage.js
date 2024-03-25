@@ -1,47 +1,47 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import postsData from './posts.json'; // Importing the JSON data
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { baseURL } from './getIPAddress';
+
+
+
 
 const ProfilePage = () => {
   // State declarations
-  const [likes, setLikes] = useState([]);
-  const [liked, setLiked] = useState([]);
   const [comments, setComments] = useState([]);
   const [showComments, setShowComments] = useState([]);
-  const [tripsCompleted, setTripsCompleted] = useState(5);
+  const [points, setPoints] = useState(0);
+  const [username, setUsername] = useState ("");
+  const[postsData,setPostsData] = useState([]);
 
   // Fetching posts data from the JSON file
   useEffect(() => {
-    // Initialize state variables based on postsData
-    const initialLikes = postsData.map(post => post.likes.length);
-    const initialLiked = postsData.map(post => post.likes.includes('df04e15c0300495abb30b8f96aae35d2'));
-    const initialComments = postsData.map(post => post.comments.map(comment => comment.comment));
-    const initialShowComments = postsData.map(() => false);
+    const fetchData = async() => {
+      // Initialize state variables based on postsData
+      const initialComments = postsData.map(post => post.comments.map(comment => comment.comment));
+      const initialShowComments = postsData.map(() => false);
+  
+      await AsyncStorage.getItem('username').then((value) => {
+        setUsername(value);
+      });
+  
+      const response = await fetch(`${baseURL}/api/users/getPoints/${username}`);
+      const pointResponse = await response.json();
+  
+      const response1 = await fetch(`${baseURL}/api/socialMedia/getUserPost/${username}`);
+      const postResponse = await response1.json();
+  
+      setPostsData(postResponse);
+      setPoints(pointResponse);
+      setComments(initialComments);
+      setShowComments(initialShowComments);
+    }
 
-    setLikes(initialLikes);
-    setLiked(initialLiked);
-    setComments(initialComments);
-    setShowComments(initialShowComments);
+    fetchData();
   }, []);
 
-  // Event handlers
-  const handleLike = (index) => {
-    const newLikes = [...likes];
-    const newLiked = [...liked];
-    if (!newLiked[index]) {
-      newLikes[index]++;
-      newLiked[index] = true;
-      const postId = postsData[index].postId; // Access postId from postsData
-      console.log('User liked post:', postId);
-    } else {
-      newLikes[index]--;
-      newLiked[index] = false;
-    }
-    setLikes(newLikes);
-    setLiked(newLiked);
-  };
-
+  // Event handler
   const handleComment = (index) => {
     setShowComments((prev) => {
       const updatedShowComments = [...prev];
@@ -53,13 +53,10 @@ const ProfilePage = () => {
   return (
     <View style={styles.container}>
       <View style={styles.profileHeader}>
-        <Image
-          source={{ uri: 'https://imgur.com/mfO5v21.jpg' }}
-          style={styles.profilePic}
-        />
+        
         <View>
-          <Text style={styles.username}>Dion Nikila</Text>
-          <Text style={styles.tripsCompleted}>{tripsCompleted} Trips Completed</Text>
+          <Text style={styles.username}>{username}</Text>
+          <Text style={styles.tripsCompleted}>Trek Points: {points} </Text>
         </View>
       </View>
       <ScrollView style={styles.scroll}>
@@ -70,10 +67,6 @@ const ProfilePage = () => {
               <Image source={{ uri: post.imageReferenceId }} style={styles.postImage} />
               <Text style={styles.caption}>{post.caption}</Text>
               <View style={styles.interactionBar}>
-                <TouchableOpacity onPress={() => handleLike(index)} style={styles.iconButton}>
-                  <FontAwesome name={liked[index] ? "heart" : "heart-o"} size={24} color={liked[index] ? "#ff9999" : "#ccc"} />
-                </TouchableOpacity>
-                <Text style={styles.likeText}>{likes[index]} Likes</Text>
                 <TouchableOpacity onPress={() => handleComment(index)} style={styles.iconButton}>
                   <FontAwesome name="comment" size={24} color="#ccc" />
                 </TouchableOpacity>
@@ -159,10 +152,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 10,
   },
-  likeText: {
-    fontSize: 16,
-    color: '#fff',
-  },
   comment: {
     paddingVertical: 10,
     paddingHorizontal: 15,
@@ -180,3 +169,4 @@ const styles = StyleSheet.create({
 });
 
 export default ProfilePage;
+
