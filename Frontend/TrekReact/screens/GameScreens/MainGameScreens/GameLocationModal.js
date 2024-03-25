@@ -119,7 +119,7 @@ const cld = new Cloudinary({
           console.log('This is the placeid:',clickedLocation.place_id );
 
           await AsyncStorage.getItem('sessionId').then((value) => {
-            console.log(value);
+            sessionId = value;
           });
 
           let userName, userID;

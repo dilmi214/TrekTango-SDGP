@@ -86,6 +86,27 @@ const createSession = async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 };
+
+
+const sessionComplete = async (req, res) => {
+  try {
+      const { sessionId } = req.body;
+
+      // Find the session by sessionId
+      const session = await Session.findOne({ sessionId });
+
+      // Update sessionComplete to true
+      session.sessionComplete = true;
+      
+      // Save the updated session
+      await session.save();
+
+      res.status(200).json({ message: "Session marked as complete" });
+  } catch (error) {
+      console.log("Error:", error);
+      res.status(500).json({ message: "Internal server error" });
+  }
+};
       
 
-  module.exports = {createSession, latestIncompleteSession, isCompleted};
+  module.exports = {createSession, latestIncompleteSession, isCompleted, sessionComplete};

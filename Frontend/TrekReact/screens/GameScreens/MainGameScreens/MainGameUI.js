@@ -3,6 +3,8 @@ import { View, StyleSheet, TouchableOpacity, Text, FlatList, Alert} from 'react-
 import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from 'react-native-maps';
 import { useNavigation } from '@react-navigation/native';
 import GameLocationModal from './GameLocationModal';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { baseURL } from '../../getIPAddress';
 
 const GameMapScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -40,7 +42,7 @@ const GameMapScreen = ({ route }) => {
   const [userPoints, setUserPoints] = useState(0);
 
 
-  const handleBackButtonPress = () => {
+  const handleBackButtonPress = async() => {
     if (capturedLocationIDs.length === finalDestinationList.length) {
       setUserPoints(prevPoints => prevPoints + 30); // Increment user points by 30
       Alert.alert('Congratulations', `You completed your trek with ${userPoints + 30} points.`, [
@@ -56,6 +58,26 @@ const GameMapScreen = ({ route }) => {
         ]
       );
     }
+    await AsyncStorage.getItem('sessionId').then((value) => {
+      sessionId = value;
+    });
+
+    const response = await fetch(`${baseURL}/api/session/complete`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        sessionId
+      }),
+    });
+    if(response.status === 200){
+      console.log("Session Updated")
+    }else{
+      console.error("Cannot update");
+    }
+
+
   };
 
   const handleSaveButtonPress = () => {
