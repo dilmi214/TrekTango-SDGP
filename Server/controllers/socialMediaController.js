@@ -48,7 +48,7 @@ const likePost = async (req, res) => {
   const { userId, postId } = req.body;
   
   try {
-    // Finding the post in the database using its post ID
+    
     const post = await SocialMediaPost.findOne({postId});
 
     post.likes.push(userId);
@@ -65,7 +65,7 @@ const unLikePost = async (req, res) => {
   const { userId, postId } = req.body;
   
   try {
-    // Finding the post in the database using its post ID
+    
     const post = await SocialMediaPost.findOne({postId});
 
     const index = post.likes.indexOf(userId);
@@ -83,7 +83,7 @@ const unLikePost = async (req, res) => {
 const postComment = async(req, res) => {
   const {username, comment, postId} = req.body;
   try {
-    // Finding the post in the database using its post ID
+    
     const post = await SocialMediaPost.findOne({postId});
 
     const commentBlock = { commentID: uuidv4(), username: username, comment: comment};
