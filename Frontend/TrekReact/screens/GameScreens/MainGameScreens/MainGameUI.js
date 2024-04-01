@@ -55,7 +55,7 @@ const GameMapScreen = ({ route }) => {
     if (capturedLocationIDs.length === finalDestinationList.length) {
       setUserPoints(prevPoints => prevPoints + 30); // Increment user points by 30
       Alert.alert('Congratulations', `You completed your trek with ${userPoints + 30} points.`, [
-        { text: 'OK', onPress: () => { for (let i = 0; i < 5; i++) navigation.goBack(); } }
+        { text: 'OK', onPress: () =>  navigation.popToTop('Home') }
       ]);
     } else {
       Alert.alert(
@@ -63,7 +63,7 @@ const GameMapScreen = ({ route }) => {
         'Are you sure you want to exit? This will end the trip.',
         [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'Exit', onPress: () => { for (let i = 0; i < 5; i++) navigation.goBack(); } }
+          { text: 'Exit', onPress: () =>  navigation.popToTop('Home')}
         ]
       );
     }
@@ -108,7 +108,7 @@ const GameMapScreen = ({ route }) => {
     if (capturedLocationIDs.length === finalDestinationList.length) {
       setUserPoints(prevPoints => prevPoints + 30); // Increment user points by 30
       Alert.alert('Congratulations', `You completed your trek with ${userPoints + 30} points.`, [
-        { text: 'OK', onPress: () => { for (let i = 0; i < 5; i++) navigation.goBack(); } }
+        { text: 'OK', onPress: () =>  navigation.popToTop('Home') } // Go back one step
       ]);
     } else {
       Alert.alert(
@@ -116,7 +116,7 @@ const GameMapScreen = ({ route }) => {
         'Are you sure you want to save your progress and exit trip?',
         [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'Yes', onPress: () => { for (let i = 0; i < 5; i++) navigation.goBack(); } }
+          { text: 'Yes', onPress: () =>  navigation.popToTop('Home') }
         ]
       );
     }
